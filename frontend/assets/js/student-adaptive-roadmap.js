@@ -47,16 +47,17 @@
         faculty: {
             icon: "👨‍🏫",
             label: "Faculty"
+        },
+
+        next_topic: {
+            icon: "➡️",
+            label: "Next Topic"
         }
 
     };
 
 
     let activeTopicId =
-        null;
-
-
-    let latestData =
         null;
 
 
@@ -245,6 +246,40 @@
 
 
     // ========================================================
+    // SAFE HTML
+    // ========================================================
+
+    function escapeHtml(
+        value
+    ) {
+
+        return String(
+            value ?? ""
+        )
+        .replaceAll(
+            "&",
+            "&amp;"
+        )
+        .replaceAll(
+            "<",
+            "&lt;"
+        )
+        .replaceAll(
+            ">",
+            "&gt;"
+        )
+        .replaceAll(
+            '"',
+            "&quot;"
+        )
+        .replaceAll(
+            "'",
+            "&#039;"
+        );
+    }
+
+
+    // ========================================================
     // STYLES
     // ========================================================
 
@@ -252,7 +287,7 @@
 
         if (
             document.getElementById(
-                "adaptive-roadmap-style"
+                "adaptive-roadmap-style-v21"
             )
         ) {
 
@@ -267,7 +302,7 @@
 
 
         style.id =
-            "adaptive-roadmap-style";
+            "adaptive-roadmap-style-v21";
 
 
         style.textContent = `
@@ -275,7 +310,7 @@
             .adaptive-roadmap-shell {
                 margin: 18px 0 24px;
                 padding: 20px;
-                border: 1px solid #e7e3ff;
+                border: 1px solid #e6e2ff;
                 border-radius: 22px;
                 background:
                     linear-gradient(
@@ -289,67 +324,146 @@
             }
 
             .adaptive-roadmap-top {
-                display: flex;
-                justify-content: space-between;
-                gap: 20px;
-                align-items: flex-start;
-                margin-bottom: 17px;
+                display: grid;
+                grid-template-columns:
+                    minmax(0, 1.1fr)
+                    minmax(300px, .9fr);
+                gap: 18px;
+                align-items: stretch;
             }
 
             .adaptive-roadmap-badge {
                 display: inline-flex;
                 padding: 6px 10px;
                 border-radius: 999px;
-                background: #f0edff;
-                color: #6655e8;
+                background: #efedff;
+                color: #6555e8;
                 font-size: 10px;
                 font-weight: 900;
                 letter-spacing: .6px;
             }
 
             .adaptive-roadmap-title {
-                margin: 8px 0 4px;
+                margin: 9px 0 5px;
                 color: #23283a;
-                font-size: 18px;
+                font-size: 19px;
             }
 
             .adaptive-roadmap-subtitle {
                 margin: 0;
+                max-width: 720px;
                 color: #7b8192;
                 font-size: 12px;
+                line-height: 1.55;
+            }
+
+            .adaptive-engine-card {
+                padding: 15px;
+                border: 1px solid #d9d3ff;
+                border-radius: 17px;
+                background:
+                    linear-gradient(
+                        145deg,
+                        #f6f4ff,
+                        #ffffff
+                    );
+            }
+
+            .adaptive-engine-topline {
+                display: flex;
+                justify-content: space-between;
+                gap: 10px;
+                align-items: center;
+            }
+
+            .adaptive-engine-label {
+                color: #6959e8;
+                font-size: 10px;
+                font-weight: 950;
+                letter-spacing: .5px;
+                text-transform: uppercase;
+            }
+
+            .adaptive-engine-version {
+                padding: 4px 7px;
+                border-radius: 999px;
+                background: #ebe7ff;
+                color: #7465df;
+                font-size: 9px;
+                font-weight: 900;
+            }
+
+            .adaptive-next-action {
+                margin-top: 9px;
+                color: #252a3a;
+                font-size: 16px;
+                font-weight: 900;
+            }
+
+            .adaptive-reason {
+                margin-top: 6px;
+                color: #757b8c;
+                font-size: 11px;
                 line-height: 1.5;
             }
 
-            .adaptive-adapter {
-                min-width: 255px;
-                max-width: 340px;
-                padding: 12px 14px;
-                border: 1px solid #d9d4ff;
-                border-radius: 15px;
-                background: #f7f5ff;
+            .adaptive-confidence-row {
+                display: flex;
+                justify-content: space-between;
+                gap: 8px;
+                margin-top: 11px;
+                color: #6d7283;
+                font-size: 10px;
+                font-weight: 800;
             }
 
-            .adaptive-adapter small {
+            .adaptive-confidence-track {
+                height: 7px;
+                margin-top: 5px;
+                overflow: hidden;
+                border-radius: 999px;
+                background: #e9e7f3;
+            }
+
+            .adaptive-confidence-fill {
+                height: 100%;
+                border-radius: inherit;
+                background:
+                    linear-gradient(
+                        90deg,
+                        #7968ef,
+                        #9e91ff
+                    );
+            }
+
+            .adaptive-summary-grid {
+                display: grid;
+                grid-template-columns:
+                    repeat(4, minmax(0, 1fr));
+                gap: 8px;
+                margin-top: 15px;
+            }
+
+            .adaptive-summary-card {
+                padding: 10px;
+                border: 1px solid #ece9f7;
+                border-radius: 13px;
+                background: #ffffff;
+            }
+
+            .adaptive-summary-card small {
                 display: block;
-                color: #7768e8;
-                font-size: 10px;
+                color: #969bad;
+                font-size: 8px;
                 font-weight: 900;
                 text-transform: uppercase;
-                letter-spacing: .5px;
             }
 
-            .adaptive-adapter strong {
+            .adaptive-summary-card strong {
                 display: block;
-                margin-top: 5px;
-                color: #282b3c;
-                font-size: 13px;
-            }
-
-            .adaptive-adapter p {
-                margin: 5px 0 0;
-                color: #777d8d;
-                font-size: 11px;
-                line-height: 1.45;
+                margin-top: 4px;
+                color: #33384a;
+                font-size: 12px;
             }
 
             .adaptive-roadmap-track {
@@ -357,6 +471,7 @@
                 grid-template-columns:
                     repeat(6, minmax(105px, 1fr));
                 gap: 8px;
+                margin-top: 17px;
             }
 
             .adaptive-step {
@@ -366,10 +481,6 @@
                 border-radius: 14px;
                 background: #ffffff;
                 text-align: center;
-                transition:
-                    transform .15s ease,
-                    border-color .15s ease,
-                    box-shadow .15s ease;
             }
 
             .adaptive-step::after {
@@ -419,9 +530,6 @@
             .adaptive-step.understood {
                 border-color: #6fd49a;
                 background: #edfff5;
-                box-shadow:
-                    0 7px 18px
-                    rgba(41, 170, 96, .10);
             }
 
             .adaptive-step.escalated {
@@ -436,7 +544,7 @@
                     rgba(121, 104, 239, .10);
             }
 
-            .adaptive-step.recommended {
+            .adaptive-step.preferred {
                 border-color: #7968ef;
                 background:
                     linear-gradient(
@@ -446,26 +554,127 @@
                     );
             }
 
-            .adaptive-recommended-tag {
+            .adaptive-step.low-effectiveness {
+                border-color: #f0c9c9;
+                background: #fff9f9;
+            }
+
+            .adaptive-tag {
                 display: inline-block;
                 margin-top: 5px;
                 padding: 3px 6px;
                 border-radius: 999px;
-                background: #7867ef;
-                color: white;
                 font-size: 8px;
                 font-weight: 900;
             }
 
-            @media (max-width: 900px) {
+            .adaptive-tag.preferred-tag {
+                background: #7867ef;
+                color: #ffffff;
+            }
 
-                .adaptive-roadmap-top {
-                    flex-direction: column;
+            .adaptive-tag.low-tag {
+                background: #fff0f0;
+                color: #b54e4e;
+            }
+
+            .adaptive-intelligence-row {
+                display: grid;
+                grid-template-columns:
+                    minmax(0, 1fr)
+                    minmax(280px, .8fr);
+                gap: 12px;
+                margin-top: 14px;
+            }
+
+            .adaptive-ranking,
+            .adaptive-signals {
+                padding: 14px;
+                border: 1px solid #ece9f7;
+                border-radius: 15px;
+                background: #ffffff;
+            }
+
+            .adaptive-section-title {
+                color: #3a4052;
+                font-size: 11px;
+                font-weight: 950;
+                text-transform: uppercase;
+                letter-spacing: .4px;
+            }
+
+            .adaptive-rank-row {
+                display: grid;
+                grid-template-columns:
+                    115px
+                    minmax(80px, 1fr)
+                    48px;
+                gap: 8px;
+                align-items: center;
+                margin-top: 9px;
+            }
+
+            .adaptive-rank-name {
+                color: #555b6c;
+                font-size: 10px;
+                font-weight: 800;
+            }
+
+            .adaptive-rank-track {
+                height: 7px;
+                overflow: hidden;
+                border-radius: 999px;
+                background: #eceaf4;
+            }
+
+            .adaptive-rank-fill {
+                height: 100%;
+                border-radius: inherit;
+                background: #8170ef;
+            }
+
+            .adaptive-rank-score {
+                color: #595f71;
+                font-size: 9px;
+                font-weight: 900;
+                text-align: right;
+            }
+
+            .adaptive-signal {
+                margin-top: 8px;
+                padding: 8px 10px;
+                border-radius: 10px;
+                background: #f7f6fb;
+                color: #6f7585;
+                font-size: 10px;
+                line-height: 1.45;
+            }
+
+            .adaptive-signal.warning {
+                background: #fff7e9;
+                color: #8a641e;
+            }
+
+            .adaptive-signal.good {
+                background: #effbf4;
+                color: #377954;
+            }
+
+            .adaptive-signal.low {
+                background: #fff2f2;
+                color: #a24e4e;
+            }
+
+            @media (max-width: 1000px) {
+
+                .adaptive-roadmap-top,
+                .adaptive-intelligence-row {
+                    grid-template-columns: 1fr;
                 }
 
-                .adaptive-adapter {
-                    width: 100%;
-                    max-width: none;
+                .adaptive-summary-grid {
+                    grid-template-columns:
+                        repeat(2, 1fr);
                 }
 
                 .adaptive-roadmap-track {
@@ -480,9 +689,17 @@
 
             @media (max-width: 560px) {
 
+                .adaptive-summary-grid,
                 .adaptive-roadmap-track {
                     grid-template-columns:
                         repeat(2, 1fr);
+                }
+
+                .adaptive-rank-row {
+                    grid-template-columns:
+                        95px
+                        1fr
+                        40px;
                 }
             }
         `;
@@ -549,7 +766,7 @@
 
 
     // ========================================================
-    // STATUS LABEL
+    // STATUS
     // ========================================================
 
     function statusLabel(
@@ -590,12 +807,9 @@
     // ========================================================
 
     function render(
-        data
+        roadmapData,
+        adaptiveData
     ) {
-
-        latestData =
-            data;
-
 
         const host =
             ensureHost();
@@ -607,8 +821,18 @@
         }
 
 
+        const decision =
+            adaptiveData?.decision
+            ||
+            adaptiveData?.adaptive_profile
+            ||
+            {};
+
+
         const topic =
-            data.topic
+            adaptiveData?.topic
+            ||
+            roadmapData?.topic
             ||
             {
                 id:
@@ -619,27 +843,48 @@
             };
 
 
-        const personalization =
-            data.personalization
+        const learner =
+            decision.learner_model
+            ||
+            {};
+
+
+        const recommendation =
+            decision.recommendation
+            ||
+            {};
+
+
+        const support =
+            decision.support
+            ||
+            {};
+
+
+        const summary =
+            decision.history_summary
+            ||
+            {};
+
+
+        const currentTopic =
+            decision.current_topic
             ||
             {};
 
 
         const preferred =
-            personalization
-                .preferred_resource;
-
-
-        const preferredLabel =
-            personalization
-                .preferred_resource_label;
+            learner.preferred_resource
+            ||
+            null;
 
 
         const confidence =
             Math.round(
                 Number(
-                    personalization
-                        .preference_confidence
+                    learner.confidence
+                    ||
+                    recommendation.confidence
                     ||
                     0
                 )
@@ -649,118 +894,299 @@
 
 
         const current =
-            data.current_resource
+            roadmapData?.current_resource
             ||
             "notes";
 
 
-        host.innerHTML =
-            "";
+        const roadmap =
+            Array.isArray(
+                roadmapData?.roadmap
+            )
+                ? roadmapData.roadmap
+                : [];
 
 
-        const top =
-            document.createElement(
-                "div"
+        const lowEffectiveness =
+            new Set(
+
+                Array.isArray(
+                    decision.low_effectiveness_resources
+                )
+
+                    ? decision
+                        .low_effectiveness_resources
+                        .map(
+                            item =>
+                                item.resource_type
+                        )
+
+                    : []
             );
 
 
-        top.className =
-            "adaptive-roadmap-top";
+        const recommendationReasons =
+            Array.isArray(
+                recommendation.reasons
+            )
+                ? recommendation.reasons
+                : [];
 
 
-        const copy =
-            document.createElement(
-                "div"
-            );
+        const firstReason =
+            recommendationReasons[0]
+            ||
+            "MY CAMPUS is still learning from your activity.";
 
 
-        copy.innerHTML = `
-            <span class="adaptive-roadmap-badge">
-                LIVE LEARNING ROADMAP
-            </span>
+        host.innerHTML = `
 
-            <h2 class="adaptive-roadmap-title">
-                Topic ${topic.id} · ${topic.title}
-            </h2>
+            <div class="adaptive-roadmap-top">
 
-            <p class="adaptive-roadmap-subtitle">
-                Your journey updates as you learn.
-                You can move forward whenever you understand the concept.
-            </p>
+                <div>
+
+                    <span class="adaptive-roadmap-badge">
+                        LIVE ADAPTIVE LEARNING ROADMAP
+                    </span>
+
+                    <h2 class="adaptive-roadmap-title">
+                        Topic ${escapeHtml(topic.id)}
+                        ·
+                        ${escapeHtml(topic.title)}
+                    </h2>
+
+                    <p class="adaptive-roadmap-subtitle">
+                        This roadmap is not fixed.
+                        MY CAMPUS continuously updates the next learning
+                        action using your previous successes, retries,
+                        assessment gaps and support history.
+                    </p>
+
+
+                    <div class="adaptive-summary-grid">
+
+                        <div class="adaptive-summary-card">
+
+                            <small>
+                                Learning state
+                            </small>
+
+                            <strong>
+                                ${escapeHtml(
+                                    currentTopic.learning_state
+                                    ||
+                                    "Learning"
+                                )}
+                            </strong>
+
+                        </div>
+
+
+                        <div class="adaptive-summary-card">
+
+                            <small>
+                                Best-fit mode
+                            </small>
+
+                            <strong>
+                                ${escapeHtml(
+                                    learner.preferred_resource_label
+                                    ||
+                                    "Learning profile"
+                                )}
+                            </strong>
+
+                        </div>
+
+
+                        <div class="adaptive-summary-card">
+
+                            <small>
+                                Topics understood
+                            </small>
+
+                            <strong>
+                                ${Number(
+                                    summary.topics_understood
+                                    ||
+                                    0
+                                )}
+                            </strong>
+
+                        </div>
+
+
+                        <div class="adaptive-summary-card">
+
+                            <small>
+                                Concept gaps
+                            </small>
+
+                            <strong>
+                                ${Number(
+                                    summary.concept_gap_count
+                                    ||
+                                    0
+                                )}
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="adaptive-engine-card">
+
+                    <div class="adaptive-engine-topline">
+
+                        <div class="adaptive-engine-label">
+                            ✨ Adaptive Intelligence
+                        </div>
+
+                        <div class="adaptive-engine-version">
+                            ENGINE v2.1
+                        </div>
+
+                    </div>
+
+
+                    <div class="adaptive-next-action">
+
+                        Next action:
+                        ${escapeHtml(
+                            recommendation.label
+                            ||
+                            "Continue Learning"
+                        )}
+
+                    </div>
+
+
+                    <div class="adaptive-reason">
+
+                        ${escapeHtml(
+                            firstReason
+                        )}
+
+                    </div>
+
+
+                    <div class="adaptive-confidence-row">
+
+                        <span>
+                            Decision confidence
+                        </span>
+
+                        <span>
+                            ${confidence}%
+                            ·
+                            ${escapeHtml(
+                                recommendation.confidence_label
+                                ||
+                                "learning"
+                            )}
+                        </span>
+
+                    </div>
+
+
+                    <div class="adaptive-confidence-track">
+
+                        <div
+                            class="adaptive-confidence-fill"
+                            style="
+                                width:
+                                ${Math.max(
+                                    0,
+                                    Math.min(
+                                        100,
+                                        confidence
+                                    )
+                                )}%;
+                            "
+                        ></div>
+
+                    </div>
+
+
+                    <div class="adaptive-signal good">
+
+                        Preferred learning mode:
+                        <b>
+                            ${escapeHtml(
+                                learner.preferred_resource_label
+                                ||
+                                "Still learning"
+                            )}
+                        </b>
+
+                    </div>
+
+
+                    ${
+                        support.reason
+
+                            ? `
+                                <div class="adaptive-signal">
+                                    ${escapeHtml(
+                                        support.reason
+                                    )}
+                                </div>
+                            `
+
+                            : ""
+                    }
+
+                </div>
+
+            </div>
+
+
+            <div
+                id="adaptiveRoadmapTrack"
+                class="adaptive-roadmap-track"
+            ></div>
+
+
+            <div class="adaptive-intelligence-row">
+
+                <div class="adaptive-ranking">
+
+                    <div class="adaptive-section-title">
+                        Learning Mode Evidence
+                    </div>
+
+                    <div id="adaptiveRankingRows">
+                    </div>
+
+                </div>
+
+
+                <div class="adaptive-signals">
+
+                    <div class="adaptive-section-title">
+                        Engine Signals
+                    </div>
+
+                    <div id="adaptiveSignalRows">
+                    </div>
+
+                </div>
+
+            </div>
         `;
 
 
-        const adapter =
-            document.createElement(
-                "div"
-            );
-
-
-        adapter.className =
-            "adaptive-adapter";
-
-
-        if (preferredLabel) {
-
-            adapter.innerHTML = `
-                <small>
-                    ✨ Personalized AI Adapter
-                </small>
-
-                <strong>
-                    Best-fit mode:
-                    ${preferredLabel}
-                </strong>
-
-                <p>
-                    MY CAMPUS learned this from your previous
-                    successful learning attempts.
-                    Confidence: ${confidence}%.
-                </p>
-            `;
-
-        } else {
-
-            adapter.innerHTML = `
-                <small>
-                    ✨ Personalized AI Adapter
-                </small>
-
-                <strong>
-                    Learning your style
-                </strong>
-
-                <p>
-                    Use the resources normally.
-                    When you choose “I Understood”, MY CAMPUS
-                    learns which method works best for you.
-                </p>
-            `;
-        }
-
-
-        top.append(
-            copy,
-            adapter
-        );
-
+        // ====================================================
+        // ROADMAP
+        // ====================================================
 
         const track =
-            document.createElement(
-                "div"
+            document.getElementById(
+                "adaptiveRoadmapTrack"
             );
-
-
-        track.className =
-            "adaptive-roadmap-track";
-
-
-        const roadmap =
-            Array.isArray(
-                data.roadmap
-            )
-                ? data.roadmap
-                : [];
 
 
         RESOURCE_ORDER.forEach(
@@ -776,7 +1202,8 @@
                     roadmap.find(
                         item =>
                             item.resource_type
-                            === resource
+                            ===
+                            resource
                     );
 
 
@@ -818,12 +1245,25 @@
                 ) {
 
                     step.classList.add(
-                        "recommended"
+                        "preferred"
+                    );
+                }
+
+
+                if (
+                    lowEffectiveness.has(
+                        resource
+                    )
+                ) {
+
+                    step.classList.add(
+                        "low-effectiveness"
                     );
                 }
 
 
                 step.innerHTML = `
+
                     <div class="adaptive-step-icon">
                         ${meta.icon}
                     </div>
@@ -837,11 +1277,30 @@
                     </div>
 
                     ${
-                        preferred === resource
+                        preferred ===
+                        resource
 
                             ? `
-                                <span class="adaptive-recommended-tag">
-                                    RECOMMENDED
+                                <span
+                                    class="adaptive-tag preferred-tag"
+                                >
+                                    BEST FIT
+                                </span>
+                            `
+
+                            : ""
+                    }
+
+                    ${
+                        lowEffectiveness.has(
+                            resource
+                        )
+
+                            ? `
+                                <span
+                                    class="adaptive-tag low-tag"
+                                >
+                                    LOW EFFECTIVENESS
                                 </span>
                             `
 
@@ -857,15 +1316,286 @@
         );
 
 
-        host.append(
-            top,
-            track
+        // ====================================================
+        // RANKING
+        // ====================================================
+
+        const rankingRoot =
+            document.getElementById(
+                "adaptiveRankingRows"
+            );
+
+
+        const ranking =
+            Array.isArray(
+                learner.ranking
+            )
+                ? learner.ranking
+                : [];
+
+
+        if (!ranking.length) {
+
+            rankingRoot.innerHTML = `
+
+                <div class="adaptive-signal">
+                    Not enough history yet.
+                    Continue learning normally and the engine
+                    will build your profile.
+                </div>
+            `;
+
+        } else {
+
+            ranking.forEach(
+                item => {
+
+                    const score =
+                        Math.max(
+                            0,
+                            Math.min(
+                                100,
+                                Number(
+                                    item.adaptive_score
+                                    ||
+                                    0
+                                )
+                            )
+                        );
+
+
+                    const row =
+                        document.createElement(
+                            "div"
+                        );
+
+
+                    row.className =
+                        "adaptive-rank-row";
+
+
+                    row.innerHTML = `
+
+                        <div class="adaptive-rank-name">
+                            ${escapeHtml(
+                                item.label
+                            )}
+                        </div>
+
+                        <div class="adaptive-rank-track">
+
+                            <div
+                                class="adaptive-rank-fill"
+                                style="
+                                    width:
+                                    ${score}%;
+                                "
+                            ></div>
+
+                        </div>
+
+                        <div class="adaptive-rank-score">
+                            ${score.toFixed(0)}
+                        </div>
+                    `;
+
+
+                    rankingRoot.appendChild(
+                        row
+                    );
+                }
+            );
+        }
+
+
+        // ====================================================
+        // SIGNALS
+        // ====================================================
+
+        const signalRoot =
+            document.getElementById(
+                "adaptiveSignalRows"
+            );
+
+
+        const signals = [];
+
+
+        recommendationReasons.forEach(
+            reason => {
+
+                signals.push({
+                    type:
+                        "normal",
+
+                    text:
+                        reason
+                });
+            }
+        );
+
+
+        if (
+            recommendation.exploration_label
+        ) {
+
+            signals.push({
+
+                type:
+                    "normal",
+
+                text:
+                    (
+                        "Exploration suggestion: "
+                        +
+                        recommendation
+                            .exploration_label
+                    )
+            });
+        }
+
+
+        if (
+            Array.isArray(
+                decision.active_concept_gaps
+            )
+        ) {
+
+            decision
+            .active_concept_gaps
+            .slice(
+                0,
+                3
+            )
+            .forEach(
+                gap => {
+
+                    signals.push({
+
+                        type:
+                            "warning",
+
+                        text:
+                            (
+                                `Weak concept: ${
+                                    gap.concept
+                                    ||
+                                    "Concept gap"
+                                }`
+                            )
+                    });
+                }
+            );
+        }
+
+
+        if (
+            Array.isArray(
+                decision.low_effectiveness_resources
+            )
+        ) {
+
+            decision
+            .low_effectiveness_resources
+            .forEach(
+                item => {
+
+                    signals.push({
+
+                        type:
+                            "low",
+
+                        text:
+                            (
+                                `${
+                                    item.label
+                                    ||
+                                    item.resource_type
+                                } is currently showing low effectiveness.`
+                            )
+                    });
+                }
+            );
+        }
+
+
+        if (
+            Array.isArray(
+                decision.data_quality_signals
+            )
+        ) {
+
+            decision
+            .data_quality_signals
+            .forEach(
+                item => {
+
+                    signals.push({
+
+                        type:
+                            "warning",
+
+                        text:
+                            item.message
+                    });
+                }
+            );
+        }
+
+
+        if (!signals.length) {
+
+            signals.push({
+
+                type:
+                    "normal",
+
+                text:
+                    "No special difficulty signals detected for this topic."
+            });
+        }
+
+
+        signalRoot.innerHTML =
+            "";
+
+
+        signals
+        .slice(
+            0,
+            6
+        )
+        .forEach(
+            signal => {
+
+                const box =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                box.className =
+                    (
+                        "adaptive-signal "
+                        +
+                        signal.type
+                    );
+
+
+                box.textContent =
+                    signal.text;
+
+
+                signalRoot.appendChild(
+                    box
+                );
+            }
         );
     }
 
 
     // ========================================================
-    // LOAD
+    // LOAD BOTH ENGINES
     // ========================================================
 
     async function refresh() {
@@ -898,33 +1628,66 @@
 
         try {
 
-            const response =
-                await fetch(
-                    `${API_BASE}/personalization/topic/${studentId}/${activeTopicId}`
-                );
+            const [
+                roadmapResponse,
+                adaptiveResponse
+            ] =
+                await Promise.all([
+
+                    fetch(
+                        `${API_BASE}/personalization/topic/${studentId}/${activeTopicId}`
+                    ),
+
+                    fetch(
+                        `${API_BASE}/adaptive-intelligence/topic/${studentId}/${activeTopicId}`
+                    )
+
+                ]);
 
 
-            if (!response.ok) {
+            if (
+                !roadmapResponse.ok
+                ||
+                !adaptiveResponse.ok
+            ) {
 
                 throw new Error(
-                    `HTTP ${response.status}`
+                    (
+                        "Adaptive API error: "
+                        +
+                        roadmapResponse.status
+                        +
+                        " / "
+                        +
+                        adaptiveResponse.status
+                    )
                 );
             }
 
 
-            const data =
-                await response.json();
+            const [
+                roadmapData,
+                adaptiveData
+            ] =
+                await Promise.all([
+
+                    roadmapResponse.json(),
+
+                    adaptiveResponse.json()
+
+                ]);
 
 
             render(
-                data
+                roadmapData,
+                adaptiveData
             );
 
 
         } catch (error) {
 
             console.warn(
-                "Adaptive roadmap unavailable:",
+                "Adaptive Intelligence unavailable:",
                 error
             );
         }
@@ -932,11 +1695,13 @@
 
 
     // ========================================================
-    // FOLLOW TOPIC CARD CLICKS
+    // FOLLOW RESOURCE BUTTON CLICKS
     // ========================================================
 
     document.addEventListener(
+
         "click",
+
         event => {
 
             const button =
@@ -993,122 +1758,86 @@
                 topicId <= 10
             ) {
 
+                activeTopicId =
+                    topicId;
+
+
                 localStorage.setItem(
                     "my_campus_last_topic",
                     String(
                         topicId
                     )
                 );
-            }
 
-        },
-        true
+
+                setTimeout(
+                    refresh,
+                    250
+                );
+            }
+        }
     );
 
 
     // ========================================================
-    // START
+    // CUSTOM REFRESH EVENT
     // ========================================================
 
-    function start() {
+    window.addEventListener(
 
-        installStyles();
+        "my-campus-personalization-updated",
 
-
-        const observer =
-            new MutationObserver(
-                () => {
-
-                    if (
-                        document.querySelector(
-                            ".topic-card"
-                        )
-                    ) {
-
-                        observer.disconnect();
-
-                        refresh();
-                    }
-                }
-            );
-
-
-        const path =
-            document.getElementById(
-                "learningPath"
-            );
-
-
-        if (path) {
-
-            observer.observe(
-                path,
-                {
-                    childList:
-                        true,
-
-                    subtree:
-                        true
-                }
-            );
-        }
-
-
-        if (
-            document.querySelector(
-                ".topic-card"
-            )
-        ) {
+        () => {
 
             refresh();
         }
-    }
-
-
-    window.refreshAdaptiveRoadmap =
-        refresh;
-
-
-    window.addEventListener(
-        "pageshow",
-        refresh
     );
 
 
-    document.addEventListener(
-        "visibilitychange",
+    // ========================================================
+    // REFRESH WHEN RETURNING TO TAB
+    // ========================================================
+
+    window.addEventListener(
+
+        "focus",
+
         () => {
 
-            if (
-                document.visibilityState
-                === "visible"
-            ) {
-
-                refresh();
-            }
+            refresh();
         }
     );
 
 
-    window.addEventListener(
-        "faculty-doubt-sent",
-        refresh
-    );
+    // ========================================================
+    // INITIAL
+    // ========================================================
+
+    installStyles();
 
 
     if (
-        document.readyState
-        === "loading"
+        document.readyState ===
+        "loading"
     ) {
 
         document.addEventListener(
             "DOMContentLoaded",
-            start
+            refresh
         );
 
     } else {
 
-        start();
+        refresh();
     }
+
+
+    // ========================================================
+    // PUBLIC MANUAL REFRESH
+    // ========================================================
+
+    window.refreshMyCampusAdaptiveEngine =
+        refresh;
+
 
 })();

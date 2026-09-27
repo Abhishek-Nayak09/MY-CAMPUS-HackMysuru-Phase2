@@ -27,12 +27,11 @@ from app.models.personalization import (
     StudentTopicResourceProgress,
 )
 
-
 from app.models.level_test import (
     StudentLevelProgress,
     LevelTestQuestion,
     LevelTestAttempt,
-    LevelTestAnswer
+    LevelTestAnswer,
 )
 
 
@@ -49,6 +48,8 @@ from app.api import level_tests
 from app.api import faculty_hub
 from app.api import ai_tutor
 from app.api import personalization
+from app.api import hod_analytics
+from app.api import adaptive_intelligence
 
 
 # ============================================================
@@ -73,7 +74,7 @@ app = FastAPI(
         "for Hack Mysuru."
     ),
 
-    version="1.0.0"
+    version="2.0.0"
 )
 
 
@@ -173,9 +174,16 @@ app.include_router(
     ai_tutor.router
 )
 
-
 app.include_router(
     personalization.router
+)
+
+app.include_router(
+    hod_analytics.router
+)
+
+app.include_router(
+    adaptive_intelligence.router
 )
 
 
@@ -239,6 +247,12 @@ def health():
             "active",
 
         "personalization_api":
+            "active",
+
+        "hod_analytics_api":
+            "active",
+
+        "adaptive_intelligence_api":
             "active",
 
         "uploads":
