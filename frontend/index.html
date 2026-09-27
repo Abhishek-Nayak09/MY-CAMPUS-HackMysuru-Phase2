@@ -1,0 +1,1845 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>My Campus | Personalized Learning</title>
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+
+        :root {
+
+            --primary: #5b5cf0;
+            --primary-dark: #4647d6;
+            --secondary: #8b5cf6;
+
+            --background: #f5f7fb;
+            --card: #ffffff;
+
+            --text: #172033;
+            --muted: #6b7280;
+
+            --border: #e5e7eb;
+
+            --success: #16a34a;
+            --danger: #dc2626;
+
+        }
+
+
+        body {
+
+            font-family:
+                Inter,
+                system-ui,
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                sans-serif;
+
+            min-height: 100vh;
+
+            background:
+                radial-gradient(
+                    circle at top left,
+                    #eef2ff 0%,
+                    #f7f8fc 42%,
+                    #ffffff 100%
+                );
+
+            color: var(--text);
+
+        }
+
+
+        .page {
+
+            min-height: 100vh;
+
+            display: grid;
+
+            grid-template-columns:
+                1.05fr 0.95fr;
+
+        }
+
+
+        /* ==========================================
+           LEFT SIDE
+        ========================================== */
+
+
+        .hero {
+
+            min-height: 100vh;
+
+            padding: 55px 70px;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    #111827 0%,
+                    #312e81 58%,
+                    #5b21b6 100%
+                );
+
+            color: white;
+
+            position: relative;
+
+            overflow: hidden;
+
+            display: flex;
+
+            flex-direction: column;
+
+        }
+
+
+        .hero::before {
+
+            content: "";
+
+            position: absolute;
+
+            width: 520px;
+            height: 520px;
+
+            border-radius: 50%;
+
+            background:
+                rgba(
+                    255,
+                    255,
+                    255,
+                    0.05
+                );
+
+            top: -180px;
+            right: -180px;
+
+        }
+
+
+        .hero::after {
+
+            content: "";
+
+            position: absolute;
+
+            width: 380px;
+            height: 380px;
+
+            border-radius: 50%;
+
+            background:
+                rgba(
+                    255,
+                    255,
+                    255,
+                    0.04
+                );
+
+            bottom: -150px;
+            left: -120px;
+
+        }
+
+
+        .brand {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 13px;
+
+            position: relative;
+
+            z-index: 2;
+
+        }
+
+
+        .brand-logo {
+
+            width: 50px;
+            height: 50px;
+
+            border-radius: 15px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #818cf8,
+                    #c084fc
+                );
+
+            font-weight: 900;
+
+            font-size: 19px;
+
+        }
+
+
+        .brand h2 {
+
+            font-size: 22px;
+
+        }
+
+
+        .brand p {
+
+            margin-top: 2px;
+
+            font-size: 12px;
+
+            color: #c7d2fe;
+
+        }
+
+
+        .hero-content {
+
+            margin-top: auto;
+            margin-bottom: auto;
+
+            max-width: 660px;
+
+            position: relative;
+
+            z-index: 2;
+
+        }
+
+
+        .tag {
+
+            display: inline-flex;
+
+            padding: 8px 14px;
+
+            border-radius: 999px;
+
+            background:
+                rgba(
+                    255,
+                    255,
+                    255,
+                    0.1
+                );
+
+            border:
+                1px solid
+                rgba(
+                    255,
+                    255,
+                    255,
+                    0.14
+                );
+
+            color: #e0e7ff;
+
+            font-size: 12px;
+
+            font-weight: 700;
+
+            margin-bottom: 22px;
+
+        }
+
+
+        .hero-content h1 {
+
+            font-size: 48px;
+
+            line-height: 1.13;
+
+            margin-bottom: 18px;
+
+            letter-spacing: -1.5px;
+
+        }
+
+
+        .hero-content h1 span {
+
+            color: #c4b5fd;
+
+        }
+
+
+        .hero-content > p {
+
+            color: #dbeafe;
+
+            line-height: 1.8;
+
+            font-size: 15px;
+
+            max-width: 580px;
+
+        }
+
+
+        .feature-grid {
+
+            margin-top: 35px;
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(2, 1fr);
+
+            gap: 13px;
+
+        }
+
+
+        .feature {
+
+            padding: 16px;
+
+            border-radius: 15px;
+
+            background:
+                rgba(
+                    255,
+                    255,
+                    255,
+                    0.08
+                );
+
+            border:
+                1px solid
+                rgba(
+                    255,
+                    255,
+                    255,
+                    0.09
+                );
+
+            font-size: 13px;
+
+            color: #e0e7ff;
+
+        }
+
+
+        .feature strong {
+
+            display: block;
+
+            color: white;
+
+            margin-bottom: 4px;
+
+        }
+
+
+        /* ==========================================
+           RIGHT SIDE
+        ========================================== */
+
+
+        .auth-area {
+
+            padding: 45px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+        }
+
+
+        .auth-container {
+
+            width: 100%;
+
+            max-width: 520px;
+
+        }
+
+
+        .auth-header {
+
+            margin-bottom: 25px;
+
+        }
+
+
+        .auth-header h2 {
+
+            font-size: 29px;
+
+            margin-bottom: 7px;
+
+        }
+
+
+        .auth-header p {
+
+            color: var(--muted);
+
+            font-size: 14px;
+
+            line-height: 1.6;
+
+        }
+
+
+        /* ROLE SELECTION */
+
+
+        .role-selection {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(2, 1fr);
+
+            gap: 12px;
+
+            margin-bottom: 20px;
+
+        }
+
+
+        .role-card {
+
+            border:
+                1px solid
+                var(--border);
+
+            background: white;
+
+            border-radius: 15px;
+
+            padding: 17px;
+
+            cursor: pointer;
+
+            transition: 0.2s;
+
+            text-align: left;
+
+        }
+
+
+        .role-card:hover {
+
+            transform: translateY(-2px);
+
+            border-color: #a5b4fc;
+
+        }
+
+
+        .role-card.active {
+
+            border:
+                2px solid
+                var(--primary);
+
+            background: #f5f3ff;
+
+        }
+
+
+        .role-icon {
+
+            width: 40px;
+            height: 40px;
+
+            border-radius: 12px;
+
+            background: #eef2ff;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            font-size: 20px;
+
+            margin-bottom: 10px;
+
+        }
+
+
+        .role-card h3 {
+
+            font-size: 15px;
+
+            margin-bottom: 4px;
+
+        }
+
+
+        .role-card p {
+
+            color: var(--muted);
+
+            font-size: 11px;
+
+            line-height: 1.5;
+
+        }
+
+
+        /* LOGIN REGISTER TABS */
+
+
+        .tabs {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(2, 1fr);
+
+            padding: 5px;
+
+            border-radius: 13px;
+
+            background: #f3f4f6;
+
+            margin-bottom: 20px;
+
+        }
+
+
+        .tab {
+
+            padding: 11px;
+
+            border: none;
+
+            background: transparent;
+
+            border-radius: 10px;
+
+            cursor: pointer;
+
+            color: var(--muted);
+
+            font-weight: 700;
+
+        }
+
+
+        .tab.active {
+
+            background: white;
+
+            color: var(--primary);
+
+            box-shadow:
+                0 3px 12px
+                rgba(
+                    17,
+                    24,
+                    39,
+                    0.08
+                );
+
+        }
+
+
+        /* FORM */
+
+
+        .form {
+
+            display: none;
+
+        }
+
+
+        .form.active {
+
+            display: block;
+
+        }
+
+
+        .field {
+
+            margin-bottom: 15px;
+
+        }
+
+
+        .field label {
+
+            display: block;
+
+            margin-bottom: 7px;
+
+            font-size: 12px;
+
+            font-weight: 700;
+
+        }
+
+
+        .field input,
+        .field select {
+
+            width: 100%;
+
+            padding: 13px 14px;
+
+            border:
+                1px solid
+                var(--border);
+
+            border-radius: 11px;
+
+            outline: none;
+
+            font-size: 13px;
+
+            background: white;
+
+        }
+
+
+        .field input:focus,
+        .field select:focus {
+
+            border-color: var(--primary);
+
+            box-shadow:
+                0 0 0 3px
+                rgba(
+                    91,
+                    92,
+                    240,
+                    0.1
+                );
+
+        }
+
+
+        .two-column {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(2, 1fr);
+
+            gap: 12px;
+
+        }
+
+
+        .submit-button {
+
+            width: 100%;
+
+            margin-top: 5px;
+
+            padding: 14px;
+
+            border: none;
+
+            border-radius: 12px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #4f46e5,
+                    #7c3aed
+                );
+
+            color: white;
+
+            font-size: 13px;
+
+            font-weight: 800;
+
+            cursor: pointer;
+
+            transition: 0.2s;
+
+        }
+
+
+        .submit-button:hover {
+
+            transform: translateY(-1px);
+
+            box-shadow:
+                0 9px 20px
+                rgba(
+                    79,
+                    70,
+                    229,
+                    0.2
+                );
+
+        }
+
+
+        .message {
+
+            display: none;
+
+            margin-top: 15px;
+
+            padding: 12px 14px;
+
+            border-radius: 11px;
+
+            font-size: 12px;
+
+            line-height: 1.5;
+
+        }
+
+
+        .message.success {
+
+            display: block;
+
+            background: #ecfdf5;
+
+            border:
+                1px solid
+                #bbf7d0;
+
+            color: #166534;
+
+        }
+
+
+        .message.error {
+
+            display: block;
+
+            background: #fef2f2;
+
+            border:
+                1px solid
+                #fecaca;
+
+            color: #991b1b;
+
+        }
+
+
+        #facultyRoleField {
+
+            display: none;
+
+        }
+
+
+        .demo-note {
+
+            margin-top: 18px;
+
+            color: var(--muted);
+
+            font-size: 11px;
+
+            text-align: center;
+
+            line-height: 1.6;
+
+        }
+
+
+        @media (
+            max-width: 900px
+        ) {
+
+            .page {
+
+                grid-template-columns:
+                    1fr;
+
+            }
+
+
+            .hero {
+
+                min-height: auto;
+
+                padding: 35px 25px;
+
+            }
+
+
+            .hero-content {
+
+                margin: 55px 0;
+
+            }
+
+
+            .hero-content h1 {
+
+                font-size: 37px;
+
+            }
+
+
+            .auth-area {
+
+                padding: 35px 20px;
+
+            }
+
+        }
+
+
+        @media (
+            max-width: 520px
+        ) {
+
+            .feature-grid,
+            .role-selection,
+            .two-column {
+
+                grid-template-columns:
+                    1fr;
+
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="page">
+
+
+    <!-- ==========================================
+         LEFT
+    =========================================== -->
+
+
+    <section class="hero">
+
+
+        <div class="brand">
+
+            <div class="brand-logo">
+                MC
+            </div>
+
+
+            <div>
+
+                <h2>
+                    My Campus
+                </h2>
+
+                <p>
+                    Personalized Adaptive Learning
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="hero-content">
+
+            <div class="tag">
+
+                ✦ Hack Mysuru 1.0
+
+            </div>
+
+
+            <h1>
+
+                Learning that adapts
+
+                <span>
+                    to every student.
+                </span>
+
+            </h1>
+
+
+            <p>
+
+                A mastery-driven learning platform
+                that understands what students know,
+                how they learn best and when they
+                need human support.
+
+            </p>
+
+
+            <div class="feature-grid">
+
+
+                <div class="feature">
+
+                    <strong>
+                        🎯 Mastery Based
+                    </strong>
+
+                    Unlock learning levels through
+                    demonstrated understanding.
+
+                </div>
+
+
+                <div class="feature">
+
+                    <strong>
+                        🧠 Adaptive Learning
+                    </strong>
+
+                    Notes, videos, interactive models
+                    and games adapt to each learner.
+
+                </div>
+
+
+                <div class="feature">
+
+                    <strong>
+                        🤖 AI Support
+                    </strong>
+
+                    Intelligent assistance before
+                    faculty escalation.
+
+                </div>
+
+
+                <div class="feature">
+
+                    <strong>
+                        👨‍🏫 Human-in-the-Loop
+                    </strong>
+
+                    Faculty receives exact concept-level
+                    student doubts.
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+
+    </section>
+
+
+
+    <!-- ==========================================
+         AUTH
+    =========================================== -->
+
+
+    <section class="auth-area">
+
+
+        <div class="auth-container">
+
+
+            <div class="auth-header">
+
+                <h2>
+                    Welcome to My Campus
+                </h2>
+
+                <p>
+                    Select your portal and continue
+                    your personalized learning journey.
+                </p>
+
+            </div>
+
+
+
+            <!-- ROLE -->
+
+
+            <div class="role-selection">
+
+
+                <div
+                    id="studentRole"
+                    class="role-card active"
+                    onclick="selectRole('student')"
+                >
+
+                    <div class="role-icon">
+                        🎓
+                    </div>
+
+                    <h3>
+                        Student
+                    </h3>
+
+                    <p>
+                        Learn, progress and receive
+                        personalized support.
+                    </p>
+
+                </div>
+
+
+
+                <div
+                    id="facultyRole"
+                    class="role-card"
+                    onclick="selectRole('faculty')"
+                >
+
+                    <div class="role-icon">
+                        👨‍🏫
+                    </div>
+
+                    <h3>
+                        Faculty
+                    </h3>
+
+                    <p>
+                        Guide students and manage
+                        learning resources.
+                    </p>
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- TABS -->
+
+
+            <div class="tabs">
+
+
+                <button
+                    id="loginTab"
+                    class="tab active"
+                    onclick="showTab('login')"
+                >
+                    Login
+                </button>
+
+
+                <button
+                    id="registerTab"
+                    class="tab"
+                    onclick="showTab('register')"
+                >
+                    Register
+                </button>
+
+
+            </div>
+
+
+
+            <!-- =====================================
+                 LOGIN
+            ====================================== -->
+
+
+            <form
+                id="loginForm"
+                class="form active"
+                onsubmit="loginUser(event)"
+            >
+
+
+                <div class="field">
+
+                    <label id="loginIdLabel">
+                        Student ID
+                    </label>
+
+                    <input
+                        id="loginId"
+                        type="text"
+                        placeholder="Enter Student ID"
+                        required
+                    >
+
+                </div>
+
+
+
+                <div class="field">
+
+                    <label>
+                        Password
+                    </label>
+
+                    <input
+                        id="loginPassword"
+                        type="password"
+                        placeholder="Enter your password"
+                        required
+                    >
+
+                </div>
+
+
+
+                <button
+                    class="submit-button"
+                    type="submit"
+                >
+
+                    Login to My Campus
+
+                </button>
+
+
+            </form>
+
+
+
+            <!-- =====================================
+                 REGISTER
+            ====================================== -->
+
+
+            <form
+                id="registerForm"
+                class="form"
+                onsubmit="registerUser(event)"
+            >
+
+
+                <div class="field">
+
+                    <label>
+                        Full Name
+                    </label>
+
+                    <input
+                        id="registerName"
+                        type="text"
+                        placeholder="Enter full name"
+                        required
+                    >
+
+                </div>
+
+
+
+                <div class="two-column">
+
+
+                    <div class="field">
+
+                        <label id="registerIdLabel">
+                            Student ID
+                        </label>
+
+                        <input
+                            id="registerLoginId"
+                            type="text"
+                            placeholder="Enter Student ID"
+                            required
+                        >
+
+                    </div>
+
+
+
+                    <div class="field">
+
+                        <label>
+                            Email
+                        </label>
+
+                        <input
+                            id="registerEmail"
+                            type="email"
+                            placeholder="name@example.com"
+                            required
+                        >
+
+                    </div>
+
+
+                </div>
+
+
+
+                <div
+                    class="field"
+                    id="facultyRoleField"
+                >
+
+                    <label>
+                        Faculty Role
+                    </label>
+
+                    <select id="registerFacultyRole">
+
+                        <option value="professor">
+                            Professor
+                        </option>
+
+                        <option value="hod">
+                            HOD
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+
+                <div class="field">
+
+                    <label>
+                        Password
+                    </label>
+
+                    <input
+                        id="registerPassword"
+                        type="password"
+                        placeholder="Create password"
+                        minlength="6"
+                        required
+                    >
+
+                </div>
+
+
+
+                <button
+                    class="submit-button"
+                    type="submit"
+                >
+
+                    Create Account
+
+                </button>
+
+
+            </form>
+
+
+
+            <div
+                id="message"
+                class="message"
+            >
+            </div>
+
+
+            <div class="demo-note">
+
+                Student accounts open the Student Portal.
+                Faculty accounts will open the Faculty Portal.
+
+            </div>
+
+
+        </div>
+
+
+    </section>
+
+
+</div>
+
+
+
+<script>
+
+
+    const API_BASE =
+        "http://127.0.0.1:8000";
+
+
+    let selectedRole =
+        "student";
+
+
+
+    /* ==========================================
+       ROLE
+    ========================================== */
+
+
+    function selectRole(role) {
+
+
+        selectedRole = role;
+
+
+        document
+            .getElementById(
+                "studentRole"
+            )
+            .classList.toggle(
+                "active",
+                role === "student"
+            );
+
+
+        document
+            .getElementById(
+                "facultyRole"
+            )
+            .classList.toggle(
+                "active",
+                role === "faculty"
+            );
+
+
+        const loginLabel =
+            document.getElementById(
+                "loginIdLabel"
+            );
+
+
+        const loginInput =
+            document.getElementById(
+                "loginId"
+            );
+
+
+        const registerLabel =
+            document.getElementById(
+                "registerIdLabel"
+            );
+
+
+        const registerInput =
+            document.getElementById(
+                "registerLoginId"
+            );
+
+
+        const facultyRoleField =
+            document.getElementById(
+                "facultyRoleField"
+            );
+
+
+        if (role === "student") {
+
+
+            loginLabel.textContent =
+                "Student ID";
+
+
+            loginInput.placeholder =
+                "Enter Student ID";
+
+
+            registerLabel.textContent =
+                "Student ID";
+
+
+            registerInput.placeholder =
+                "Enter Student ID";
+
+
+            facultyRoleField.style.display =
+                "none";
+
+
+        } else {
+
+
+            loginLabel.textContent =
+                "Faculty ID";
+
+
+            loginInput.placeholder =
+                "Enter Faculty ID";
+
+
+            registerLabel.textContent =
+                "Faculty ID";
+
+
+            registerInput.placeholder =
+                "Enter Faculty ID";
+
+
+            facultyRoleField.style.display =
+                "block";
+
+
+        }
+
+
+        clearMessage();
+
+    }
+
+
+
+    /* ==========================================
+       LOGIN / REGISTER TAB
+    ========================================== */
+
+
+    function showTab(tab) {
+
+
+        document
+            .getElementById(
+                "loginTab"
+            )
+            .classList.toggle(
+                "active",
+                tab === "login"
+            );
+
+
+        document
+            .getElementById(
+                "registerTab"
+            )
+            .classList.toggle(
+                "active",
+                tab === "register"
+            );
+
+
+        document
+            .getElementById(
+                "loginForm"
+            )
+            .classList.toggle(
+                "active",
+                tab === "login"
+            );
+
+
+        document
+            .getElementById(
+                "registerForm"
+            )
+            .classList.toggle(
+                "active",
+                tab === "register"
+            );
+
+
+        clearMessage();
+
+    }
+
+
+
+    /* ==========================================
+       REGISTER
+    ========================================== */
+
+
+    async function registerUser(event) {
+
+
+        event.preventDefault();
+
+
+        const payload = {
+
+
+            full_name:
+                document
+                    .getElementById(
+                        "registerName"
+                    )
+                    .value
+                    .trim(),
+
+
+            login_id:
+                document
+                    .getElementById(
+                        "registerLoginId"
+                    )
+                    .value
+                    .trim(),
+
+
+            email:
+                document
+                    .getElementById(
+                        "registerEmail"
+                    )
+                    .value
+                    .trim(),
+
+
+            password:
+                document
+                    .getElementById(
+                        "registerPassword"
+                    )
+                    .value,
+
+
+            role:
+                selectedRole,
+
+
+            faculty_role:
+                selectedRole === "faculty"
+                    ?
+                    document
+                        .getElementById(
+                            "registerFacultyRole"
+                        )
+                        .value
+                    :
+                    null
+
+        };
+
+
+        try {
+
+
+            const response =
+                await fetch(
+                    `${API_BASE}/auth/register`,
+                    {
+
+                        method: "POST",
+
+                        headers: {
+
+                            "Content-Type":
+                                "application/json"
+
+                        },
+
+                        body:
+                            JSON.stringify(
+                                payload
+                            )
+
+                    }
+                );
+
+
+            const data =
+                await response.json();
+
+
+            if (!response.ok) {
+
+
+                throw new Error(
+                    data.detail ||
+                    "Registration failed"
+                );
+
+
+            }
+
+
+            showMessage(
+                "Account created successfully. You can login now.",
+                "success"
+            );
+
+
+            document
+                .getElementById(
+                    "loginId"
+                )
+                .value =
+                    payload.login_id;
+
+
+            document
+                .getElementById(
+                    "registerForm"
+                )
+                .reset();
+
+
+            setTimeout(
+                () => {
+
+                    showTab(
+                        "login"
+                    );
+
+                },
+                800
+            );
+
+
+        } catch (error) {
+
+
+            showMessage(
+                error.message,
+                "error"
+            );
+
+
+        }
+
+    }
+
+
+
+    /* ==========================================
+       LOGIN
+    ========================================== */
+
+
+    async function loginUser(event) {
+
+
+        event.preventDefault();
+
+
+        const payload = {
+
+
+            login_id:
+                document
+                    .getElementById(
+                        "loginId"
+                    )
+                    .value
+                    .trim(),
+
+
+            password:
+                document
+                    .getElementById(
+                        "loginPassword"
+                    )
+                    .value
+
+        };
+
+
+        try {
+
+
+            const response =
+                await fetch(
+                    `${API_BASE}/auth/login`,
+                    {
+
+                        method: "POST",
+
+                        headers: {
+
+                            "Content-Type":
+                                "application/json"
+
+                        },
+
+                        body:
+                            JSON.stringify(
+                                payload
+                            )
+
+                    }
+                );
+
+
+            const data =
+                await response.json();
+
+
+            if (!response.ok) {
+
+
+                throw new Error(
+                    data.detail ||
+                    "Login failed"
+                );
+
+
+            }
+
+
+            /*
+             * Prevent logging into the wrong portal.
+             */
+
+            if (
+                data.user.role !==
+                selectedRole
+            ) {
+
+
+                throw new Error(
+
+                    selectedRole === "student"
+                        ?
+                        "This ID belongs to a Faculty account."
+                        :
+                        "This ID belongs to a Student account."
+
+                );
+
+
+            }
+
+
+            /*
+             * Store current user locally.
+             */
+
+
+            localStorage.setItem(
+                "myCampusUser",
+                JSON.stringify(
+                    data.user
+                )
+            );
+
+
+            showMessage(
+                `Welcome ${data.user.full_name}!`,
+                "success"
+            );
+
+
+            /*
+             * Portal Routing
+             */
+
+
+            if (
+                data.user.role ===
+                "student"
+            ) {
+
+
+                window.location.href =
+                    "student.html";
+
+
+            } else {
+
+
+                /*
+                 * Faculty dashboard will be
+                 * built in the next step.
+                 */
+
+
+                window.location.href =
+                    "faculty.html";
+
+
+            }
+
+
+        } catch (error) {
+
+
+            showMessage(
+                error.message,
+                "error"
+            );
+
+
+        }
+
+    }
+
+
+
+    /* ==========================================
+       MESSAGE
+    ========================================== */
+
+
+    function showMessage(
+        text,
+        type
+    ) {
+
+
+        const box =
+            document.getElementById(
+                "message"
+            );
+
+
+        box.className =
+            `message ${type}`;
+
+
+        box.textContent =
+            text;
+
+
+    }
+
+
+
+    function clearMessage() {
+
+
+        const box =
+            document.getElementById(
+                "message"
+            );
+
+
+        box.className =
+            "message";
+
+
+        box.textContent =
+            "";
+
+
+    }
+
+
+</script>
+
+
+</body>
+
+</html>

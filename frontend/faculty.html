@@ -1,0 +1,1913 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>My Campus | Faculty Portal</title>
+
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+
+        :root {
+
+            --primary: #5b5cf0;
+            --primary-dark: #4647d6;
+            --secondary: #8b5cf6;
+
+            --background: #f5f7fb;
+            --card: #ffffff;
+
+            --text: #172033;
+            --muted: #6b7280;
+
+            --border: #e5e7eb;
+
+            --success: #16a34a;
+            --warning: #f59e0b;
+            --danger: #dc2626;
+
+            --sidebar: #111827;
+
+        }
+
+
+        body {
+
+            font-family:
+                Inter,
+                system-ui,
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                sans-serif;
+
+            background: var(--background);
+
+            color: var(--text);
+
+            min-height: 100vh;
+
+        }
+
+
+        .app {
+
+            display: flex;
+
+            min-height: 100vh;
+
+        }
+
+
+
+        /* ======================================================
+           SIDEBAR
+        ====================================================== */
+
+
+        .sidebar {
+
+            width: 260px;
+
+            position: fixed;
+
+            top: 0;
+            left: 0;
+            bottom: 0;
+
+            background: var(--sidebar);
+
+            color: white;
+
+            padding: 24px 18px;
+
+            display: flex;
+
+            flex-direction: column;
+
+        }
+
+
+        .brand {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 12px;
+
+            padding: 4px 8px 28px;
+
+        }
+
+
+        .brand-logo {
+
+            width: 45px;
+            height: 45px;
+
+            border-radius: 14px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #6366f1,
+                    #8b5cf6
+                );
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            font-weight: 900;
+
+        }
+
+
+        .brand h2 {
+
+            font-size: 19px;
+
+        }
+
+
+        .brand p {
+
+            color: #9ca3af;
+
+            font-size: 11px;
+
+            margin-top: 2px;
+
+        }
+
+
+        .menu-title {
+
+            color: #6b7280;
+
+            font-size: 11px;
+
+            font-weight: 800;
+
+            letter-spacing: 1.4px;
+
+            margin: 12px 12px;
+
+        }
+
+
+        .nav-item {
+
+            padding: 13px 14px;
+
+            border-radius: 12px;
+
+            margin-bottom: 6px;
+
+            color: #cbd5e1;
+
+            display: flex;
+
+            gap: 11px;
+
+            align-items: center;
+
+            cursor: pointer;
+
+            transition: 0.2s;
+
+        }
+
+
+        .nav-item:hover {
+
+            background: #1f2937;
+
+            color: white;
+
+        }
+
+
+        .nav-item.active {
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #4f46e5,
+                    #7c3aed
+                );
+
+            color: white;
+
+        }
+
+
+        .profile {
+
+            margin-top: auto;
+
+            background: #1f2937;
+
+            border-radius: 16px;
+
+            padding: 15px;
+
+        }
+
+
+        .profile-top {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 11px;
+
+        }
+
+
+        .avatar {
+
+            width: 42px;
+            height: 42px;
+
+            border-radius: 50%;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #0ea5e9,
+                    #6366f1
+                );
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            font-weight: 800;
+
+        }
+
+
+        .profile h4 {
+
+            font-size: 13px;
+
+        }
+
+
+        .profile p {
+
+            font-size: 11px;
+
+            color: #9ca3af;
+
+            margin-top: 2px;
+
+        }
+
+
+        .logout {
+
+            margin-top: 13px;
+
+            width: 100%;
+
+            padding: 9px;
+
+            border: none;
+
+            border-radius: 9px;
+
+            background: #374151;
+
+            color: white;
+
+            cursor: pointer;
+
+            font-size: 11px;
+
+            font-weight: 700;
+
+        }
+
+
+
+        /* ======================================================
+           MAIN
+        ====================================================== */
+
+
+        .main {
+
+            margin-left: 260px;
+
+            width: calc(100% - 260px);
+
+            padding: 30px 34px 60px;
+
+        }
+
+
+        .topbar {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            margin-bottom: 26px;
+
+        }
+
+
+        .topbar h1 {
+
+            font-size: 28px;
+
+        }
+
+
+        .topbar p {
+
+            color: var(--muted);
+
+            font-size: 13px;
+
+            margin-top: 5px;
+
+        }
+
+
+        .role-badge {
+
+            padding: 10px 16px;
+
+            border-radius: 999px;
+
+            background: #eef2ff;
+
+            color: #4f46e5;
+
+            font-size: 12px;
+
+            font-weight: 800;
+
+        }
+
+
+
+        /* ======================================================
+           HERO
+        ====================================================== */
+
+
+        .hero {
+
+            padding: 26px;
+
+            border-radius: 21px;
+
+            margin-bottom: 24px;
+
+            color: white;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #312e81,
+                    #6d28d9
+                );
+
+        }
+
+
+        .hero h2 {
+
+            font-size: 24px;
+
+            margin-bottom: 7px;
+
+        }
+
+
+        .hero p {
+
+            color: #e0e7ff;
+
+            font-size: 13px;
+
+            line-height: 1.6;
+
+            max-width: 700px;
+
+        }
+
+
+
+        /* ======================================================
+           STATS
+        ====================================================== */
+
+
+        .stats {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(4, 1fr);
+
+            gap: 16px;
+
+            margin-bottom: 24px;
+
+        }
+
+
+        .stat-card {
+
+            background: white;
+
+            border: 1px solid var(--border);
+
+            border-radius: 17px;
+
+            padding: 19px;
+
+        }
+
+
+        .stat-icon {
+
+            width: 39px;
+            height: 39px;
+
+            border-radius: 11px;
+
+            background: #eef2ff;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            font-size: 18px;
+
+            margin-bottom: 13px;
+
+        }
+
+
+        .stat-card h3 {
+
+            font-size: 24px;
+
+        }
+
+
+        .stat-card p {
+
+            color: var(--muted);
+
+            font-size: 11px;
+
+            margin-top: 4px;
+
+        }
+
+
+
+        /* ======================================================
+           GRID
+        ====================================================== */
+
+
+        .dashboard-grid {
+
+            display: grid;
+
+            grid-template-columns:
+                1fr 1.4fr;
+
+            gap: 20px;
+
+        }
+
+
+        .card {
+
+            background: white;
+
+            border: 1px solid var(--border);
+
+            border-radius: 20px;
+
+            padding: 23px;
+
+        }
+
+
+        .card-title {
+
+            margin-bottom: 19px;
+
+        }
+
+
+        .card-title h2 {
+
+            font-size: 18px;
+
+        }
+
+
+        .card-title p {
+
+            color: var(--muted);
+
+            font-size: 12px;
+
+            margin-top: 5px;
+
+            line-height: 1.5;
+
+        }
+
+
+
+        /* ======================================================
+           RESOURCE UPLOAD
+        ====================================================== */
+
+
+        .field {
+
+            margin-bottom: 14px;
+
+        }
+
+
+        .field label {
+
+            display: block;
+
+            margin-bottom: 7px;
+
+            font-size: 11px;
+
+            font-weight: 800;
+
+        }
+
+
+        .field input,
+        .field select,
+        .field textarea {
+
+            width: 100%;
+
+            padding: 12px 13px;
+
+            border-radius: 11px;
+
+            border: 1px solid var(--border);
+
+            outline: none;
+
+            background: white;
+
+            font-family: inherit;
+
+            font-size: 12px;
+
+        }
+
+
+        .field textarea {
+
+            min-height: 90px;
+
+            resize: vertical;
+
+        }
+
+
+        .field input:focus,
+        .field select:focus,
+        .field textarea:focus {
+
+            border-color: var(--primary);
+
+            box-shadow:
+                0 0 0 3px
+                rgba(
+                    91,
+                    92,
+                    240,
+                    0.1
+                );
+
+        }
+
+
+        .upload-box {
+
+            padding: 20px;
+
+            border:
+                2px dashed
+                #c7d2fe;
+
+            border-radius: 14px;
+
+            text-align: center;
+
+            background: #fafaff;
+
+            margin-bottom: 14px;
+
+        }
+
+
+        .upload-box strong {
+
+            display: block;
+
+            margin-bottom: 4px;
+
+            font-size: 13px;
+
+        }
+
+
+        .upload-box span {
+
+            color: var(--muted);
+
+            font-size: 11px;
+
+        }
+
+
+        .primary-btn {
+
+            width: 100%;
+
+            padding: 12px;
+
+            border: none;
+
+            border-radius: 11px;
+
+            color: white;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #4f46e5,
+                    #7c3aed
+                );
+
+            cursor: pointer;
+
+            font-size: 12px;
+
+            font-weight: 800;
+
+        }
+
+
+
+        /* ======================================================
+           TICKETS
+        ====================================================== */
+
+
+        .ticket {
+
+            padding: 16px;
+
+            border: 1px solid var(--border);
+
+            border-radius: 14px;
+
+            margin-bottom: 12px;
+
+        }
+
+
+        .ticket-header {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            gap: 12px;
+
+            margin-bottom: 8px;
+
+        }
+
+
+        .ticket h4 {
+
+            font-size: 14px;
+
+        }
+
+
+        .ticket p {
+
+            color: var(--muted);
+
+            font-size: 11px;
+
+            line-height: 1.6;
+
+        }
+
+
+        .ticket-meta {
+
+            display: flex;
+
+            gap: 7px;
+
+            flex-wrap: wrap;
+
+            margin-top: 12px;
+
+        }
+
+
+        .chip {
+
+            padding: 6px 9px;
+
+            border-radius: 999px;
+
+            background: #f3f4f6;
+
+            color: #4b5563;
+
+            font-size: 10px;
+
+            font-weight: 700;
+
+        }
+
+
+        .status-new {
+
+            background: #eff6ff;
+
+            color: #1d4ed8;
+
+        }
+
+
+        .status-progress {
+
+            background: #fffbeb;
+
+            color: #b45309;
+
+        }
+
+
+        .status-resolved {
+
+            background: #ecfdf5;
+
+            color: #15803d;
+
+        }
+
+
+        .empty-state {
+
+            text-align: center;
+
+            padding: 42px 20px;
+
+            color: var(--muted);
+
+        }
+
+
+        .empty-state .icon {
+
+            font-size: 37px;
+
+            margin-bottom: 11px;
+
+        }
+
+
+        .empty-state h3 {
+
+            color: var(--text);
+
+            font-size: 15px;
+
+            margin-bottom: 5px;
+
+        }
+
+
+        .empty-state p {
+
+            font-size: 11px;
+
+            line-height: 1.6;
+
+        }
+
+
+
+        /* ======================================================
+           HOD TABLE
+        ====================================================== */
+
+
+        table {
+
+            width: 100%;
+
+            border-collapse: collapse;
+
+        }
+
+
+        th {
+
+            text-align: left;
+
+            padding: 12px;
+
+            background: #f9fafb;
+
+            color: var(--muted);
+
+            font-size: 10px;
+
+            text-transform: uppercase;
+
+            letter-spacing: 0.4px;
+
+        }
+
+
+        td {
+
+            padding: 14px 12px;
+
+            border-bottom:
+                1px solid
+                var(--border);
+
+            font-size: 12px;
+
+        }
+
+
+        .analytics-card {
+
+            grid-column: span 2;
+
+        }
+
+
+
+        /* ======================================================
+           MESSAGE
+        ====================================================== */
+
+
+        .message {
+
+            display: none;
+
+            margin-top: 13px;
+
+            padding: 11px 13px;
+
+            border-radius: 10px;
+
+            font-size: 11px;
+
+        }
+
+
+        .message.success {
+
+            display: block;
+
+            background: #ecfdf5;
+
+            color: #166534;
+
+            border: 1px solid #bbf7d0;
+
+        }
+
+
+
+        /* ======================================================
+           RESPONSIVE
+        ====================================================== */
+
+
+        @media (max-width: 1050px) {
+
+            .stats {
+
+                grid-template-columns:
+                    repeat(2, 1fr);
+
+            }
+
+
+            .dashboard-grid {
+
+                grid-template-columns:
+                    1fr;
+
+            }
+
+
+            .analytics-card {
+
+                grid-column: span 1;
+
+            }
+
+        }
+
+
+        @media (max-width: 760px) {
+
+            .sidebar {
+
+                display: none;
+
+            }
+
+
+            .main {
+
+                margin-left: 0;
+
+                width: 100%;
+
+                padding: 20px;
+
+            }
+
+
+            .stats {
+
+                grid-template-columns:
+                    1fr;
+
+            }
+
+        }
+
+    </style>
+
+<link rel="stylesheet" href="assets/css/faculty-hub.css?v=1"></head>
+
+
+<body>
+
+
+<div class="app">
+
+
+    <!-- ======================================================
+         SIDEBAR
+    ======================================================= -->
+
+
+    <aside class="sidebar">
+
+
+        <div class="brand">
+
+            <div class="brand-logo">
+                MC
+            </div>
+
+
+            <div>
+
+                <h2>
+                    My Campus
+                </h2>
+
+                <p>
+                    Faculty Portal
+                </p>
+
+            </div>
+
+        </div>
+
+
+
+        <div class="menu-title">
+            FACULTY
+        </div>
+
+
+        <div class="nav-item active">
+            🏠 Dashboard
+        </div>
+
+
+        <div
+            id="resourceNav"
+            class="nav-item"
+        >
+            📚 Resources
+        </div>
+
+
+        <div
+            id="ticketsNav"
+            class="nav-item"
+        >
+            🎫 Student Doubts
+        </div>
+
+
+        <div
+            id="analyticsNav"
+            class="nav-item"
+        >
+            📊 Analytics
+        </div>
+
+
+
+        <div class="profile">
+
+
+            <div class="profile-top">
+
+
+                <div class="avatar">
+                    F
+                </div>
+
+
+                <div>
+
+                    <h4 id="profileName">
+                        Faculty
+                    </h4>
+
+                    <p id="profileRole">
+                        Professor
+                    </p>
+
+                </div>
+
+
+            </div>
+
+
+            <button
+                class="logout"
+                onclick="logout()"
+            >
+                Logout
+            </button>
+
+
+        </div>
+
+
+    </aside>
+
+
+
+    <!-- ======================================================
+         MAIN
+    ======================================================= -->
+
+
+    <main class="main">
+
+
+        <div class="topbar">
+
+
+            <div>
+
+                <h1 id="welcomeTitle">
+                    Faculty Dashboard
+                </h1>
+
+                <p id="welcomeSubtitle">
+                    Manage learning resources and student support.
+                </p>
+
+            </div>
+
+
+            <div
+                class="role-badge"
+                id="roleBadge"
+            >
+                Professor
+            </div>
+
+
+        </div>
+
+
+
+        <section class="hero">
+
+
+            <h2 id="heroTitle">
+                Support every learner with the right intervention.
+            </h2>
+
+
+            <p id="heroText">
+
+                Student doubts are escalated with the
+                exact subject, topic and learning context,
+                helping faculty provide targeted support.
+
+            </p>
+
+
+        </section>
+
+
+
+        <!-- ==================================================
+             PROFESSOR DASHBOARD
+        =================================================== -->
+
+
+        <div id="professorDashboard">
+
+
+            <section class="stats">
+
+
+                <div class="stat-card">
+
+                    <div class="stat-icon">
+                        🎫
+                    </div>
+
+                    <h3 id="newTickets">
+                        0
+                    </h3>
+
+                    <p>
+                        New Doubts
+                    </p>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-icon">
+                        ⏳
+                    </div>
+
+                    <h3 id="progressTickets">
+                        0
+                    </h3>
+
+                    <p>
+                        In Progress
+                    </p>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-icon">
+                        ✅
+                    </div>
+
+                    <h3 id="resolvedTickets">
+                        0
+                    </h3>
+
+                    <p>
+                        Resolved
+                    </p>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-icon">
+                        📚
+                    </div>
+
+                    <h3 id="resourceCount">
+                        0
+                    </h3>
+
+                    <p>
+                        Resources Uploaded
+                    </p>
+
+                </div>
+
+
+            </section>
+
+
+
+            <div class="dashboard-grid">
+
+
+                <!-- RESOURCE UPLOAD -->
+
+
+                <section class="card">
+
+
+                    <div class="card-title">
+
+                        <h2>
+                            Upload Learning Resource
+                        </h2>
+
+                        <p>
+
+                            Add notes, videos or interactive
+                            learning materials for students.
+
+                        </p>
+
+                    </div>
+
+
+
+                    <form
+                        onsubmit="demoUpload(event)"
+                    >
+
+
+                        <div class="field">
+
+                            <label>
+                                Subject
+                            </label>
+
+                            <select required>
+
+                                <option value="">
+                                    Select subject
+                                </option>
+
+                                <option>
+                                    Physics
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+
+                        <div class="field">
+
+                            <label>
+                                Topic
+                            </label>
+
+                            <select required>
+
+                                <option value="">
+                                    Select topic
+                                </option>
+
+                                <option>
+                                    Why Physics? & Real-World Applications
+                                </option>
+
+                                <option>
+                                    Motion, Distance, Speed & Velocity
+                                </option>
+
+                                <option>
+                                    Forces & Newton's Laws
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+
+                        <div class="field">
+
+                            <label>
+                                Resource Type
+                            </label>
+
+                            <select required>
+
+                                <option value="">
+                                    Select type
+                                </option>
+
+                                <option>
+                                    Notes
+                                </option>
+
+                                <option>
+                                    Video
+                                </option>
+
+                                <option>
+                                    3D / Interactive Model
+                                </option>
+
+                                <option>
+                                    Game / Activity
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+
+                        <div class="upload-box">
+
+                            <strong>
+                                📤 Upload Resource
+                            </strong>
+
+                            <span>
+                                File storage backend will be connected next.
+                            </span>
+
+                        </div>
+
+
+
+                        <div class="field">
+
+                            <label>
+                                Resource Description
+                            </label>
+
+                            <textarea
+                                placeholder="Brief description of the learning material..."
+                            ></textarea>
+
+                        </div>
+
+
+
+                        <button
+                            type="submit"
+                            class="primary-btn"
+                        >
+                            Add Resource
+                        </button>
+
+
+
+                        <div
+                            id="uploadMessage"
+                            class="message"
+                        >
+                        </div>
+
+
+                    </form>
+
+
+                </section>
+
+
+
+                <!-- DOUBT TICKETS -->
+
+
+                <section class="card">
+
+
+                    <div class="card-title">
+
+                        <h2>
+                            Student Doubt Tickets
+                        </h2>
+
+                        <p>
+
+                            Escalated doubts will include
+                            the exact topic and learning context.
+
+                        </p>
+
+                    </div>
+
+
+
+                    <div id="ticketContainer">
+
+
+                        <div class="empty-state">
+
+                            <div class="icon">
+                                🎫
+                            </div>
+
+                            <h3>
+                                No student doubts yet
+                            </h3>
+
+                            <p>
+
+                                When a student cannot resolve a
+                                concept using learning resources
+                                and AI Tutor, the doubt will appear
+                                here automatically.
+
+                            </p>
+
+                        </div>
+
+
+                    </div>
+
+
+                </section>
+
+
+            </div>
+
+
+        </div>
+
+
+
+        <!-- ==================================================
+             HOD DASHBOARD
+        =================================================== -->
+
+
+        <div
+            id="hodDashboard"
+            style="display:none;"
+        >
+
+
+            <section class="stats">
+
+
+                <div class="stat-card">
+
+                    <div class="stat-icon">
+                        👨‍🏫
+                    </div>
+
+                    <h3>
+                        0
+                    </h3>
+
+                    <p>
+                        Active Professors
+                    </p>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-icon">
+                        🎫
+                    </div>
+
+                    <h3>
+                        0
+                    </h3>
+
+                    <p>
+                        Total Student Problems
+                    </p>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-icon">
+                        ✅
+                    </div>
+
+                    <h3>
+                        0
+                    </h3>
+
+                    <p>
+                        Problems Resolved
+                    </p>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-icon">
+                        ⏱️
+                    </div>
+
+                    <h3>
+                        -
+                    </h3>
+
+                    <p>
+                        Avg. Resolution Time
+                    </p>
+
+                </div>
+
+
+            </section>
+
+
+
+            <div class="dashboard-grid">
+
+
+                <section
+                    class="card analytics-card"
+                >
+
+
+                    <div class="card-title">
+
+                        <h2>
+                            Faculty Performance & Support Analytics
+                        </h2>
+
+                        <p>
+
+                            Monitor student support workload,
+                            resolution rate and response time
+                            across faculty members.
+
+                        </p>
+
+                    </div>
+
+
+
+                    <table>
+
+
+                        <thead>
+
+                        <tr>
+
+                            <th>
+                                Faculty
+                            </th>
+
+                            <th>
+                                Problems Received
+                            </th>
+
+                            <th>
+                                Resolved
+                            </th>
+
+                            <th>
+                                Pending
+                            </th>
+
+                            <th>
+                                Avg. Resolution Time
+                            </th>
+
+                        </tr>
+
+                        </thead>
+
+
+
+                        <tbody id="facultyAnalytics">
+
+
+                        <tr>
+
+                            <td colspan="5">
+
+                                <div class="empty-state">
+
+                                    <div class="icon">
+                                        📊
+                                    </div>
+
+                                    <h3>
+                                        No analytics available yet
+                                    </h3>
+
+                                    <p>
+
+                                        Faculty performance data
+                                        will appear when student
+                                        doubt tickets start flowing
+                                        through the system.
+
+                                    </p>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+
+                        </tbody>
+
+
+                    </table>
+
+
+                </section>
+
+
+            </div>
+
+
+        </div>
+
+
+    </main>
+
+
+</div>
+
+
+
+<script>
+
+
+    /*
+    =========================================================
+    CURRENT USER
+    =========================================================
+    */
+
+
+    const storedUser =
+        localStorage.getItem(
+            "myCampusUser"
+        );
+
+
+    if (!storedUser) {
+
+        window.location.href =
+            "index.html";
+
+    }
+
+
+    const user =
+        JSON.parse(
+            storedUser
+        );
+
+
+    /*
+    =========================================================
+    SECURITY / ROLE CHECK
+    =========================================================
+    */
+
+
+    if (
+        user.role !== "faculty"
+    ) {
+
+        window.location.href =
+            "index.html";
+
+    }
+
+
+
+    /*
+    =========================================================
+    PROFILE
+    =========================================================
+    */
+
+
+    document.getElementById(
+        "profileName"
+    ).textContent =
+        user.full_name;
+
+
+    const facultyRole =
+        user.faculty_role || "professor";
+
+
+    const readableRole =
+        facultyRole === "hod"
+            ? "HOD"
+            : "Professor";
+
+
+    document.getElementById(
+        "profileRole"
+    ).textContent =
+        readableRole;
+
+
+    document.getElementById(
+        "roleBadge"
+    ).textContent =
+        readableRole;
+
+
+
+    /*
+    =========================================================
+    PROFESSOR / HOD DASHBOARD SWITCH
+    =========================================================
+    */
+
+
+    if (
+        facultyRole === "hod"
+    ) {
+
+
+        document.getElementById(
+            "professorDashboard"
+        ).style.display =
+            "none";
+
+
+        document.getElementById(
+            "hodDashboard"
+        ).style.display =
+            "block";
+
+
+        document.getElementById(
+            "welcomeTitle"
+        ).textContent =
+            `Welcome, ${user.full_name}`;
+
+
+        document.getElementById(
+            "welcomeSubtitle"
+        ).textContent =
+            "Department learning and faculty support overview.";
+
+
+        document.getElementById(
+            "heroTitle"
+        ).textContent =
+            "See where students struggle and how quickly support reaches them.";
+
+
+        document.getElementById(
+            "heroText"
+        ).textContent =
+            "Track faculty workload, resolution rates, pending student problems and response time across the department.";
+
+
+        document.getElementById(
+            "resourceNav"
+        ).style.display =
+            "none";
+
+
+        document.getElementById(
+            "ticketsNav"
+        ).style.display =
+            "none";
+
+
+    } else {
+
+
+        document.getElementById(
+            "welcomeTitle"
+        ).textContent =
+            `Welcome, ${user.full_name}`;
+
+
+        document.getElementById(
+            "welcomeSubtitle"
+        ).textContent =
+            "Manage student learning resources and doubt tickets.";
+
+
+        document.getElementById(
+            "analyticsNav"
+        ).style.display =
+            "none";
+
+
+    }
+
+
+
+    /*
+    =========================================================
+    TEMPORARY RESOURCE UI TEST
+    =========================================================
+    */
+
+
+    function demoUpload(event) {
+
+
+        event.preventDefault();
+
+
+        const message =
+            document.getElementById(
+                "uploadMessage"
+            );
+
+
+        message.className =
+            "message success";
+
+
+        message.textContent =
+            "Resource form is working. Backend resource storage will be connected in the next module.";
+
+
+    }
+
+
+
+    /*
+    =========================================================
+    LOGOUT
+    =========================================================
+    */
+
+
+    function logout() {
+
+
+        localStorage.removeItem(
+            "myCampusUser"
+        );
+
+
+        window.location.href =
+            "index.html";
+
+
+    }
+
+
+</script>
+
+
+<script src="assets/js/faculty-hub.js?v=1"></script></body>
+
+</html>

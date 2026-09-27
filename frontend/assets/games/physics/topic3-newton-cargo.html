@@ -1,0 +1,2497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>My Campus - Newton Cargo Rescue</title>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;background:#08131d;font-family:Segoe UI,Arial,sans-serif}
+#game{position:fixed;inset:0}
+canvas{display:block}
+
+.hud{position:fixed;inset:0;z-index:10;color:#fff;pointer-events:none}
+.glass{
+    background:linear-gradient(135deg,rgba(5,20,32,.94),rgba(7,29,44,.80));
+    border:1px solid rgba(255,255,255,.13);
+    border-radius:15px;
+    box-shadow:0 14px 40px rgba(0,0,0,.28);
+    backdrop-filter:blur(13px)
+}
+
+.title{position:absolute;top:18px;left:18px;width:355px;padding:14px 17px}
+.eyebrow{color:#68e4ff;font-size:10px;font-weight:900;letter-spacing:1.6px}
+.title h1{font-size:20px;margin-top:4px}
+.title p{font-size:11px;color:#aec0cc;line-height:1.4;margin-top:5px}
+
+.progress{position:absolute;top:18px;left:50%;transform:translateX(-50%);width:440px;padding:11px 14px}
+.progress-top{display:flex;justify-content:space-between;font-size:9px;color:#9fb2c0;font-weight:900}
+.track{height:7px;background:rgba(255,255,255,.1);border-radius:20px;margin-top:7px;overflow:hidden}
+#progressFill{height:100%;width:0;background:linear-gradient(90deg,#49ddff,#6eff9c)}
+
+.stage{
+    position:absolute;top:18px;right:18px;width:190px;padding:12px;text-align:center
+}
+.stage small{font-size:9px;color:#99adbc;font-weight:900}
+.stage strong{display:block;color:#68e4ff;font-size:17px;margin-top:3px}
+
+.force-panel{
+    position:absolute;left:18px;top:160px;width:295px;padding:14px;pointer-events:auto
+}
+.panel-title{color:#69e5ff;font-size:10px;font-weight:950;letter-spacing:1.1px}
+.force-buttons{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:10px}
+.force-buttons button{
+    border:1px solid rgba(255,255,255,.13);
+    border-radius:9px;
+    padding:10px 5px;
+    background:rgba(255,255,255,.06);
+    color:white;
+    font-weight:900;
+    cursor:pointer
+}
+.force-buttons button.active{
+    background:#64e1ff;
+    color:#04131c
+}
+.force-help{font-size:9px;color:#9eb1bf;margin-top:8px;line-height:1.4}
+
+.metrics{
+    position:absolute;right:18px;bottom:18px;width:330px;padding:15px
+}
+.metric-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.metric{padding:9px;background:rgba(255,255,255,.05);border-radius:9px}
+.metric label{display:block;color:#91a6b5;font-size:8px;font-weight:900}
+.metric strong{display:block;margin-top:2px;font-size:15px}
+.metric strong.highlight{color:#72e5ff}
+
+.accelbar{height:7px;background:rgba(255,255,255,.09);border-radius:20px;overflow:hidden;margin:11px 0}
+#accelFill{height:100%;width:0;background:linear-gradient(90deg,#53ddff,#78ff9c,#ffe16b)}
+
+.live-equation{
+    margin-top:8px;padding:10px;border-radius:10px;
+    background:rgba(77,220,255,.07);
+    border:1px solid rgba(78,219,255,.16);
+    font-size:10px;line-height:1.45
+}
+.live-equation b{color:#6ee5ff}
+
+.coach{
+    position:absolute;left:50%;bottom:14px;transform:translateX(-50%);
+    width:min(690px,43vw);padding:12px 16px;text-align:center
+}
+#coachTitle{font-size:10px;color:#65e3ff;font-weight:950;letter-spacing:1px}
+#coachText{font-size:11px;color:#e2ecf2;margin-top:4px;line-height:1.45}
+#coachFormula{font-size:10px;color:#92a9b8;margin-top:4px}
+
+.controls{
+    position:absolute;left:50%;top:95px;transform:translateX(-50%);
+    padding:8px 13px;font-size:10px
+}
+
+.mission{
+    position:fixed;inset:0;z-index:40;
+    display:flex;align-items:center;justify-content:center;
+    background:rgba(2,8,14,.72);backdrop-filter:blur(7px);
+    pointer-events:auto;color:#fff
+}
+.mission-box{width:min(620px,90vw);padding:25px;text-align:center}
+.mission-box h2{font-size:30px}
+.mission-box p{color:#b5c7d3;font-size:12px;line-height:1.6;margin-top:10px}
+.mission-box button{
+    margin-top:18px;padding:12px 25px;border:0;border-radius:10px;
+    background:#61e1ff;color:#03131c;font-weight:950;cursor:pointer
+}
+
+.challenge{
+    position:fixed;top:120px;left:50%;transform:translateX(-50%);
+    z-index:60;width:min(720px,90vw);padding:18px;color:#fff;display:none;pointer-events:auto
+}
+.challenge.show{display:block}
+.challenge-badge{font-size:10px;color:#ffe16b;font-weight:950;letter-spacing:1.2px}
+.challenge h3{font-size:19px;margin-top:6px}
+.challenge-hint{font-size:11px;color:#b7c8d4;margin-top:4px}
+.answers{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.answer{
+    padding:10px;border:1px solid rgba(255,255,255,.14);border-radius:9px;
+    background:rgba(255,255,255,.07);color:#fff;font-weight:900;cursor:pointer
+}
+.answer:hover{background:rgba(70,215,255,.15)}
+.answer:disabled{opacity:.6}
+.feedback{
+    display:none;margin-top:10px;padding:11px;max-height:235px;overflow:auto;
+    border-radius:10px;background:rgba(66,214,255,.08);
+    border:1px solid rgba(82,218,255,.17);font-size:11px;line-height:1.55
+}
+.feedback b{color:#6ee5ff}
+.continue{
+    display:none;margin:10px auto 0;padding:10px 23px;border:0;border-radius:9px;
+    background:#61e1ff;color:#03131c;font-weight:900;cursor:pointer
+}
+
+.collision{
+    position:fixed;left:50%;top:145px;transform:translateX(-50%);
+    z-index:65;width:min(650px,88vw);padding:17px;display:none;text-align:center;color:#fff
+}
+.collision.show{display:block}
+.action-arrow{font-size:18px;color:#ffdd69;font-weight:950;margin:10px 0}
+
+.finish{
+    position:fixed;inset:0;z-index:80;display:none;align-items:center;justify-content:center;
+    background:rgba(1,7,13,.84);backdrop-filter:blur(10px);color:#fff;pointer-events:auto
+}
+.finish.show{display:flex}
+.finish-box{width:min(790px,94vw);max-height:93vh;overflow:auto;padding:27px}
+.finish-box h2{text-align:center;font-size:32px}
+.finish-sub{text-align:center;color:#a9bbc8;font-size:11px;margin-top:5px}
+.final-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:15px}
+.final-card{text-align:center;padding:12px;border-radius:10px;background:rgba(255,255,255,.055)}
+.final-card strong{display:block;color:#69e3ff;font-size:19px}
+.final-card span{font-size:8px;color:#92a7b5}
+.explanation{
+    margin-top:15px;padding:16px;border-radius:11px;
+    background:rgba(68,212,255,.075);border:1px solid rgba(89,220,255,.18);
+    font-size:11px;line-height:1.65
+}
+.explanation b{color:#6ee5ff}
+.restart{
+    display:block;margin:16px auto 0;padding:11px 25px;border:0;border-radius:9px;
+    background:#61e1ff;color:#03131c;font-weight:900;cursor:pointer
+}
+</style>
+</head>
+
+<body>
+
+<div id="game"></div>
+
+<div class="hud">
+
+<div class="title glass">
+    <div class="eyebrow">MY CAMPUS - PHYSICS GAME</div>
+    <h1>Campus Cargo Rescue - Newton's Laws</h1>
+    <p id="studentText"></p>
+</div>
+
+<div class="progress glass">
+    <div class="progress-top">
+        <span>STORE</span>
+        <span id="progressText">0 / 1200 m</span>
+        <span>PHYSICS LAB</span>
+    </div>
+    <div class="track"><div id="progressFill"></div></div>
+</div>
+
+<div class="stage glass">
+    <small>CURRENT CONCEPT</small>
+    <strong id="stageText">Newton's 1st Law</strong>
+</div>
+
+<div class="controls glass">
+    W / UP = Push &nbsp; | &nbsp; S / DOWN = Brake &nbsp; | &nbsp; A D = Steer
+</div>
+
+<div class="force-panel glass">
+    <div class="panel-title">SELECT PUSH FORCE</div>
+
+    <div class="force-buttons">
+        <button data-force="120">120 N</button>
+        <button data-force="240" class="active">240 N</button>
+        <button data-force="360">360 N</button>
+    </div>
+
+    <div class="force-help">
+        Press 1 / 2 / 3 also. More force does not always mean the same acceleration because cart mass and friction can change.
+    </div>
+</div>
+
+<div class="metrics glass">
+
+    <div class="metric-grid">
+        <div class="metric">
+            <label>CART MASS</label>
+            <strong><span id="mass">40</span> kg</strong>
+        </div>
+
+        <div class="metric">
+            <label>APPLIED FORCE</label>
+            <strong><span id="appliedForce">0</span> N</strong>
+        </div>
+
+        <div class="metric">
+            <label>FRICTION</label>
+            <strong><span id="friction">30</span> N</strong>
+        </div>
+
+        <div class="metric">
+            <label>NET FORCE</label>
+            <strong><span id="netForce">0</span> N</strong>
+        </div>
+
+        <div class="metric">
+            <label>ACCELERATION</label>
+            <strong class="highlight"><span id="acceleration">0.00</span> m/s²</strong>
+        </div>
+
+        <div class="metric">
+            <label>SPEED</label>
+            <strong><span id="speed">0.0</span> m/s</strong>
+        </div>
+    </div>
+
+    <div class="accelbar"><div id="accelFill"></div></div>
+
+    <div class="live-equation" id="equation">
+        <b>Newton's 2nd Law:</b><br>
+        Fnet = ma
+    </div>
+
+</div>
+
+<div class="coach glass">
+    <div id="coachTitle">NEWTON'S FIRST LAW</div>
+    <div id="coachText">
+        The cart is at rest. It stays at rest until you apply an external force.
+    </div>
+    <div id="coachFormula">
+        An object remains at rest or in uniform motion unless acted on by a net external force.
+    </div>
+</div>
+
+</div>
+
+<div id="mission" class="mission">
+    <div class="mission-box glass">
+        <h2>Urgent Physics Lab Delivery</h2>
+        <p>
+            Carry the laboratory equipment from the campus store to the Physics Lab.
+            The cart mass, friction and obstacles will change during the mission.
+            Use force correctly, brake before barriers and experience all three Newton's Laws.
+        </p>
+        <button id="startBtn">Start Mission</button>
+    </div>
+</div>
+
+<div id="challenge" class="challenge glass">
+    <div class="challenge-badge">PHYSICS FORCE CHALLENGE</div>
+    <h3 id="question"></h3>
+    <div id="challengeHint" class="challenge-hint"></div>
+    <div id="answers" class="answers"></div>
+    <div id="feedback" class="feedback"></div>
+    <button id="continueBtn" class="continue">Continue Delivery</button>
+</div>
+
+<div id="collisionBox" class="collision glass">
+    <div class="challenge-badge">NEWTON'S THIRD LAW EVENT</div>
+    <h3>Your cart hit the blocking trolley.</h3>
+    <div class="action-arrow">
+        YOUR CART &nbsp; ---- 320 N ----&gt; &nbsp; OTHER CART<br>
+        YOUR CART &nbsp; &lt;---- 320 N ---- &nbsp; OTHER CART
+    </div>
+    <div style="font-size:11px;line-height:1.55;color:#dce8ef">
+        Your cart pushes the other trolley with <b>320 N</b>.
+        At the same instant, the other trolley pushes your cart back with
+        <b>320 N in the opposite direction</b>.
+        These forces do not cancel because they act on different objects.
+    </div>
+    <button id="collisionContinue" class="continue" style="display:block">
+        Continue Mission
+    </button>
+</div>
+
+<div id="finish" class="finish">
+    <div class="finish-box glass">
+
+        <h2>Equipment Delivered!</h2>
+
+        <div class="finish-sub">
+            Your gameplay data now becomes the Newton's Laws explanation.
+        </div>
+
+        <div class="final-grid">
+            <div class="final-card">
+                <strong id="finalTime">-</strong>
+                <span>MISSION TIME</span>
+            </div>
+
+            <div class="final-card">
+                <strong id="finalMaxMass">-</strong>
+                <span>MAX MASS</span>
+            </div>
+
+            <div class="final-card">
+                <strong id="finalMaxForce">-</strong>
+                <span>MAX FORCE</span>
+            </div>
+
+            <div class="final-card">
+                <strong id="finalTopSpeed">-</strong>
+                <span>TOP SPEED</span>
+            </div>
+        </div>
+
+        <div id="finalExplanation" class="explanation"></div>
+
+        <button class="restart" onclick="location.reload()">
+            Play Again - New Questions
+        </button>
+
+    </div>
+</div>
+
+<script src="../../vendor/three-0.160.1.min.js"></script>
+
+<script>
+(() => {
+
+"use strict";
+
+/* =========================================================
+   CONFIG
+========================================================= */
+
+const TRACK_LENGTH = 1200;
+
+const studentName =
+    localStorage.getItem("student_name") ||
+    sessionStorage.getItem("student_name") ||
+    "Student";
+
+document.getElementById("studentText").textContent =
+    studentName + " - deliver the cargo by controlling force, mass, acceleration and inertia.";
+
+/* =========================================================
+   THREE
+========================================================= */
+
+const scene = new THREE.Scene();
+
+scene.background =
+    new THREE.Color(0x86cbea);
+
+scene.fog =
+    new THREE.Fog(
+        0x86cbea,
+        150,
+        520
+    );
+
+const camera =
+    new THREE.PerspectiveCamera(
+        58,
+        innerWidth / innerHeight,
+        .1,
+        700
+    );
+
+const renderer =
+    new THREE.WebGLRenderer({
+        antialias:true,
+        powerPreference:"high-performance"
+    });
+
+renderer.setSize(
+    innerWidth,
+    innerHeight
+);
+
+renderer.setPixelRatio(
+    Math.min(devicePixelRatio,2)
+);
+
+renderer.shadowMap.enabled = true;
+
+renderer.outputColorSpace =
+    THREE.SRGBColorSpace;
+
+renderer.toneMapping =
+    THREE.ACESFilmicToneMapping;
+
+document
+    .getElementById("game")
+    .appendChild(renderer.domElement);
+
+scene.add(
+    new THREE.HemisphereLight(
+        0xdaf3ff,
+        0x4c7348,
+        2.5
+    )
+);
+
+const sun =
+    new THREE.DirectionalLight(
+        0xffefcf,
+        4
+    );
+
+sun.position.set(
+    -60,
+    100,
+    -30
+);
+
+sun.castShadow = true;
+
+sun.shadow.mapSize.set(
+    2048,
+    2048
+);
+
+scene.add(sun);
+
+/* =========================================================
+   MATERIALS
+========================================================= */
+
+const MAT = {
+
+    road:new THREE.MeshStandardMaterial({
+        color:0x353a3f,
+        roughness:.92
+    }),
+
+    grass:new THREE.MeshStandardMaterial({
+        color:0x559949,
+        roughness:1
+    }),
+
+    white:new THREE.MeshStandardMaterial({
+        color:0xf6f6ee
+    }),
+
+    concrete:new THREE.MeshStandardMaterial({
+        color:0xb1b9bc,
+        roughness:.9
+    }),
+
+    dark:new THREE.MeshStandardMaterial({
+        color:0x161b20,
+        roughness:.55,
+        metalness:.3
+    }),
+
+    blue:new THREE.MeshStandardMaterial({
+        color:0x189fdf,
+        roughness:.5,
+        metalness:.25
+    }),
+
+    crate:new THREE.MeshStandardMaterial({
+        color:0xb77b3c,
+        roughness:.9
+    }),
+
+    rough:new THREE.MeshStandardMaterial({
+        color:0x70594a,
+        roughness:1
+    }),
+
+    red:new THREE.MeshStandardMaterial({
+        color:0xd84f4f,
+        roughness:.65
+    }),
+
+    yellow:new THREE.MeshStandardMaterial({
+        color:0xf0b735,
+        roughness:.6
+    })
+};
+
+function box(
+    w,h,d,
+    material,
+    x,y,z,
+    parent=scene
+){
+
+    const mesh =
+        new THREE.Mesh(
+            new THREE.BoxGeometry(w,h,d),
+            material
+        );
+
+    mesh.position.set(x,y,z);
+
+    mesh.castShadow = true;
+
+    mesh.receiveShadow = true;
+
+    parent.add(mesh);
+
+    return mesh;
+}
+
+/* =========================================================
+   WORLD
+========================================================= */
+
+const ground =
+    new THREE.Mesh(
+        new THREE.PlaneGeometry(
+            150,
+            TRACK_LENGTH + 250
+        ),
+        MAT.grass
+    );
+
+ground.rotation.x =
+    -Math.PI/2;
+
+ground.position.z =
+    TRACK_LENGTH/2;
+
+ground.receiveShadow = true;
+
+scene.add(ground);
+
+/* ROAD */
+
+box(
+    17,
+    .08,
+    TRACK_LENGTH + 60,
+    MAT.road,
+    0,
+    .02,
+    TRACK_LENGTH/2
+);
+
+/* SIDEWALKS */
+
+box(
+    2.5,
+    .22,
+    TRACK_LENGTH + 60,
+    MAT.concrete,
+    -9.8,
+    .08,
+    TRACK_LENGTH/2
+);
+
+box(
+    2.5,
+    .22,
+    TRACK_LENGTH + 60,
+    MAT.concrete,
+    9.8,
+    .08,
+    TRACK_LENGTH/2
+);
+
+/* ROAD LINES */
+
+for(let z=0;z<TRACK_LENGTH;z+=14){
+
+    box(
+        .14,
+        .025,
+        6,
+        MAT.white,
+        0,
+        .08,
+        z
+    );
+}
+
+/* =========================================================
+   CAMPUS BUILDINGS
+========================================================= */
+
+function building(
+    x,z,w,h,d,color
+){
+
+    const material =
+        new THREE.MeshStandardMaterial({
+            color,
+            roughness:.82
+        });
+
+    box(
+        w,h,d,
+        material,
+        x,
+        h/2,
+        z
+    );
+
+    box(
+        w+.3,
+        .28,
+        d+.3,
+        MAT.dark,
+        x,
+        h+.14,
+        z
+    );
+}
+
+for(let z=50;z<TRACK_LENGTH;z+=90){
+
+    building(
+        -27,
+        z,
+        15,
+        8 + Math.random()*8,
+        14,
+        0xd6d0c2
+    );
+
+    building(
+        27,
+        z+40,
+        15,
+        8 + Math.random()*8,
+        14,
+        0xb7c4cd
+    );
+}
+
+/* =========================================================
+   ZONE MARKERS
+========================================================= */
+
+function zoneStrip(
+    z,
+    material
+){
+
+    box(
+        17,
+        .035,
+        4,
+        material,
+        0,
+        .08,
+        z
+    );
+}
+
+/* load */
+zoneStrip(
+    260,
+    MAT.yellow
+);
+
+/* second load */
+zoneStrip(
+    500,
+    MAT.yellow
+);
+
+/* rough road */
+box(
+    17,
+    .035,
+    170,
+    MAT.rough,
+    0,
+    .08,
+    650
+);
+
+/* braking */
+zoneStrip(
+    830,
+    MAT.red
+);
+
+/* third law collision */
+zoneStrip(
+    980,
+    MAT.blue
+);
+
+/* finish */
+zoneStrip(
+    1200,
+    MAT.white
+);
+
+/* =========================================================
+   PLAYER CART
+========================================================= */
+
+const cart =
+    new THREE.Group();
+
+scene.add(cart);
+
+/* base */
+
+box(
+    2.2,
+    .45,
+    3.2,
+    MAT.blue,
+    0,
+    .75,
+    0,
+    cart
+);
+
+/* front bumper */
+
+box(
+    2.3,
+    .35,
+    .3,
+    MAT.dark,
+    0,
+    .65,
+    1.7,
+    cart
+);
+
+/* handle */
+
+box(
+    1.5,
+    .12,
+    .12,
+    MAT.dark,
+    0,
+    1.55,
+    -1.4,
+    cart
+);
+
+box(
+    .12,
+    1.3,
+    .12,
+    MAT.dark,
+    -.65,
+    1.2,
+    -1.4,
+    cart
+);
+
+box(
+    .12,
+    1.3,
+    .12,
+    MAT.dark,
+    .65,
+    1.2,
+    -1.4,
+    cart
+);
+
+/* wheels */
+
+function cartWheel(x,z){
+
+    const wheel =
+        new THREE.Mesh(
+            new THREE.CylinderGeometry(
+                .42,
+                .42,
+                .28,
+                18
+            ),
+            MAT.dark
+        );
+
+    wheel.rotation.z =
+        Math.PI/2;
+
+    wheel.position.set(
+        x,
+        .42,
+        z
+    );
+
+    wheel.castShadow = true;
+
+    cart.add(wheel);
+}
+
+cartWheel(-1.05,-1.05);
+cartWheel(1.05,-1.05);
+cartWheel(-1.05,1.05);
+cartWheel(1.05,1.05);
+
+/* player character behind cart */
+
+const person =
+    new THREE.Group();
+
+cart.add(person);
+
+box(
+    .75,
+    1.15,
+    .5,
+    new THREE.MeshStandardMaterial({
+        color:0x176eaa
+    }),
+    0,
+    2.15,
+    -2.0,
+    person
+);
+
+const head =
+    new THREE.Mesh(
+        new THREE.SphereGeometry(
+            .34,
+            18,
+            14
+        ),
+        new THREE.MeshStandardMaterial({
+            color:0xc58a63
+        })
+    );
+
+head.position.set(
+    0,
+    3.05,
+    -2
+);
+
+person.add(head);
+
+/* cargo group */
+
+const cargoGroup =
+    new THREE.Group();
+
+cart.add(cargoGroup);
+
+function rebuildCargo(
+    mass
+){
+
+    while(
+        cargoGroup.children.length
+    ){
+
+        cargoGroup.remove(
+            cargoGroup.children[0]
+        );
+    }
+
+    const boxes =
+        mass<=40
+        ? 1
+        : mass<=60
+        ? 2
+        : 3;
+
+    for(let i=0;i<boxes;i++){
+
+        box(
+            1.25,
+            .8,
+            1.0,
+            MAT.crate,
+            i%2===0 ? -.35 : .35,
+            1.4 + Math.floor(i/2)*.85,
+            .05,
+            cargoGroup
+        );
+    }
+}
+
+rebuildCargo(40);
+
+/* =========================================================
+   BLOCKING CART FOR NEWTON 3
+========================================================= */
+
+const obstacleCart =
+    new THREE.Group();
+
+scene.add(obstacleCart);
+
+box(
+    2.1,
+    .55,
+    3,
+    MAT.red,
+    0,
+    .72,
+    980,
+    obstacleCart
+);
+
+obstacleCart.position.x = 0;
+
+/* action reaction arrows */
+
+const arrowForward =
+    new THREE.ArrowHelper(
+        new THREE.Vector3(0,0,1),
+        new THREE.Vector3(-1.5,1.7,976),
+        4,
+        0xffd34e,
+        .7,
+        .35
+    );
+
+const arrowBack =
+    new THREE.ArrowHelper(
+        new THREE.Vector3(0,0,-1),
+        new THREE.Vector3(1.5,1.7,984),
+        4,
+        0x55dfff,
+        .7,
+        .35
+    );
+
+arrowForward.visible = false;
+arrowBack.visible = false;
+
+scene.add(
+    arrowForward,
+    arrowBack
+);
+
+/* =========================================================
+   STATE
+========================================================= */
+
+let started = false;
+let finished = false;
+let challengeActive = false;
+let collisionActive = false;
+
+let elapsed = 0;
+
+let lastTime =
+    performance.now();
+
+let selectedForce = 240;
+
+let cartMass = 40;
+
+let frictionForce = 30;
+
+let velocity = 0;
+
+let acceleration = 0;
+
+let positionZ = 0;
+
+let lateralX = 0;
+
+let maxMass = 40;
+
+let maxAppliedForce = 0;
+
+let maxSpeed = 0;
+
+let load1Triggered = false;
+let load2Triggered = false;
+let collisionTriggered = false;
+
+/* =========================================================
+   FORCE BUTTONS
+========================================================= */
+
+const forceButtons =
+    [...document.querySelectorAll(
+        ".force-buttons button"
+    )];
+
+function setForce(
+    force
+){
+
+    selectedForce =
+        force;
+
+    forceButtons.forEach(
+        button=>{
+
+            button.classList.toggle(
+                "active",
+                Number(
+                    button.dataset.force
+                ) === force
+            );
+        }
+    );
+}
+
+forceButtons.forEach(
+    button=>{
+
+        button.onclick =
+            ()=>setForce(
+                Number(
+                    button.dataset.force
+                )
+            );
+    }
+);
+
+/* =========================================================
+   INPUT
+========================================================= */
+
+const keys = {};
+
+addEventListener(
+    "keydown",
+    event=>{
+
+        keys[
+            event.key.toLowerCase()
+        ] = true;
+
+        if(event.key==="1"){
+            setForce(120);
+        }
+
+        if(event.key==="2"){
+            setForce(240);
+        }
+
+        if(event.key==="3"){
+            setForce(360);
+        }
+    }
+);
+
+addEventListener(
+    "keyup",
+    event=>{
+
+        keys[
+            event.key.toLowerCase()
+        ] = false;
+    }
+);
+
+function pressed(...names){
+
+    return names.some(
+        name=>keys[name]
+    );
+}
+
+/* =========================================================
+   RANDOM QUESTIONS
+========================================================= */
+
+function randomItem(
+    array
+){
+
+    return array[
+        Math.floor(
+            Math.random()*
+            array.length
+        )
+    ];
+}
+
+function shuffle(
+    array
+){
+
+    const copy =
+        [...array];
+
+    for(
+        let i=copy.length-1;
+        i>0;
+        i--
+    ){
+
+        const j =
+            Math.floor(
+                Math.random()*
+                (i+1)
+            );
+
+        [
+            copy[i],
+            copy[j]
+        ] = [
+            copy[j],
+            copy[i]
+        ];
+    }
+
+    return copy;
+}
+
+function optionSet(
+    correct,
+    wrong1,
+    wrong2
+){
+
+    const options =
+        shuffle([
+            correct,
+            wrong1,
+            wrong2
+        ]);
+
+    return {
+        options,
+        correct:
+            options.indexOf(
+                correct
+            )
+    };
+}
+
+/* F = ma */
+
+function forceQuestion(){
+
+    const mass =
+        randomItem([
+            20,30,40,50,60
+        ]);
+
+    const accel =
+        randomItem([
+            2,3,4,5
+        ]);
+
+    const force =
+        mass*accel;
+
+    const answer =
+        force+" N";
+
+    const options =
+        optionSet(
+            answer,
+            force-40+" N",
+            force+40+" N"
+        );
+
+    return {
+
+        id:
+            "force_"+mass+"_"+accel,
+
+        q:
+            `A ${mass} kg cart must accelerate at ${accel} m/s². What net force is required?`,
+
+        hint:
+            "Use F = ma",
+
+        options:
+            options.options,
+
+        correct:
+            options.correct,
+
+        explanation:
+        `
+        <b>Newton's Second Law</b><br>
+        F = ma<br><br>
+
+        <b>Substitute</b><br>
+        F = ${mass} x ${accel}<br><br>
+
+        <b>Answer</b><br>
+        F = <b>${force} N</b><br><br>
+
+        <b>Game connection</b><br>
+        Your cargo cart behaves exactly the same way.
+        More net force produces more acceleration,
+        while a heavier cart needs more force to achieve
+        the same acceleration.
+        `
+    };
+}
+
+/* acceleration */
+
+function accelerationQuestion(){
+
+    const mass =
+        randomItem([
+            30,40,50,60
+        ]);
+
+    const force =
+        mass *
+        randomItem([
+            2,3,4
+        ]);
+
+    const accel =
+        force/mass;
+
+    const answer =
+        accel.toFixed(1)+
+        " m/s²";
+
+    const options =
+        optionSet(
+            answer,
+            (accel+1).toFixed(1)+
+            " m/s²",
+            Math.max(
+                .5,
+                accel-1
+            ).toFixed(1)+
+            " m/s²"
+        );
+
+    return {
+
+        id:
+            "acc_"+mass+"_"+force,
+
+        q:
+            `A ${mass} kg cart experiences ${force} N net force. Find acceleration.`,
+
+        hint:
+            "a = F / m",
+
+        options:
+            options.options,
+
+        correct:
+            options.correct,
+
+        explanation:
+        `
+        <b>Formula</b><br>
+        a = F / m<br><br>
+
+        <b>Substitute</b><br>
+        a = ${force} / ${mass}<br><br>
+
+        <b>Answer</b><br>
+        a = <b>${accel.toFixed(1)} m/s²</b><br><br>
+
+        <b>Game connection</b><br>
+        The live acceleration value on your HUD
+        is calculated from the same relationship.
+        `
+    };
+}
+
+/* net force */
+
+function netForceQuestion(){
+
+    const applied =
+        randomItem([
+            180,220,260,300
+        ]);
+
+    const friction =
+        randomItem([
+            20,40,60
+        ]);
+
+    const net =
+        applied-friction;
+
+    const answer =
+        net+" N";
+
+    const options =
+        optionSet(
+            answer,
+            applied+" N",
+            applied+friction+" N"
+        );
+
+    return {
+
+        id:
+            "net_"+applied+"_"+friction,
+
+        q:
+            `Applied force is ${applied} N and friction opposes motion with ${friction} N. What is the net force?`,
+
+        hint:
+            "Net Force = Applied Force - Opposing Friction",
+
+        options:
+            options.options,
+
+        correct:
+            options.correct,
+
+        explanation:
+        `
+        <b>Formula</b><br>
+        Net Force =
+        Applied Force - Friction<br><br>
+
+        <b>Substitute</b><br>
+        ${applied} - ${friction}<br><br>
+
+        <b>Answer</b><br>
+        Net Force =
+        <b>${net} N</b><br><br>
+
+        <b>Game connection</b><br>
+        On the rough road section,
+        friction increases.
+        Therefore less of your applied force remains
+        to accelerate the cart.
+        `
+    };
+}
+
+function inertiaQuestion(){
+
+    return {
+
+        id:
+            "inertia_"+Math.random(),
+
+        q:
+            "You stop pushing a moving cart. Why does it not stop instantly?",
+
+        hint:
+            "Think about Newton's First Law and inertia.",
+
+        options:[
+            "Because a moving object tends to continue moving",
+            "Because its mass becomes zero",
+            "Because acceleration always increases"
+        ],
+
+        correct:0,
+
+        explanation:
+        `
+        <b>Newton's First Law</b><br><br>
+
+        An object in motion tends to remain in motion
+        unless a net external force changes that motion.<br><br>
+
+        <b>Game connection</b><br>
+        Releasing W removes your pushing force,
+        but the cart still has velocity.
+
+        Friction and braking force are needed to reduce
+        that velocity and stop the cart.
+        `
+    };
+}
+
+function thirdLawQuestion(){
+
+    return {
+
+        id:
+            "third_"+Math.random(),
+
+        q:
+            "Your cart pushes another trolley with 300 N. What force does the other trolley exert on your cart?",
+
+        hint:
+            "Newton's Third Law: interaction forces are equal and opposite.",
+
+        options:[
+            "0 N",
+            "150 N opposite",
+            "300 N opposite"
+        ],
+
+        correct:2,
+
+        explanation:
+        `
+        <b>Newton's Third Law</b><br><br>
+
+        If your cart exerts
+        <b>300 N</b>
+        on the other trolley,
+        the other trolley simultaneously exerts
+        <b>300 N in the opposite direction</b>
+        on your cart.<br><br>
+
+        They do not cancel because
+        each force acts on a different object.
+        `
+    };
+}
+
+const questionGenerators = [
+    forceQuestion,
+    accelerationQuestion,
+    netForceQuestion,
+    inertiaQuestion,
+    thirdLawQuestion
+];
+
+let previousQuestionIds = [];
+
+try{
+
+    previousQuestionIds =
+        JSON.parse(
+            localStorage.getItem(
+                "newtonGamePreviousQuestions"
+            ) || "[]"
+        );
+
+}catch(error){
+
+    previousQuestionIds = [];
+}
+
+const selectedQuestions = [];
+
+for(
+    const generator of
+    shuffle(questionGenerators)
+){
+
+    let question = null;
+
+    for(
+        let attempt=0;
+        attempt<10;
+        attempt++
+    ){
+
+        const candidate =
+            generator();
+
+        if(
+            !previousQuestionIds
+            .includes(
+                candidate.id
+            )
+        ){
+
+            question =
+                candidate;
+
+            break;
+        }
+    }
+
+    question =
+        question ||
+        generator();
+
+    selectedQuestions.push(
+        question
+    );
+
+    if(
+        selectedQuestions.length===3
+    ){
+
+        break;
+    }
+}
+
+localStorage.setItem(
+    "newtonGamePreviousQuestions",
+    JSON.stringify(
+        selectedQuestions
+        .map(
+            question=>
+            question.id
+        )
+    )
+);
+
+const challenges =
+    selectedQuestions.map(
+        (question,index)=>({
+
+            ...question,
+
+            at:[
+                320,
+                690,
+                870
+            ][index],
+
+            asked:false
+        })
+    );
+
+/* =========================================================
+   QUESTION UI
+========================================================= */
+
+const challengeBox =
+    document.getElementById(
+        "challenge"
+    );
+
+function openChallenge(
+    challenge
+){
+
+    challengeActive = true;
+
+    challenge.asked = true;
+
+    velocity *= .2;
+
+    document
+        .getElementById("question")
+        .textContent =
+        challenge.q;
+
+    document
+        .getElementById("challengeHint")
+        .textContent =
+        challenge.hint;
+
+    const answers =
+        document.getElementById(
+            "answers"
+        );
+
+    const feedback =
+        document.getElementById(
+            "feedback"
+        );
+
+    const continueButton =
+        document.getElementById(
+            "continueBtn"
+        );
+
+    answers.innerHTML = "";
+
+    feedback.style.display =
+        "none";
+
+    continueButton.style.display =
+        "none";
+
+    challenge.options.forEach(
+        (option,index)=>{
+
+            const button =
+                document.createElement(
+                    "button"
+                );
+
+            button.className =
+                "answer";
+
+            button.textContent =
+                option;
+
+            button.onclick =
+                ()=>{
+
+                    answers
+                        .querySelectorAll(
+                            "button"
+                        )
+                        .forEach(
+                            item=>
+                            item.disabled=true
+                        );
+
+                    feedback.style.display =
+                        "block";
+
+                    if(
+                        index===
+                        challenge.correct
+                    ){
+
+                        feedback.innerHTML =
+                        `
+                        <b>CORRECT</b><br><br>
+                        ${challenge.explanation}
+                        <br><br>
+                        <b>GAME REWARD:</b>
+                        The cart receives a short force boost.
+                        `;
+
+                        velocity += 2;
+                    }
+                    else{
+
+                        feedback.innerHTML =
+                        `
+                        <b>NOT CORRECT - FOLLOW THE PHYSICS</b><br><br>
+                        ${challenge.explanation}
+                        `;
+                    }
+
+                    continueButton.style.display =
+                        "block";
+                };
+
+            answers.appendChild(
+                button
+            );
+        }
+    );
+
+    continueButton.onclick =
+        ()=>{
+
+            challengeBox
+                .classList
+                .remove(
+                    "show"
+                );
+
+            challengeActive = false;
+
+            lastTime =
+                performance.now();
+        };
+
+    challengeBox
+        .classList
+        .add(
+            "show"
+        );
+}
+
+/* =========================================================
+   START
+========================================================= */
+
+document
+    .getElementById("startBtn")
+    .onclick =
+    ()=>{
+
+        started = true;
+
+        document
+            .getElementById("mission")
+            .style.display =
+            "none";
+
+        lastTime =
+            performance.now();
+    };
+
+/* =========================================================
+   PHYSICS
+========================================================= */
+
+function updatePhysics(
+    dt
+){
+
+    let applied = 0;
+
+    if(
+        pressed(
+            "w",
+            "arrowup"
+        )
+    ){
+
+        applied =
+            selectedForce;
+    }
+
+    /*
+       Surface friction.
+    */
+
+    if(
+        positionZ>=560 &&
+        positionZ<=740
+    ){
+
+        frictionForce =
+            90;
+    }
+    else{
+
+        frictionForce =
+            30;
+    }
+
+    /*
+       Braking force.
+    */
+
+    let braking = 0;
+
+    if(
+        pressed(
+            "s",
+            "arrowdown"
+        )
+    ){
+
+        braking =
+            300;
+    }
+
+    let netForce = 0;
+
+    if(velocity>0.05){
+
+        netForce =
+            applied -
+            frictionForce -
+            braking;
+    }
+    else{
+
+        /*
+           Static case.
+        */
+
+        netForce =
+            Math.max(
+                0,
+                applied -
+                frictionForce
+            );
+
+        if(braking>0){
+
+            netForce=0;
+        }
+    }
+
+    acceleration =
+        netForce /
+        cartMass;
+
+    velocity +=
+        acceleration*dt;
+
+    velocity =
+        Math.max(
+            0,
+            Math.min(
+                velocity,
+                13
+            )
+        );
+
+    positionZ +=
+        velocity*dt;
+
+    /*
+       Steering.
+    */
+
+    const steer =
+        3.5*dt;
+
+    if(
+        pressed(
+            "d",
+            "arrowleft"
+        )
+    ){
+
+        lateralX +=
+            steer;
+    }
+
+    if(
+        pressed(
+            "a",
+            "arrowright"
+        )
+    ){
+
+        lateralX -=
+            steer;
+    }
+
+    lateralX =
+        THREE.MathUtils.clamp(
+            lateralX,
+            -6.5,
+            6.5
+        );
+
+    cart.position.set(
+        lateralX,
+        0,
+        positionZ
+    );
+
+    maxAppliedForce =
+        Math.max(
+            maxAppliedForce,
+            applied
+        );
+
+    maxSpeed =
+        Math.max(
+            maxSpeed,
+            velocity
+        );
+
+    updateHUD(
+        applied,
+        netForce
+    );
+}
+
+/* =========================================================
+   EVENTS
+========================================================= */
+
+function updateEvents(){
+
+    /*
+       Load #1
+    */
+
+    if(
+        positionZ>=250 &&
+        !load1Triggered
+    ){
+
+        load1Triggered = true;
+
+        cartMass = 60;
+
+        maxMass =
+            Math.max(
+                maxMass,
+                cartMass
+            );
+
+        rebuildCargo(
+            cartMass
+        );
+
+        document
+            .getElementById("coachTitle")
+            .textContent =
+            "MASS INCREASED";
+
+        document
+            .getElementById("coachText")
+            .textContent =
+            "20 kg of equipment was added. The same force now produces less acceleration because mass increased.";
+    }
+
+    /*
+       Load #2
+    */
+
+    if(
+        positionZ>=500 &&
+        !load2Triggered
+    ){
+
+        load2Triggered = true;
+
+        cartMass = 80;
+
+        maxMass =
+            Math.max(
+                maxMass,
+                cartMass
+            );
+
+        rebuildCargo(
+            cartMass
+        );
+    }
+
+    /*
+       Third law collision.
+    */
+
+    if(
+        positionZ>=968 &&
+        !collisionTriggered
+    ){
+
+        collisionTriggered = true;
+
+        collisionActive = true;
+
+        velocity = 0;
+
+        arrowForward.visible =
+            true;
+
+        arrowBack.visible =
+            true;
+
+        document
+            .getElementById("collisionBox")
+            .classList
+            .add(
+                "show"
+            );
+    }
+}
+
+document
+    .getElementById("collisionContinue")
+    .onclick =
+    ()=>{
+
+        collisionActive = false;
+
+        arrowForward.visible =
+            false;
+
+        arrowBack.visible =
+            false;
+
+        obstacleCart.visible =
+            false;
+
+        document
+            .getElementById("collisionBox")
+            .classList
+            .remove(
+                "show"
+            );
+
+        positionZ = 990;
+
+        lastTime =
+            performance.now();
+    };
+
+/* =========================================================
+   QUESTIONS
+========================================================= */
+
+function checkChallenges(){
+
+    if(
+        challengeActive ||
+        collisionActive
+    ){
+
+        return;
+    }
+
+    for(
+        const challenge of
+        challenges
+    ){
+
+        if(
+            !challenge.asked &&
+            positionZ>=challenge.at
+        ){
+
+            openChallenge(
+                challenge
+            );
+
+            break;
+        }
+    }
+}
+
+/* =========================================================
+   HUD / LIVE EXPLANATION
+========================================================= */
+
+function updateHUD(
+    applied,
+    netForce
+){
+
+    document
+        .getElementById("mass")
+        .textContent =
+        cartMass.toFixed(0);
+
+    document
+        .getElementById("appliedForce")
+        .textContent =
+        applied.toFixed(0);
+
+    document
+        .getElementById("friction")
+        .textContent =
+        frictionForce.toFixed(0);
+
+    document
+        .getElementById("netForce")
+        .textContent =
+        netForce.toFixed(0);
+
+    document
+        .getElementById("acceleration")
+        .textContent =
+        acceleration.toFixed(2);
+
+    document
+        .getElementById("speed")
+        .textContent =
+        velocity.toFixed(1);
+
+    document
+        .getElementById("accelFill")
+        .style.width =
+        Math.min(
+            100,
+            Math.abs(
+                acceleration
+            )/8*100
+        )+"%";
+
+    document
+        .getElementById("progressText")
+        .textContent =
+        Math.min(
+            TRACK_LENGTH,
+            positionZ
+        ).toFixed(0)+
+        " / "+
+        TRACK_LENGTH+
+        " m";
+
+    document
+        .getElementById("progressFill")
+        .style.width =
+        Math.min(
+            100,
+            positionZ/
+            TRACK_LENGTH*
+            100
+        )+"%";
+
+    document
+        .getElementById("equation")
+        .innerHTML =
+        `
+        <b>Live Newton 2 Calculation</b><br>
+        Fnet = ${applied.toFixed(0)} - ${frictionForce.toFixed(0)}
+        ${pressed("s","arrowdown") ? " - 300 brake" : ""}
+        = ${netForce.toFixed(0)} N<br>
+        a = Fnet / m =
+        ${netForce.toFixed(0)} /
+        ${cartMass.toFixed(0)}
+        = <b>${acceleration.toFixed(2)} m/s²</b>
+        `;
+
+    updateCoach(
+        applied,
+        netForce
+    );
+}
+
+function updateCoach(
+    applied,
+    netForce
+){
+
+    const title =
+        document.getElementById(
+            "coachTitle"
+        );
+
+    const text =
+        document.getElementById(
+            "coachText"
+        );
+
+    const formula =
+        document.getElementById(
+            "coachFormula"
+        );
+
+    const stage =
+        document.getElementById(
+            "stageText"
+        );
+
+    if(positionZ<220){
+
+        stage.textContent =
+            "Newton's 1st Law";
+
+        title.textContent =
+            "INERTIA - NEWTON'S FIRST LAW";
+
+        if(velocity<.1){
+
+            text.textContent =
+                "The cart is at rest. It remains at rest until your push creates a net external force.";
+        }
+        else if(applied===0){
+
+            text.textContent =
+                "You stopped pushing, but the cart is still moving. Its motion continues until friction or braking changes it.";
+        }
+        else{
+
+            text.textContent =
+                "Your external push changed the cart from rest to motion. This overcomes its inertia.";
+        }
+
+        formula.textContent =
+            "An object resists changes in its state of motion.";
+    }
+
+    else if(positionZ<560){
+
+        stage.textContent =
+            "Newton's 2nd Law";
+
+        title.textContent =
+            "FORCE, MASS AND ACCELERATION";
+
+        text.textContent =
+            `Cart mass is ${cartMass} kg. Net force is ${netForce.toFixed(0)} N, giving acceleration ${acceleration.toFixed(2)} m/s². Increase force or reduce mass to increase acceleration.`;
+
+        formula.textContent =
+            "Fnet = ma  ->  a = Fnet / m";
+    }
+
+    else if(positionZ<760){
+
+        stage.textContent =
+            "Net Force & Friction";
+
+        title.textContent =
+            "ROUGH SURFACE - FRICTION INCREASED";
+
+        text.textContent =
+            `Friction increased to ${frictionForce} N. Part of your push is now opposed, so net force and acceleration decrease.`;
+
+        formula.textContent =
+            "Net Force = Applied Force - Friction";
+    }
+
+    else if(positionZ<940){
+
+        stage.textContent =
+            "Inertia & Braking";
+
+        title.textContent =
+            "BRAKING ZONE";
+
+        text.textContent =
+            "The moving cart tends to continue forward because of inertia. Press S before the barrier so an opposing braking force reduces its velocity.";
+
+        formula.textContent =
+            "Opposing force produces negative acceleration.";
+    }
+
+    else if(positionZ<1030){
+
+        stage.textContent =
+            "Newton's 3rd Law";
+
+        title.textContent =
+            "ACTION AND REACTION";
+
+        text.textContent =
+            "You are approaching another trolley. During contact, each trolley exerts an equal-magnitude and opposite-direction force on the other.";
+
+        formula.textContent =
+            "F(A on B) = -F(B on A)";
+    }
+
+    else{
+
+        stage.textContent =
+            "Final Delivery";
+
+        title.textContent =
+            "FINAL NEWTON CHALLENGE";
+
+        text.textContent =
+            "Use the correct force for the heavy loaded cart and reach the Physics Lab.";
+
+        formula.textContent =
+            "Force, mass, acceleration and inertia now work together.";
+    }
+}
+
+/* =========================================================
+   CAMERA - SIMPLE FIXED THIRD PERSON
+========================================================= */
+
+function updateCamera(){
+
+    /*
+       ALWAYS:
+       Camera behind cart.
+       Cart visible.
+       Road ahead visible.
+       No quaternion tricks.
+    */
+
+    camera.position.set(
+        cart.position.x,
+        5.2,
+        cart.position.z - 11
+    );
+
+    camera.lookAt(
+        cart.position.x,
+        1.2,
+        cart.position.z + 6
+    );
+}
+
+/* =========================================================
+   FINISH
+========================================================= */
+
+function finishGame(){
+
+    if(finished){
+        return;
+    }
+
+    finished = true;
+
+    const sampleForce =
+        maxAppliedForce ||
+        240;
+
+    const exampleNet =
+        Math.max(
+            0,
+            sampleForce-30
+        );
+
+    const exampleAcceleration =
+        exampleNet /
+        maxMass;
+
+    document
+        .getElementById("finish")
+        .classList
+        .add(
+            "show"
+        );
+
+    document
+        .getElementById("finalTime")
+        .textContent =
+        elapsed.toFixed(1)+
+        " s";
+
+    document
+        .getElementById("finalMaxMass")
+        .textContent =
+        maxMass+
+        " kg";
+
+    document
+        .getElementById("finalMaxForce")
+        .textContent =
+        maxAppliedForce+
+        " N";
+
+    document
+        .getElementById("finalTopSpeed")
+        .textContent =
+        maxSpeed.toFixed(1)+
+        " m/s";
+
+    document
+        .getElementById("finalExplanation")
+        .innerHTML =
+        `
+        <b>HOW YOUR MISSION DEMONSTRATED NEWTON'S LAWS</b><br><br>
+
+        <b>1. Newton's First Law - Inertia</b><br>
+        At the start, the cart remained at rest until you applied a force.
+        Later, when you released the push while the cart was moving,
+        it did not stop instantly.
+        It continued moving until friction or braking produced an opposing net force.<br><br>
+
+        <b>2. Newton's Second Law - F = ma</b><br>
+
+        Your maximum cargo mass became
+        <b>${maxMass} kg</b>.<br>
+
+        Example using your selected force:<br><br>
+
+        Applied Force =
+        ${sampleForce} N<br>
+
+        Normal friction =
+        30 N<br><br>
+
+        Net Force =
+        ${sampleForce} - 30 =
+        <b>${exampleNet} N</b><br><br>
+
+        Acceleration =
+        Fnet / m<br>
+
+        =
+        ${exampleNet} /
+        ${maxMass}<br>
+
+        =
+        <b>${exampleAcceleration.toFixed(2)} m/s²</b><br><br>
+
+        When cargo mass increased,
+        the same force produced less acceleration.
+        When you selected a larger force,
+        acceleration increased.<br><br>
+
+        <b>3. Friction and Net Force</b><br>
+
+        On the rough road,
+        friction increased from
+        <b>30 N</b>
+        to
+        <b>90 N</b>.<br><br>
+
+        Since friction opposed your push,
+        the net forward force became smaller,
+        so acceleration decreased.<br><br>
+
+        <b>4. Braking and Inertia</b><br>
+
+        The moving cart wanted to continue forward.
+        Braking applied an opposing force,
+        creating negative acceleration and reducing speed.
+        This demonstrated how a net external force changes motion.<br><br>
+
+        <b>5. Newton's Third Law</b><br>
+
+        When your cart contacted the blocking trolley,
+        your cart pushed it forward.
+
+        At exactly the same time,
+        the trolley pushed your cart backward
+        with an equal-magnitude force.<br><br>
+
+        <b>
+        F(cart on trolley) =
+        -F(trolley on cart)
+        </b><br><br>
+
+        These forces are equal and opposite,
+        but they do not cancel because they act on
+        <b>different objects</b>.<br><br>
+
+        <b>FINAL CONNECTION</b><br>
+
+        Inertia explained why the cart resisted changes in motion.<br>
+
+        Newton's Second Law connected force, mass and acceleration.<br>
+
+        Friction changed the net force.<br>
+
+        Braking changed the cart's motion.<br>
+
+        Newton's Third Law explained the forces during contact.<br><br>
+
+        All three laws directly controlled whether you could deliver
+        the equipment successfully.
+        `;
+}
+
+/* =========================================================
+   LOOP
+========================================================= */
+
+function animate(
+    now
+){
+
+    requestAnimationFrame(
+        animate
+    );
+
+    const dt =
+        Math.min(
+            (
+                now-lastTime
+            )/1000,
+            .035
+        );
+
+    lastTime = now;
+
+    if(
+        started &&
+        !finished &&
+        !challengeActive &&
+        !collisionActive
+    ){
+
+        elapsed += dt;
+
+        updatePhysics(
+            dt
+        );
+
+        updateEvents();
+
+        checkChallenges();
+
+        if(
+            positionZ>=TRACK_LENGTH
+        ){
+
+            positionZ =
+                TRACK_LENGTH;
+
+            finishGame();
+        }
+    }
+
+    updateCamera();
+
+    renderer.render(
+        scene,
+        camera
+    );
+}
+
+/* initial */
+
+cart.position.set(
+    0,
+    0,
+    0
+);
+
+updateCamera();
+
+updateHUD(
+    0,
+    0
+);
+
+requestAnimationFrame(
+    animate
+);
+
+/* resize */
+
+addEventListener(
+    "resize",
+    ()=>{
+
+        camera.aspect =
+            innerWidth/
+            innerHeight;
+
+        camera.updateProjectionMatrix();
+
+        renderer.setSize(
+            innerWidth,
+            innerHeight
+        );
+    }
+);
+
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,63 @@
+# =========================================
+# MY CAMPUS - Hack Mysuru
+# =========================================
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Python virtual environments
+.venv/
+venv/
+env/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Logs / temp
+*.log
+*.tmp
+*.temp
+*.bak
+
+# Test / cache folders
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Local uploads / generated runtime files
+backend/uploads/
+
+# Unity backup - active MVP uses Three.js/WebGL
+unity_game/
+
+# One-time development / migration helper scripts
+/FIX_*.py
+/FIX_*.ps1
+/fix_*.py
+/add_*.py
+/connect_*.py
+/embed_*.py
+/install_*.py
+/maximize_*.py
+/repair_*.py
+/upgrade_*.ps1
+
+# Local scratch / backups
+*_before_*.html
+*_backup.*/FINAL_BIKE_FIX.ps1
+FINAL_BIKE_FIX.ps1
+*.db
+*.sqlite
+*.sqlite3

@@ -1,0 +1,2660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>AI Tutor | My Campus</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --bg: #07111f;
+            --panel: #0d1b2c;
+            --panel-2: #11243a;
+            --panel-3: #152c46;
+            --border: rgba(255,255,255,.10);
+
+            --text: #f5f8ff;
+            --muted: #9fb0c7;
+
+            --cyan: #4bdcff;
+            --blue: #6884ff;
+            --green: #52e3a3;
+            --yellow: #ffd66d;
+            --red: #ff7580;
+            --purple: #a881ff;
+        }
+
+        html,
+        body {
+            width: 100%;
+            min-height: 100%;
+            background:
+                radial-gradient(
+                    circle at top left,
+                    rgba(75,220,255,.08),
+                    transparent 28%
+                ),
+                radial-gradient(
+                    circle at top right,
+                    rgba(168,129,255,.08),
+                    transparent 26%
+                ),
+                var(--bg);
+
+            color: var(--text);
+
+            font-family:
+                Inter,
+                system-ui,
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                sans-serif;
+        }
+
+        body {
+            overflow: hidden;
+        }
+
+        button,
+        textarea {
+            font: inherit;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        .app {
+            height: 100vh;
+            display: grid;
+            grid-template-rows: auto 1fr;
+        }
+
+        /* ------------------------------------------------
+           TOP BAR
+        ------------------------------------------------ */
+
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+
+            padding: 14px 20px;
+
+            border-bottom: 1px solid var(--border);
+
+            background:
+                rgba(7,17,31,.92);
+
+            backdrop-filter:
+                blur(18px);
+
+            z-index: 20;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-icon {
+            width: 45px;
+            height: 45px;
+
+            display: grid;
+            place-items: center;
+
+            border-radius: 15px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--cyan),
+                    var(--purple)
+                );
+
+            color: #06111c;
+
+            font-size: 22px;
+            font-weight: 900;
+
+            box-shadow:
+                0 14px 35px
+                rgba(75,220,255,.13);
+        }
+
+        .brand h1 {
+            font-size: 17px;
+        }
+
+        .brand p {
+            margin-top: 3px;
+
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .top-actions {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+
+            padding: 8px 11px;
+
+            border-radius: 99px;
+
+            border:
+                1px solid
+                rgba(82,227,163,.19);
+
+            background:
+                rgba(82,227,163,.07);
+
+            color: #cffff0;
+
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        .status-dot {
+            width: 7px;
+            height: 7px;
+
+            border-radius: 50%;
+
+            background:
+                var(--green);
+
+            box-shadow:
+                0 0 12px
+                var(--green);
+        }
+
+        .back-btn {
+            padding: 9px 13px;
+
+            border-radius: 11px;
+
+            border:
+                1px solid
+                var(--border);
+
+            background:
+                rgba(255,255,255,.04);
+
+            color: white;
+
+            font-weight: 750;
+            font-size: 12px;
+        }
+
+        /* ------------------------------------------------
+           MAIN LAYOUT
+        ------------------------------------------------ */
+
+        .workspace {
+            min-height: 0;
+
+            display: grid;
+
+            grid-template-columns:
+                290px
+                minmax(0, 1fr)
+                310px;
+        }
+
+        .sidebar {
+            min-height: 0;
+
+            border-right:
+                1px solid
+                var(--border);
+
+            background:
+                rgba(10,23,39,.74);
+
+            padding: 17px;
+
+            overflow-y: auto;
+        }
+
+        .rightbar {
+            min-height: 0;
+
+            border-left:
+                1px solid
+                var(--border);
+
+            background:
+                rgba(10,23,39,.74);
+
+            padding: 17px;
+
+            overflow-y: auto;
+        }
+
+        .chat-area {
+            min-width: 0;
+            min-height: 0;
+
+            display: grid;
+
+            grid-template-rows:
+                auto
+                1fr
+                auto;
+
+            background:
+                rgba(5,14,25,.36);
+        }
+
+        /* ------------------------------------------------
+           LEFT SIDEBAR
+        ------------------------------------------------ */
+
+        .section-label {
+            color: var(--muted);
+
+            font-size: 10px;
+            font-weight: 900;
+
+            letter-spacing: 1px;
+            text-transform: uppercase;
+
+            margin-bottom: 8px;
+        }
+
+        .topic-card {
+            padding: 15px;
+
+            border-radius: 17px;
+
+            border:
+                1px solid
+                rgba(75,220,255,.14);
+
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(75,220,255,.08),
+                    rgba(255,255,255,.025)
+                );
+        }
+
+        .topic-number {
+            color: var(--cyan);
+
+            font-size: 11px;
+            font-weight: 900;
+        }
+
+        .topic-card h2 {
+            margin-top: 7px;
+
+            font-size: 16px;
+            line-height: 1.35;
+        }
+
+        .topic-card p {
+            margin-top: 8px;
+
+            color: var(--muted);
+
+            font-size: 12px;
+            line-height: 1.55;
+        }
+
+        .grounding {
+            margin-top: 12px;
+
+            padding: 10px;
+
+            border-radius: 11px;
+
+            background:
+                rgba(82,227,163,.06);
+
+            border:
+                1px solid
+                rgba(82,227,163,.12);
+
+            font-size: 11px;
+            color: #ceffea;
+        }
+
+        .grounding strong {
+            display: block;
+
+            margin-bottom: 3px;
+        }
+
+        .quick-section {
+            margin-top: 21px;
+        }
+
+        .quick-grid {
+            display: grid;
+            gap: 8px;
+        }
+
+        .quick-btn {
+            width: 100%;
+
+            display: flex;
+            align-items: center;
+            gap: 10px;
+
+            padding: 11px 12px;
+
+            border-radius: 12px;
+
+            border:
+                1px solid
+                var(--border);
+
+            background:
+                rgba(255,255,255,.035);
+
+            color: white;
+
+            text-align: left;
+
+            transition:
+                transform .16s ease,
+                border-color .16s ease,
+                background .16s ease;
+        }
+
+        .quick-btn:hover {
+            transform:
+                translateX(3px);
+
+            border-color:
+                rgba(75,220,255,.28);
+
+            background:
+                rgba(75,220,255,.055);
+        }
+
+        .quick-icon {
+            width: 28px;
+            height: 28px;
+
+            flex: 0 0 auto;
+
+            display: grid;
+            place-items: center;
+
+            border-radius: 9px;
+
+            background:
+                rgba(75,220,255,.07);
+        }
+
+        .quick-btn div strong {
+            display: block;
+
+            font-size: 12px;
+        }
+
+        .quick-btn div span {
+            display: block;
+
+            margin-top: 2px;
+
+            font-size: 10px;
+            color: var(--muted);
+        }
+
+        /* ------------------------------------------------
+           CHAT HEADER
+        ------------------------------------------------ */
+
+        .chat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+
+            padding: 16px 20px;
+
+            border-bottom:
+                1px solid
+                var(--border);
+
+            background:
+                rgba(13,27,44,.72);
+        }
+
+        .tutor-profile {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+        }
+
+        .tutor-avatar {
+            width: 41px;
+            height: 41px;
+
+            display: grid;
+            place-items: center;
+
+            border-radius: 14px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #193a5d,
+                    #2e315c
+                );
+
+            border:
+                1px solid
+                rgba(75,220,255,.18);
+
+            font-size: 21px;
+        }
+
+        .tutor-profile h3 {
+            font-size: 14px;
+        }
+
+        .tutor-profile p {
+            margin-top: 3px;
+
+            color: var(--muted);
+            font-size: 11px;
+        }
+
+        .clear-btn {
+            padding: 8px 11px;
+
+            border-radius: 10px;
+
+            border:
+                1px solid
+                var(--border);
+
+            background:
+                rgba(255,255,255,.03);
+
+            color: var(--muted);
+
+            font-size: 11px;
+        }
+
+        /* ------------------------------------------------
+           CHAT MESSAGES
+        ------------------------------------------------ */
+
+        .messages {
+            min-height: 0;
+
+            overflow-y: auto;
+
+            padding:
+                23px
+                max(20px, calc((100% - 850px) / 2));
+        }
+
+        .message {
+            display: flex;
+            gap: 10px;
+
+            margin-bottom: 18px;
+
+            animation:
+                messageIn .2s ease;
+        }
+
+        @keyframes messageIn {
+            from {
+                opacity: 0;
+                transform:
+                    translateY(5px);
+            }
+
+            to {
+                opacity: 1;
+                transform:
+                    translateY(0);
+            }
+        }
+
+        .message.user {
+            flex-direction:
+                row-reverse;
+        }
+
+        .message-avatar {
+            width: 33px;
+            height: 33px;
+
+            flex: 0 0 auto;
+
+            display: grid;
+            place-items: center;
+
+            border-radius: 11px;
+
+            background:
+                var(--panel-2);
+
+            border:
+                1px solid
+                var(--border);
+
+            font-size: 15px;
+        }
+
+        .message.user
+        .message-avatar {
+            background:
+                rgba(104,132,255,.12);
+        }
+
+        .bubble {
+            max-width: 78%;
+
+            padding:
+                12px
+                14px;
+
+            border-radius:
+                4px
+                15px
+                15px
+                15px;
+
+            background:
+                var(--panel-2);
+
+            border:
+                1px solid
+                var(--border);
+
+            line-height: 1.65;
+
+            font-size: 13px;
+
+            white-space:
+                pre-wrap;
+        }
+
+        .message.user
+        .bubble {
+            border-radius:
+                15px
+                4px
+                15px
+                15px;
+
+            background:
+                rgba(104,132,255,.12);
+
+            border-color:
+                rgba(104,132,255,.18);
+        }
+
+        .bubble strong {
+            color: #ffffff;
+        }
+
+        .bubble .physics-note {
+            display: block;
+
+            margin-top: 11px;
+
+            padding: 10px 11px;
+
+            border-radius: 10px;
+
+            background:
+                rgba(75,220,255,.06);
+
+            border:
+                1px solid
+                rgba(75,220,255,.10);
+
+            color: #dff9ff;
+
+            font-size: 12px;
+        }
+
+        .typing {
+            display: inline-flex;
+            gap: 5px;
+
+            padding: 4px 0;
+        }
+
+        .typing span {
+            width: 6px;
+            height: 6px;
+
+            border-radius: 50%;
+
+            background:
+                var(--muted);
+
+            animation:
+                bounce 1s infinite;
+        }
+
+        .typing span:nth-child(2) {
+            animation-delay:
+                .13s;
+        }
+
+        .typing span:nth-child(3) {
+            animation-delay:
+                .26s;
+        }
+
+        @keyframes bounce {
+            0%,
+            60%,
+            100% {
+                transform:
+                    translateY(0);
+                opacity: .4;
+            }
+
+            30% {
+                transform:
+                    translateY(-5px);
+                opacity: 1;
+            }
+        }
+
+        /* ------------------------------------------------
+           INPUT
+        ------------------------------------------------ */
+
+        .composer {
+            padding:
+                13px
+                max(18px, calc((100% - 850px) / 2))
+                17px;
+
+            border-top:
+                1px solid
+                var(--border);
+
+            background:
+                rgba(7,17,31,.88);
+
+            backdrop-filter:
+                blur(15px);
+        }
+
+        .composer-box {
+            display: grid;
+
+            grid-template-columns:
+                1fr
+                auto;
+
+            align-items: end;
+
+            gap: 10px;
+
+            padding: 10px;
+
+            border-radius: 16px;
+
+            border:
+                1px solid
+                rgba(75,220,255,.17);
+
+            background:
+                var(--panel);
+        }
+
+        #messageInput {
+            width: 100%;
+            min-height: 45px;
+            max-height: 135px;
+
+            resize: none;
+
+            border: none;
+            outline: none;
+
+            background:
+                transparent;
+
+            color: white;
+
+            padding:
+                7px
+                8px;
+
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        #messageInput::placeholder {
+            color:
+                #768aa3;
+        }
+
+        #sendBtn {
+            width: 43px;
+            height: 43px;
+
+            border: none;
+
+            border-radius: 12px;
+
+            display: grid;
+            place-items: center;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--cyan),
+                    #80efff
+                );
+
+            color: #06111a;
+
+            font-size: 17px;
+            font-weight: 900;
+        }
+
+        #sendBtn:disabled {
+            opacity: .45;
+            cursor: default;
+        }
+
+        .composer-hint {
+            margin-top: 7px;
+
+            color:
+                #778ba3;
+
+            font-size: 10px;
+
+            text-align: center;
+        }
+
+        /* ------------------------------------------------
+           RIGHT PANEL
+        ------------------------------------------------ */
+
+        .panel-block {
+            margin-bottom: 20px;
+        }
+
+        .panel-title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            margin-bottom: 9px;
+        }
+
+        .panel-title h3 {
+            font-size: 13px;
+        }
+
+        .panel-title span {
+            color: var(--muted);
+            font-size: 10px;
+        }
+
+        .concept-list {
+            display: grid;
+            gap: 7px;
+        }
+
+        .concept-item {
+            padding: 10px;
+
+            border-radius: 11px;
+
+            background:
+                rgba(255,255,255,.03);
+
+            border:
+                1px solid
+                var(--border);
+        }
+
+        .concept-head {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+
+            font-size: 11px;
+        }
+
+        .concept-head strong {
+            font-size: 11px;
+        }
+
+        .concept-level {
+            color: var(--yellow);
+
+            font-size: 9px;
+            font-weight: 900;
+        }
+
+        .mini-bar {
+            height: 5px;
+
+            margin-top: 7px;
+
+            border-radius: 99px;
+
+            background:
+                rgba(255,255,255,.06);
+
+            overflow: hidden;
+        }
+
+        .mini-fill {
+            height: 100%;
+
+            border-radius: inherit;
+
+            background:
+                linear-gradient(
+                    90deg,
+                    var(--cyan),
+                    var(--green)
+                );
+        }
+
+        .session-card {
+            padding: 12px;
+
+            border-radius: 13px;
+
+            background:
+                rgba(255,255,255,.03);
+
+            border:
+                1px solid
+                var(--border);
+        }
+
+        .session-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+
+            padding:
+                6px
+                0;
+
+            font-size: 11px;
+
+            border-bottom:
+                1px solid
+                rgba(255,255,255,.05);
+        }
+
+        .session-row:last-child {
+            border-bottom: none;
+        }
+
+        .session-row span {
+            color: var(--muted);
+        }
+
+        .faculty-box {
+            padding: 13px;
+
+            border-radius: 14px;
+
+            border:
+                1px solid
+                rgba(168,129,255,.16);
+
+            background:
+                rgba(168,129,255,.05);
+        }
+
+        .faculty-box p {
+            margin-top: 6px;
+
+            color: var(--muted);
+
+            font-size: 11px;
+            line-height: 1.5;
+        }
+
+        .faculty-btn {
+            width: 100%;
+
+            margin-top: 10px;
+
+            padding: 9px;
+
+            border-radius: 10px;
+
+            border:
+                1px solid
+                rgba(168,129,255,.22);
+
+            background:
+                rgba(168,129,255,.09);
+
+            color: #e9deff;
+
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        /* ------------------------------------------------
+           RESPONSIVE
+        ------------------------------------------------ */
+
+        @media (
+            max-width: 1100px
+        ) {
+            .workspace {
+                grid-template-columns:
+                    250px
+                    minmax(0,1fr);
+            }
+
+            .rightbar {
+                display: none;
+            }
+        }
+
+        @media (
+            max-width: 760px
+        ) {
+            body {
+                overflow: auto;
+            }
+
+            .app {
+                min-height: 100vh;
+                height: auto;
+            }
+
+            .workspace {
+                display: block;
+            }
+
+            .sidebar {
+                display: none;
+            }
+
+            .chat-area {
+                min-height:
+                    calc(100vh - 74px);
+            }
+
+            .top-actions
+            .status-pill {
+                display: none;
+            }
+
+            .messages {
+                padding:
+                    18px
+                    14px;
+            }
+
+            .bubble {
+                max-width: 88%;
+            }
+
+            .composer {
+                padding:
+                    11px
+                    12px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- ============================
+         TOP BAR
+    ============================ -->
+
+    <header class="topbar">
+
+        <div class="brand">
+
+            <div class="brand-icon">
+                AI
+            </div>
+
+            <div>
+                <h1>
+                    My Campus AI Tutor
+                </h1>
+
+                <p>
+                    Personalized • Topic-aware • Learning focused
+                </p>
+            </div>
+
+        </div>
+
+        <div class="top-actions">
+
+            <div class="status-pill">
+                <span class="status-dot"></span>
+                <span id="contextStatus">
+                    Loading topic context
+                </span>
+            </div>
+
+            <button
+                class="back-btn"
+                id="backBtn"
+            >
+                ← Back to Learning
+            </button>
+
+        </div>
+
+    </header>
+
+
+    <!-- ============================
+         WORKSPACE
+    ============================ -->
+
+    <div class="workspace">
+
+        <!-- ========================
+             LEFT SIDE
+        ======================== -->
+
+        <aside class="sidebar">
+
+            <div class="section-label">
+                Current learning context
+            </div>
+
+            <div class="topic-card">
+
+                <div
+                    class="topic-number"
+                    id="topicNumber"
+                >
+                    TOPIC 1
+                </div>
+
+                <h2 id="topicTitle">
+                    Why Physics? & Real-World Applications
+                </h2>
+
+                <p id="topicDescription">
+                    Loading current topic information...
+                </p>
+
+                <div class="grounding">
+                    <strong>
+                        📚 Tutor Grounding
+                    </strong>
+
+                    <span id="groundingText">
+                        Connecting to your topic notes...
+                    </span>
+                </div>
+
+            </div>
+
+
+            <div class="quick-section">
+
+                <div class="section-label">
+                    Quick tutor modes
+                </div>
+
+                <div class="quick-grid">
+
+                    <button
+                        class="quick-btn"
+                        data-action="simple"
+                    >
+                        <div class="quick-icon">
+                            🌱
+                        </div>
+
+                        <div>
+                            <strong>
+                                Explain Simply
+                            </strong>
+
+                            <span>
+                                Beginner-friendly explanation
+                            </span>
+                        </div>
+                    </button>
+
+
+                    <button
+                        class="quick-btn"
+                        data-action="example"
+                    >
+                        <div class="quick-icon">
+                            🌍
+                        </div>
+
+                        <div>
+                            <strong>
+                                Real-Life Example
+                            </strong>
+
+                            <span>
+                                Connect this topic to daily life
+                            </span>
+                        </div>
+                    </button>
+
+
+                    <button
+                        class="quick-btn"
+                        data-action="steps"
+                    >
+                        <div class="quick-icon">
+                            🪜
+                        </div>
+
+                        <div>
+                            <strong>
+                                Step by Step
+                            </strong>
+
+                            <span>
+                                Break the concept into steps
+                            </span>
+                        </div>
+                    </button>
+
+
+                    <button
+                        class="quick-btn"
+                        data-action="analogy"
+                    >
+                        <div class="quick-icon">
+                            💡
+                        </div>
+
+                        <div>
+                            <strong>
+                                Give an Analogy
+                            </strong>
+
+                            <span>
+                                Understand through comparison
+                            </span>
+                        </div>
+                    </button>
+
+
+                    <button
+                        class="quick-btn"
+                        data-action="check"
+                    >
+                        <div class="quick-icon">
+                            🧠
+                        </div>
+
+                        <div>
+                            <strong>
+                                Check My Understanding
+                            </strong>
+
+                            <span>
+                                One focused concept check
+                            </span>
+                        </div>
+                    </button>
+
+                </div>
+
+            </div>
+
+        </aside>
+
+
+        <!-- ========================
+             CHAT AREA
+        ======================== -->
+
+        <main class="chat-area">
+
+            <div class="chat-header">
+
+                <div class="tutor-profile">
+
+                    <div class="tutor-avatar">
+                        🤖
+                    </div>
+
+                    <div>
+                        <h3>
+                            Physics AI Tutor
+                        </h3>
+
+                        <p>
+                            Ask anything from the current topic
+                        </p>
+                    </div>
+
+                </div>
+
+                <button
+                    class="clear-btn"
+                    id="clearBtn"
+                >
+                    Clear conversation
+                </button>
+
+            </div>
+
+
+            <div
+                class="messages"
+                id="messages"
+            >
+
+                <div class="message tutor">
+
+                    <div class="message-avatar">
+                        🤖
+                    </div>
+
+                    <div class="bubble">
+
+                        Hi! I’m your Physics AI Tutor.
+
+                        I’ll stay focused on the topic you are currently learning and explain things at your level.
+
+                        You can ask me something like:
+
+                        <span class="physics-note">
+                            “Why is Physics useful in everyday life?”
+                            <br>
+                            “Explain this in simple words.”
+                            <br>
+                            “Give me a real-life example.”
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- COMPOSER -->
+
+            <div class="composer">
+
+                <div class="composer-box">
+
+                    <textarea
+                        id="messageInput"
+                        rows="1"
+                        placeholder="Ask your doubt about this topic..."
+                    ></textarea>
+
+                    <button
+                        id="sendBtn"
+                        title="Send"
+                    >
+                        ➤
+                    </button>
+
+                </div>
+
+                <div class="composer-hint">
+                    Enter to send • Shift + Enter for new line
+                </div>
+
+            </div>
+
+        </main>
+
+
+        <!-- ========================
+             RIGHT SIDE
+        ======================== -->
+
+        <aside class="rightbar">
+
+            <div class="panel-block">
+
+                <div class="panel-title">
+                    <h3>
+                        🧠 Concept Tracker
+                    </h3>
+
+                    <span>
+                        This session
+                    </span>
+                </div>
+
+                <div
+                    class="concept-list"
+                    id="conceptList"
+                >
+
+                    <div class="concept-item">
+
+                        <div class="concept-head">
+                            <strong>
+                                Topic understanding
+                            </strong>
+
+                            <span class="concept-level">
+                                STARTING
+                            </span>
+                        </div>
+
+                        <div class="mini-bar">
+                            <div
+                                class="mini-fill"
+                                id="understandingBar"
+                                style="width:20%;"
+                            ></div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="panel-block">
+
+                <div class="panel-title">
+                    <h3>
+                        📊 Tutor Session
+                    </h3>
+                </div>
+
+                <div class="session-card">
+
+                    <div class="session-row">
+                        <span>
+                            Questions asked
+                        </span>
+
+                        <strong id="questionCount">
+                            0
+                        </strong>
+                    </div>
+
+                    <div class="session-row">
+                        <span>
+                            Explanations
+                        </span>
+
+                        <strong id="explanationCount">
+                            0
+                        </strong>
+                    </div>
+
+                    <div class="session-row">
+                        <span>
+                            Examples
+                        </span>
+
+                        <strong id="exampleCount">
+                            0
+                        </strong>
+                    </div>
+
+                    <div class="session-row">
+                        <span>
+                            Current mode
+                        </span>
+
+                        <strong id="currentMode">
+                            Normal
+                        </strong>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="panel-block">
+
+                <div class="panel-title">
+                    <h3>
+                        👨‍🏫 Still confused?
+                    </h3>
+                </div>
+
+                <div class="faculty-box">
+
+                    <strong>
+                        Ask your Faculty
+                    </strong>
+
+                    <p>
+                        If the AI explanation still doesn't clear your doubt, save the question and send it to faculty.
+                    </p>
+
+                    <button
+                        class="faculty-btn"
+                        id="facultyBtn"
+                    >
+                        Escalate Doubt
+                    </button>
+
+                </div>
+
+            </div>
+
+        </aside>
+
+    </div>
+
+</div>
+
+
+<script>
+(() => {
+
+    /* ====================================================
+       CONFIG
+    ==================================================== */
+
+    const API_BASE =
+        "http://127.0.0.1:8000";
+
+
+    /* ====================================================
+       QUERY PARAMS
+    ==================================================== */
+
+    const params =
+        new URLSearchParams(
+            window.location.search
+        );
+
+
+    const topicId =
+        Number(
+            params.get("topic_id") ||
+            1
+        );
+
+
+    const studentId =
+        Number(
+            params.get("student_id") ||
+            localStorage.getItem(
+                "student_id"
+            ) ||
+            1
+        );
+
+
+    let topicTitleFromUrl =
+        params.get(
+            "topic_title"
+        );
+
+
+    /* ====================================================
+       STATE
+    ==================================================== */
+
+    const state = {
+
+        topicId,
+
+        studentId,
+
+        topicTitle:
+            topicTitleFromUrl ||
+            "Physics Topic",
+
+        topicDescription:
+            "",
+
+        notesLoaded:
+            false,
+
+        currentMode:
+            "normal",
+
+        questionCount:
+            0,
+
+        explanationCount:
+            0,
+
+        exampleCount:
+            0,
+
+        interactionCount:
+            0,
+
+        history: [],
+
+        isSending:
+            false
+    };
+
+
+    /* ====================================================
+       DOM
+    ==================================================== */
+
+    const messages =
+        document.getElementById(
+            "messages"
+        );
+
+
+    const messageInput =
+        document.getElementById(
+            "messageInput"
+        );
+
+
+    const sendBtn =
+        document.getElementById(
+            "sendBtn"
+        );
+
+
+    const topicNumber =
+        document.getElementById(
+            "topicNumber"
+        );
+
+
+    const topicTitle =
+        document.getElementById(
+            "topicTitle"
+        );
+
+
+    const topicDescription =
+        document.getElementById(
+            "topicDescription"
+        );
+
+
+    const groundingText =
+        document.getElementById(
+            "groundingText"
+        );
+
+
+    const contextStatus =
+        document.getElementById(
+            "contextStatus"
+        );
+
+
+    const questionCount =
+        document.getElementById(
+            "questionCount"
+        );
+
+
+    const explanationCount =
+        document.getElementById(
+            "explanationCount"
+        );
+
+
+    const exampleCount =
+        document.getElementById(
+            "exampleCount"
+        );
+
+
+    const currentMode =
+        document.getElementById(
+            "currentMode"
+        );
+
+
+    const understandingBar =
+        document.getElementById(
+            "understandingBar"
+        );
+
+
+    /* ====================================================
+       TOPIC FALLBACK DATA
+    ==================================================== */
+
+    const fallbackTopics = {
+
+        1: {
+            title:
+                "Why Physics? & Real-World Applications",
+
+            description:
+                "Discover how Physics explains vehicles, mobile phones, buildings, sports, medicine, satellites and everyday technology."
+        },
+
+        2: {
+            title:
+                "Motion, Distance, Speed & Velocity",
+
+            description:
+                "Understand how objects move and how distance, displacement, speed and velocity describe motion."
+        },
+
+        3: {
+            title:
+                "Forces & Newton's Laws",
+
+            description:
+                "Explore force, inertia, acceleration, action and reaction through real-world situations."
+        },
+
+        4: {
+            title:
+                "Work, Energy & Power",
+
+            description:
+                "Learn work, kinetic energy, potential energy, energy conversion and power."
+        },
+
+        5: {
+            title:
+                "Momentum & Collisions",
+
+            description:
+                "Understand momentum, impulse and collision behaviour."
+        },
+
+        6: {
+            title:
+                "Waves, Sound & Vibrations",
+
+            description:
+                "Explore wave motion, frequency, wavelength, sound and vibrations."
+        },
+
+        7: {
+            title:
+                "Electricity & Electric Circuits",
+
+            description:
+                "Understand voltage, current, resistance and electrical circuits."
+        },
+
+        8: {
+            title:
+                "Magnetism & Electromagnetism",
+
+            description:
+                "Explore magnetic fields, magnetic forces and electromagnetism."
+        },
+
+        9: {
+            title:
+                "Light & Optics",
+
+            description:
+                "Explore reflection, refraction, mirrors and lenses."
+        },
+
+        10: {
+            title:
+                "Modern Physics",
+
+            description:
+                "Explore atoms, photons, nuclear Physics and introductory modern Physics."
+        }
+    };
+
+
+    /* ====================================================
+       INITIAL TOPIC DISPLAY
+    ==================================================== */
+
+    function applyFallbackTopic() {
+
+        const data =
+            fallbackTopics[
+                state.topicId
+            ];
+
+
+        if (!data) {
+            return;
+        }
+
+
+        state.topicTitle =
+            topicTitleFromUrl ||
+            data.title;
+
+
+        state.topicDescription =
+            data.description;
+
+
+        topicNumber.textContent =
+            `TOPIC ${state.topicId}`;
+
+
+        topicTitle.textContent =
+            state.topicTitle;
+
+
+        topicDescription.textContent =
+            state.topicDescription;
+    }
+
+
+    applyFallbackTopic();
+
+
+    /* ====================================================
+       LOAD TOPIC NOTES
+    ==================================================== */
+
+    async function loadTopicContext() {
+
+        try {
+
+            const response =
+                await fetch(
+                    `${API_BASE}/notes/topic/${state.topicId}`
+                );
+
+
+            if (!response.ok) {
+                throw new Error(
+                    "Topic notes unavailable"
+                );
+            }
+
+
+            const data =
+                await response.json();
+
+
+            state.notesLoaded =
+                true;
+
+
+            if (
+                data.topic_title
+            ) {
+
+                state.topicTitle =
+                    data.topic_title;
+
+
+                topicTitle.textContent =
+                    data.topic_title;
+            }
+
+
+            groundingText.textContent =
+                `${data.total_sections || 0} learning sections loaded. Tutor can use this topic context.`;
+
+
+            contextStatus.textContent =
+                "Topic context ready";
+
+
+        } catch (error) {
+
+            state.notesLoaded =
+                false;
+
+
+            groundingText.textContent =
+                "Topic metadata loaded. AI backend grounding will be connected next.";
+
+
+            contextStatus.textContent =
+                "Tutor UI ready";
+        }
+    }
+
+
+    loadTopicContext();
+
+
+    /* ====================================================
+       CHAT UI HELPERS
+    ==================================================== */
+
+    function scrollToBottom() {
+
+        messages.scrollTop =
+            messages.scrollHeight;
+    }
+
+
+    function addMessage(
+        role,
+        content,
+        options = {}
+    ) {
+
+        const row =
+            document.createElement(
+                "div"
+            );
+
+
+        row.className =
+            `message ${role}`;
+
+
+        const avatar =
+            document.createElement(
+                "div"
+            );
+
+
+        avatar.className =
+            "message-avatar";
+
+
+        avatar.textContent =
+            role === "user"
+            ? "🧑"
+            : "🤖";
+
+
+        const bubble =
+            document.createElement(
+                "div"
+            );
+
+
+        bubble.className =
+            "bubble";
+
+
+        if (
+            options.html
+        ) {
+
+            bubble.innerHTML =
+                content;
+
+        } else {
+
+            bubble.textContent =
+                content;
+        }
+
+
+        row.appendChild(
+            avatar
+        );
+
+
+        row.appendChild(
+            bubble
+        );
+
+
+        messages.appendChild(
+            row
+        );
+
+
+        scrollToBottom();
+
+
+        return row;
+    }
+
+
+    function addTyping() {
+
+        return addMessage(
+            "tutor",
+            `
+                <div class="typing">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            `,
+            {
+                html: true
+            }
+        );
+    }
+
+
+    /* ====================================================
+       SESSION STATS
+    ==================================================== */
+
+    function updateStats() {
+
+        questionCount.textContent =
+            state.questionCount;
+
+
+        explanationCount.textContent =
+            state.explanationCount;
+
+
+        exampleCount.textContent =
+            state.exampleCount;
+
+
+        const labels = {
+
+            normal:
+                "Normal",
+
+            simple:
+                "Simple",
+
+            example:
+                "Example",
+
+            steps:
+                "Step by Step",
+
+            analogy:
+                "Analogy",
+
+            check:
+                "Concept Check"
+        };
+
+
+        currentMode.textContent =
+            labels[
+                state.currentMode
+            ] ||
+            "Normal";
+
+
+        const understanding =
+            Math.min(
+                100,
+                20 +
+                state.interactionCount *
+                8
+            );
+
+
+        understandingBar.style.width =
+            `${understanding}%`;
+    }
+
+
+    /* ====================================================
+       LOCAL FRONTEND FALLBACK
+       This will disappear after FastAPI AI endpoint is added.
+    ==================================================== */
+
+    function buildDemoReply(
+        userText,
+        mode
+    ) {
+
+        const topic =
+            state.topicTitle;
+
+
+        if (
+            mode ===
+            "simple"
+        ) {
+
+            return `
+<strong>Simple explanation:</strong>
+
+${topic} is easier to understand when we connect it to things you already see around you.
+
+Physics explains why objects move, how forces act, how energy changes form, and how technologies work.
+
+<span class="physics-note">
+This is currently a frontend demo response. Next we will connect the Python AI Tutor backend so the answer uses your actual topic notes.
+</span>
+            `.trim();
+        }
+
+
+        if (
+            mode ===
+            "example"
+        ) {
+
+            state.exampleCount++;
+
+
+            return `
+<strong>Real-life connection:</strong>
+
+Think about your normal day: switching on a fan, riding a bicycle, using a phone, hearing a speaker, or watching light through a lens.
+
+Each of these involves Physics.
+
+Your question was:
+“${escapeHtml(userText)}”
+
+<span class="physics-note">
+The Python tutor backend will next generate an example specifically grounded in Topic ${state.topicId}.
+</span>
+            `.trim();
+        }
+
+
+        if (
+            mode ===
+            "steps"
+        ) {
+
+            return `
+<strong>Let's break it down:</strong>
+
+1. First identify what is happening physically.
+2. Find the main quantity involved — motion, force, energy, electricity, waves, etc.
+3. Connect the observation to the relevant Physics principle.
+4. Apply it to the real-world situation.
+5. Check whether the result makes physical sense.
+
+<span class="physics-note">
+Current topic: Topic ${state.topicId} — ${escapeHtml(topic)}
+</span>
+            `.trim();
+        }
+
+
+        if (
+            mode ===
+            "analogy"
+        ) {
+
+            return `
+<strong>Think of Physics like the operating system of the physical world.</strong>
+
+You may not see the rules directly, but they control how motion, energy, light, sound, electricity and machines behave.
+
+The exact analogy for your doubt will become topic-specific once the AI backend is connected.
+
+<span class="physics-note">
+Ask the same doubt after backend integration and the tutor will use your stored Notes content.
+</span>
+            `.trim();
+        }
+
+
+        if (
+            mode ===
+            "check"
+        ) {
+
+            return `
+<strong>Quick understanding check:</strong>
+
+Explain in your own words how the idea you are learning could appear in one real-life situation.
+
+Don't worry about perfect wording — focus on the Physics relationship.
+
+<span class="physics-note">
+After the AI backend is connected, your answer can be evaluated for the exact concept gap rather than simple keyword matching.
+</span>
+            `.trim();
+        }
+
+
+        return `
+I received your doubt:
+
+<strong>“${escapeHtml(userText)}”</strong>
+
+The Tutor interface is working correctly.
+
+Right now this page is the <strong>frontend V1</strong>. The next step is to connect the Python FastAPI AI endpoint so I can answer using your actual Topic ${state.topicId} Notes instead of giving a generic frontend response.
+
+<span class="physics-note">
+Current context: ${escapeHtml(topic)}
+</span>
+        `.trim();
+    }
+
+
+    /* ====================================================
+       AI REQUEST
+    ==================================================== */
+
+    async function requestTutor(
+        userText
+    ) {
+
+        /*
+            Future backend endpoint:
+
+            POST /ai-tutor/chat
+
+            {
+                student_id: 1,
+                topic_id: 3,
+                message: "...",
+                mode: "simple",
+                history: [...]
+            }
+
+            Until that endpoint exists,
+            UI automatically uses the local
+            frontend fallback below.
+        */
+
+
+        try {
+
+            const response =
+                await fetch(
+                    `${API_BASE}/ai-tutor/chat`,
+                    {
+                        method:
+                            "POST",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body:
+                            JSON.stringify({
+                                student_id:
+                                    state.studentId,
+
+                                topic_id:
+                                    state.topicId,
+
+                                message:
+                                    userText,
+
+                                mode:
+                                    state.currentMode,
+
+                                history:
+                                    state.history
+                            })
+                    }
+                );
+
+
+            if (!response.ok) {
+                throw new Error(
+                    "AI Tutor backend not connected"
+                );
+            }
+
+
+            const data =
+                await response.json();
+
+
+            return {
+                text:
+                    data.answer ||
+                    data.response ||
+                    "Tutor returned an empty response.",
+
+                fromBackend:
+                    true
+            };
+
+
+        } catch (error) {
+
+            return {
+                text:
+                    buildDemoReply(
+                        userText,
+                        state.currentMode
+                    ),
+
+                fromBackend:
+                    false
+            };
+        }
+    }
+
+
+    /* ====================================================
+       SEND MESSAGE
+    ==================================================== */
+
+    async function sendMessage(
+        forcedText = null
+    ) {
+
+        if (
+            state.isSending
+        ) {
+            return;
+        }
+
+
+        const text =
+            (
+                forcedText !== null
+                ? forcedText
+                : messageInput.value
+            ).trim();
+
+
+        if (!text) {
+            return;
+        }
+
+
+        state.isSending =
+            true;
+
+
+        sendBtn.disabled =
+            true;
+
+
+        addMessage(
+            "user",
+            text
+        );
+
+
+        messageInput.value =
+            "";
+
+
+        autoResize();
+
+
+        state.questionCount++;
+
+        state.interactionCount++;
+
+        updateStats();
+
+
+        state.history.push({
+            role:
+                "user",
+
+            content:
+                text
+        });
+
+
+        const typing =
+            addTyping();
+
+
+        const result =
+            await requestTutor(
+                text
+            );
+
+
+        typing.remove();
+
+
+        addMessage(
+            "tutor",
+            result.text,
+            {
+                html: true
+            }
+        );
+
+
+        state.explanationCount++;
+
+
+        state.history.push({
+            role:
+                "assistant",
+
+            content:
+                result.text
+        });
+
+
+        /*
+            Keep recent context bounded.
+        */
+
+        if (
+            state.history.length >
+            12
+        ) {
+
+            state.history =
+                state.history.slice(
+                    -12
+                );
+        }
+
+
+        updateStats();
+
+
+        state.currentMode =
+            "normal";
+
+
+        updateStats();
+
+
+        state.isSending =
+            false;
+
+
+        sendBtn.disabled =
+            false;
+
+
+        messageInput.focus();
+    }
+
+
+    /* ====================================================
+       QUICK ACTIONS
+    ==================================================== */
+
+    document
+        .querySelectorAll(
+            ".quick-btn"
+        )
+        .forEach(
+            button => {
+
+                button.addEventListener(
+                    "click",
+                    () => {
+
+                        const action =
+                            button.dataset.action;
+
+
+                        state.currentMode =
+                            action;
+
+
+                        updateStats();
+
+
+                        const prompts = {
+
+                            simple:
+                                `Explain ${state.topicTitle} to me in very simple words.`,
+
+                            example:
+                                `Give me one strong real-life example from ${state.topicTitle}.`,
+
+                            steps:
+                                `Teach the main idea of ${state.topicTitle} step by step.`,
+
+                            analogy:
+                                `Give me an easy analogy to understand ${state.topicTitle}.`,
+
+                            check:
+                                `Check whether I understand ${state.topicTitle}. Ask me one focused concept question.`
+                        };
+
+
+                        sendMessage(
+                            prompts[
+                                action
+                            ]
+                        );
+                    }
+                );
+            }
+        );
+
+
+    /* ====================================================
+       INPUT EVENTS
+    ==================================================== */
+
+    function autoResize() {
+
+        messageInput.style.height =
+            "auto";
+
+
+        messageInput.style.height =
+            Math.min(
+                messageInput.scrollHeight,
+                135
+            ) + "px";
+    }
+
+
+    messageInput.addEventListener(
+        "input",
+        autoResize
+    );
+
+
+    messageInput.addEventListener(
+        "keydown",
+        event => {
+
+            if (
+                event.key ===
+                "Enter" &&
+                !event.shiftKey
+            ) {
+
+                event.preventDefault();
+
+
+                sendMessage();
+            }
+        }
+    );
+
+
+    sendBtn.addEventListener(
+        "click",
+        () => {
+
+            sendMessage();
+        }
+    );
+
+
+    /* ====================================================
+       CLEAR CHAT
+    ==================================================== */
+
+    document
+        .getElementById(
+            "clearBtn"
+        )
+        .addEventListener(
+            "click",
+            () => {
+
+                messages.innerHTML =
+                    `
+                    <div class="message tutor">
+
+                        <div class="message-avatar">
+                            🤖
+                        </div>
+
+                        <div class="bubble">
+                            Conversation cleared.
+
+                            Ask me a new doubt from
+                            <strong>${escapeHtml(state.topicTitle)}</strong>.
+                        </div>
+
+                    </div>
+                    `;
+
+
+                state.history =
+                    [];
+
+
+                state.questionCount =
+                    0;
+
+
+                state.explanationCount =
+                    0;
+
+
+                state.exampleCount =
+                    0;
+
+
+                state.interactionCount =
+                    0;
+
+
+                state.currentMode =
+                    "normal";
+
+
+                updateStats();
+            }
+        );
+
+
+    /* ====================================================
+       FACULTY ESCALATION
+    ==================================================== */
+
+    document
+        .getElementById(
+            "facultyBtn"
+        )
+        .addEventListener(
+            "click",
+            () => {
+
+                addMessage(
+                    "tutor",
+                    `
+<strong>Faculty escalation is ready for the next integration step.</strong>
+
+We can send your current topic, latest doubt, and AI conversation context to the existing Faculty Doubt system.
+
+<span class="physics-note">
+This button is intentionally not submitting anything yet. We'll connect it after the tutor backend is approved.
+</span>
+                    `.trim(),
+                    {
+                        html: true
+                    }
+                );
+            }
+        );
+
+
+    /* ====================================================
+       BACK
+    ==================================================== */
+
+    document
+        .getElementById(
+            "backBtn"
+        )
+        .addEventListener(
+            "click",
+            () => {
+
+                if (
+                    window.history.length >
+                    1
+                ) {
+
+                    window.history.back();
+
+                } else {
+
+                    window.location.href =
+                        "student.html";
+                }
+            }
+        );
+
+
+    /* ====================================================
+       SANITIZE
+    ==================================================== */
+
+    function escapeHtml(
+        value
+    ) {
+
+        return String(value)
+            .replaceAll(
+                "&",
+                "&amp;"
+            )
+            .replaceAll(
+                "<",
+                "&lt;"
+            )
+            .replaceAll(
+                ">",
+                "&gt;"
+            )
+            .replaceAll(
+                '"',
+                "&quot;"
+            )
+            .replaceAll(
+                "'",
+                "&#039;"
+            );
+    }
+
+
+    /* ====================================================
+       INIT
+    ==================================================== */
+
+    updateStats();
+
+    autoResize();
+
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,288 @@
+
+/* ==========================================================
+   MY CAMPUS - UNIVERSAL PERSONALIZED LEARNING JOURNEY
+   ========================================================== */
+
+body.journey-resource-page {
+    padding-bottom: 108px !important;
+}
+
+
+.my-campus-journey-bar {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    z-index: 8000;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 18px;
+
+    padding: 13px 24px;
+
+    border-top: 1px solid #e4e0ff;
+
+    background: rgba(255, 255, 255, .97);
+
+    backdrop-filter: blur(16px);
+
+    box-shadow:
+        0 -12px 36px
+        rgba(44, 35, 100, .10);
+}
+
+
+.my-campus-journey-left {
+    min-width: 0;
+}
+
+
+.my-campus-journey-stage {
+    color: #6d5dfc;
+
+    font-size: 10px;
+    font-weight: 900;
+
+    letter-spacing: .7px;
+    text-transform: uppercase;
+}
+
+
+.my-campus-journey-question {
+    margin-top: 3px;
+
+    color: #222738;
+
+    font-size: 14px;
+    font-weight: 850;
+}
+
+
+.my-campus-journey-hint {
+    margin-top: 3px;
+
+    color: #81889a;
+
+    font-size: 10px;
+}
+
+
+.my-campus-journey-actions {
+    display: flex;
+    align-items: center;
+
+    gap: 9px;
+
+    flex: 0 0 auto;
+}
+
+
+.my-campus-journey-button {
+    min-height: 43px;
+
+    padding: 0 16px;
+
+    border-radius: 11px;
+
+    font-size: 11px;
+    font-weight: 850;
+
+    cursor: pointer;
+
+    transition:
+        transform .15s ease,
+        box-shadow .15s ease;
+}
+
+
+.my-campus-journey-button:hover {
+    transform: translateY(-1px);
+}
+
+
+.my-campus-journey-next {
+    border: 1px solid #dad5ff;
+
+    background: #f5f3ff;
+
+    color: #5f52dc;
+}
+
+
+.my-campus-journey-understood {
+    border: 1px solid #6d5dfc;
+
+    background:
+        linear-gradient(
+            135deg,
+            #6d5dfc,
+            #806ff1
+        );
+
+    color: #ffffff;
+
+    box-shadow:
+        0 8px 22px
+        rgba(109, 93, 252, .18);
+}
+
+
+.my-campus-journey-button:disabled {
+    opacity: .55;
+    cursor: default;
+    transform: none;
+}
+
+
+/* ==========================================================
+   AI TUTOR JOURNEY ACTIONS
+   ========================================================== */
+
+.ai-journey-actions {
+    display: flex;
+    flex-wrap: wrap;
+
+    gap: 8px;
+
+    margin-top: 10px;
+}
+
+
+.ai-journey-action {
+    min-height: 37px;
+
+    padding: 0 12px;
+
+    border-radius: 10px;
+
+    font-size: 10px;
+    font-weight: 850;
+
+    cursor: pointer;
+}
+
+
+.ai-journey-next {
+    border: 1px solid #ddd8ff;
+
+    background: #f7f5ff;
+
+    color: #6053dc;
+}
+
+
+.ai-journey-understood {
+    border: 1px solid #a9e0bf;
+
+    background: #effaf4;
+
+    color: #187342;
+}
+
+
+/* ==========================================================
+   FACULTY PERSONALIZATION
+   ========================================================== */
+
+.faculty-journey-understood {
+    min-height: 40px;
+
+    padding: 0 13px;
+
+    border: 1px solid #98dcb5;
+
+    border-radius: 10px;
+
+    background: #effbf4;
+
+    color: #176e3e;
+
+    font-size: 11px;
+    font-weight: 850;
+
+    cursor: pointer;
+}
+
+
+/* ==========================================================
+   TOAST
+   ========================================================== */
+
+.journey-toast {
+    position: fixed;
+
+    right: 22px;
+    bottom: 118px;
+
+    z-index: 9500;
+
+    max-width: 390px;
+
+    padding: 12px 15px;
+
+    border: 1px solid #d5efdf;
+
+    border-radius: 12px;
+
+    background: #f1fbf5;
+
+    color: #176d3d;
+
+    box-shadow:
+        0 12px 34px
+        rgba(26, 96, 57, .14);
+
+    font-size: 11px;
+    font-weight: 800;
+
+    line-height: 1.5;
+}
+
+
+@media (max-width: 760px) {
+
+    body.journey-resource-page {
+        padding-bottom: 166px !important;
+    }
+
+
+    .my-campus-journey-bar {
+        align-items: stretch;
+        flex-direction: column;
+
+        gap: 9px;
+
+        padding: 11px 13px;
+    }
+
+
+    .my-campus-journey-actions {
+        display: grid;
+
+        grid-template-columns:
+            1fr
+            1fr;
+
+        width: 100%;
+    }
+
+
+    .my-campus-journey-button {
+        width: 100%;
+    }
+
+
+    .journey-toast {
+        left: 14px;
+        right: 14px;
+
+        bottom: 178px;
+
+        max-width: none;
+    }
+
+}

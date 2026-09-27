@@ -1,0 +1,5483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+<title>My Campus - Quantum Research Lab</title>
+
+<style>
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0
+}
+
+html,body{
+    width:100%;
+    height:100%;
+    overflow:hidden;
+
+    background:#06121c;
+
+    font-family:
+        Segoe UI,
+        Arial,
+        sans-serif
+}
+
+#game{
+    position:fixed;
+    inset:0
+}
+
+canvas{
+    display:block
+}
+
+.hud{
+    position:fixed;
+    inset:0;
+
+    z-index:10;
+
+    color:white;
+
+    pointer-events:none
+}
+
+.glass{
+    background:
+        linear-gradient(
+            135deg,
+            rgba(5,20,32,.95),
+            rgba(7,29,44,.84)
+        );
+
+    border:
+        1px solid
+        rgba(255,255,255,.13);
+
+    border-radius:15px;
+
+    box-shadow:
+        0 14px 40px
+        rgba(0,0,0,.28);
+
+    backdrop-filter:
+        blur(13px)
+}
+
+/* ======================================================
+   HEADER
+====================================================== */
+
+.title{
+    position:absolute;
+
+    top:18px;
+    left:18px;
+
+    width:360px;
+
+    padding:14px 17px
+}
+
+.eyebrow{
+    color:#65e4ff;
+
+    font-size:10px;
+    font-weight:900;
+
+    letter-spacing:1.5px
+}
+
+.title h1{
+    margin-top:4px;
+
+    font-size:20px
+}
+
+.title p{
+    margin-top:5px;
+
+    color:#aec0cc;
+
+    font-size:11px;
+    line-height:1.4
+}
+
+/* ======================================================
+   STAGE
+====================================================== */
+
+.stage{
+    position:absolute;
+
+    top:18px;
+    left:50%;
+
+    transform:
+        translateX(-50%);
+
+    width:440px;
+
+    padding:12px;
+
+    text-align:center
+}
+
+.stage small{
+    color:#98adbc;
+
+    font-size:9px;
+    font-weight:900
+}
+
+.stage strong{
+    display:block;
+
+    margin-top:3px;
+
+    color:#69e4ff;
+
+    font-size:18px
+}
+
+.stage p{
+    margin-top:3px;
+
+    color:#b8c8d2;
+
+    font-size:9px
+}
+
+/* ======================================================
+   SCORE + TIMER
+====================================================== */
+
+.status-panel{
+    position:absolute;
+
+    top:18px;
+    right:18px;
+
+    width:220px;
+
+    display:grid;
+
+    grid-template-columns:
+        1fr 1fr;
+
+    gap:8px;
+
+    padding:10px
+}
+
+.status-box{
+    padding:6px;
+
+    border-radius:9px;
+
+    background:
+        rgba(255,255,255,.05);
+
+    text-align:center
+}
+
+.status-box small{
+    display:block;
+
+    color:#98adbc;
+
+    font-size:8px;
+    font-weight:900
+}
+
+.status-box strong{
+    display:block;
+
+    margin-top:2px;
+
+    font-size:22px
+}
+
+#score{
+    color:#ffe16a
+}
+
+#timerValue{
+    color:#69e4ff
+}
+
+#timerValue.warning{
+    color:#ffc95c
+}
+
+#timerValue.danger{
+    color:#ff6262;
+
+    animation:
+        pulse .55s
+        infinite alternate
+}
+
+@keyframes pulse{
+
+    from{
+        transform:
+            scale(1)
+    }
+
+    to{
+        transform:
+            scale(1.13)
+    }
+}
+
+/* ======================================================
+   CONTROLS
+====================================================== */
+
+.controls{
+    position:absolute;
+
+    top:150px;
+    left:18px;
+
+    width:320px;
+
+    padding:14px;
+
+    pointer-events:auto
+}
+
+.panel-title{
+    color:#69e5ff;
+
+    font-size:10px;
+    font-weight:950;
+
+    letter-spacing:1px
+}
+
+.control-group{
+    margin-top:11px
+}
+
+.control-label{
+    color:#a9bac6;
+
+    font-size:9px;
+    font-weight:900
+}
+
+.option-row{
+    display:grid;
+
+    grid-template-columns:
+        repeat(3,1fr);
+
+    gap:6px;
+
+    margin-top:5px
+}
+
+.option-row.four{
+    grid-template-columns:
+        repeat(4,1fr)
+}
+
+.option-row button{
+    min-height:38px;
+
+    padding:7px 3px;
+
+    border:
+        1px solid
+        rgba(255,255,255,.14);
+
+    border-radius:8px;
+
+    background:
+        rgba(255,255,255,.06);
+
+    color:white;
+
+    font-size:9px;
+    font-weight:900;
+
+    cursor:pointer
+}
+
+.option-row button.active{
+    background:#63e1ff;
+
+    color:#03131c
+}
+
+#particleGroup,
+#levelGroup,
+#frequencyGroup,
+#thresholdGroup,
+#halfLifeGroup,
+#fissionGroup{
+    display:none
+}
+
+.test-button{
+    width:100%;
+
+    margin-top:13px;
+
+    padding:11px;
+
+    border:0;
+
+    border-radius:9px;
+
+    background:#63e1ff;
+
+    color:#03131c;
+
+    font-weight:950;
+
+    cursor:pointer
+}
+
+.test-button:disabled{
+    opacity:.45;
+
+    cursor:not-allowed
+}
+
+.control-help{
+    margin-top:8px;
+
+    color:#95a9b7;
+
+    font-size:9px;
+    line-height:1.45
+}
+
+/* ======================================================
+   VALUES
+====================================================== */
+
+.values{
+    position:absolute;
+
+    right:18px;
+    bottom:18px;
+
+    width:360px;
+
+    padding:15px
+}
+
+.value-grid{
+    display:grid;
+
+    grid-template-columns:
+        1fr 1fr;
+
+    gap:7px
+}
+
+.value{
+    padding:9px;
+
+    border-radius:9px;
+
+    background:
+        rgba(255,255,255,.05)
+}
+
+.value label{
+    display:block;
+
+    color:#92a7b5;
+
+    font-size:8px;
+    font-weight:900
+}
+
+.value strong{
+    display:block;
+
+    margin-top:2px;
+
+    font-size:14px
+}
+
+.value strong.highlight{
+    color:#69e4ff
+}
+
+.energy-title{
+    display:flex;
+
+    justify-content:
+        space-between;
+
+    margin-top:10px;
+
+    color:#9cafbc;
+
+    font-size:8px;
+    font-weight:900
+}
+
+.energy-bar{
+    height:7px;
+
+    margin-top:4px;
+
+    overflow:hidden;
+
+    border-radius:20px;
+
+    background:
+        rgba(255,255,255,.08)
+}
+
+#energyFill{
+    width:0%;
+    height:100%;
+
+    background:
+        linear-gradient(
+            90deg,
+            #59ddff,
+            #9a7cff,
+            #ffe268
+        )
+}
+
+.equation{
+    margin-top:10px;
+
+    padding:10px;
+
+    border:
+        1px solid
+        rgba(83,220,255,.17);
+
+    border-radius:10px;
+
+    background:
+        rgba(71,216,255,.07);
+
+    font-size:10px;
+    line-height:1.5
+}
+
+.equation b{
+    color:#69e4ff
+}
+
+/* ======================================================
+   COACH
+====================================================== */
+
+.coach{
+    position:absolute;
+
+    left:50%;
+    bottom:15px;
+
+    transform:
+        translateX(-50%);
+
+    width:min(
+        680px,
+        41vw
+    );
+
+    padding:12px 16px;
+
+    text-align:center
+}
+
+#coachTitle{
+    color:#66e3ff;
+
+    font-size:10px;
+    font-weight:950;
+
+    letter-spacing:1px
+}
+
+#coachText{
+    margin-top:4px;
+
+    color:#e2ecf2;
+
+    font-size:11px;
+    line-height:1.45
+}
+
+#coachFormula{
+    margin-top:4px;
+
+    color:#93a9b7;
+
+    font-size:10px
+}
+
+/* ======================================================
+   START
+====================================================== */
+
+.start-screen{
+    position:fixed;
+
+    inset:0;
+
+    z-index:40;
+
+    display:flex;
+
+    align-items:center;
+    justify-content:center;
+
+    background:
+        rgba(2,8,14,.78);
+
+    backdrop-filter:
+        blur(8px);
+
+    color:white;
+
+    pointer-events:auto
+}
+
+.start-box{
+    width:min(
+        700px,
+        92vw
+    );
+
+    padding:28px;
+
+    text-align:center
+}
+
+.start-box h2{
+    font-size:32px
+}
+
+.start-box p{
+    margin-top:10px;
+
+    color:#b7c8d3;
+
+    font-size:12px;
+    line-height:1.6
+}
+
+.rules{
+    margin-top:14px;
+
+    padding:12px;
+
+    border-radius:10px;
+
+    background:
+        rgba(255,255,255,.05);
+
+    color:#d7e6ed;
+
+    font-size:11px;
+    line-height:1.65
+}
+
+.rules b{
+    color:#69e4ff
+}
+
+.start-box button{
+    margin-top:18px;
+
+    padding:12px 28px;
+
+    border:0;
+
+    border-radius:10px;
+
+    background:#61e1ff;
+
+    color:#03131c;
+
+    font-weight:950;
+
+    cursor:pointer
+}
+
+/* ======================================================
+   RESULT
+====================================================== */
+
+.result{
+    position:fixed;
+
+    top:78px;
+    left:50%;
+
+    transform:
+        translateX(-50%);
+
+    z-index:70;
+
+    width:min(
+        770px,
+        92vw
+    );
+
+    max-height:
+        calc(100vh - 98px);
+
+    display:none;
+
+    flex-direction:column;
+
+    padding:18px;
+
+    overflow:hidden;
+
+    color:white;
+
+    pointer-events:auto
+}
+
+.result.show{
+    display:flex
+}
+
+.result-scroll{
+    min-height:0;
+
+    overflow-y:auto;
+
+    padding-right:6px
+}
+
+.result-badge{
+    color:#ffe16b;
+
+    font-size:10px;
+    font-weight:950;
+
+    letter-spacing:1.1px
+}
+
+.result h3{
+    margin-top:5px;
+
+    font-size:20px
+}
+
+.result-text{
+    margin-top:8px;
+
+    padding:11px;
+
+    border-radius:9px;
+
+    background:
+        rgba(255,255,255,.05);
+
+    color:#dce8ef;
+
+    font-size:11px;
+    line-height:1.55
+}
+
+.question-label{
+    margin-top:12px;
+
+    color:#69e4ff;
+
+    font-size:10px;
+    font-weight:950
+}
+
+#question{
+    margin-top:5px;
+
+    font-size:16px
+}
+
+#questionHint{
+    margin-top:4px;
+
+    color:#a2b5c2;
+
+    font-size:10px
+}
+
+.answers{
+    display:grid;
+
+    grid-template-columns:
+        repeat(3,1fr);
+
+    gap:8px;
+
+    margin-top:10px
+}
+
+.answer{
+    padding:10px;
+
+    border:
+        1px solid
+        rgba(255,255,255,.14);
+
+    border-radius:9px;
+
+    background:
+        rgba(255,255,255,.07);
+
+    color:white;
+
+    font-weight:900;
+
+    cursor:pointer
+}
+
+.answer.correct{
+    background:
+        rgba(63,207,116,.24);
+
+    border-color:#6aed98
+}
+
+.answer.wrong{
+    background:
+        rgba(255,72,72,.24);
+
+    border-color:#ff7676
+}
+
+.answer:disabled{
+    opacity:.75
+}
+
+#feedback{
+    display:none;
+
+    max-height:135px;
+
+    overflow-y:auto;
+
+    margin-top:10px;
+
+    padding:11px;
+
+    border:
+        1px solid
+        rgba(80,218,255,.17);
+
+    border-radius:10px;
+
+    background:
+        rgba(69,214,255,.08);
+
+    font-size:11px;
+    line-height:1.55
+}
+
+#feedback b{
+    color:#6de4ff
+}
+
+.result-footer{
+    flex:0 0 auto;
+
+    padding-top:11px
+}
+
+.next-button{
+    display:none;
+
+    width:min(
+        320px,
+        90%
+    );
+
+    margin:0 auto;
+
+    padding:12px;
+
+    border:0;
+
+    border-radius:9px;
+
+    background:#61e1ff;
+
+    color:#03131c;
+
+    font-weight:950;
+
+    cursor:pointer
+}
+
+/* ======================================================
+   FAILURE
+====================================================== */
+
+.failure{
+    position:fixed;
+
+    inset:0;
+
+    z-index:100;
+
+    display:none;
+
+    align-items:center;
+    justify-content:center;
+
+    background:
+        rgba(13,3,7,.93);
+
+    backdrop-filter:
+        blur(11px);
+
+    color:white;
+
+    pointer-events:auto
+}
+
+.failure.show{
+    display:flex
+}
+
+.failure-box{
+    width:min(
+        630px,
+        92vw
+    );
+
+    padding:30px;
+
+    text-align:center;
+
+    border:
+        1px solid
+        rgba(255,90,90,.35);
+
+    border-radius:16px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(40,8,14,.96),
+            rgba(18,12,20,.95)
+        )
+}
+
+.failure-icon{
+    font-size:52px
+}
+
+.failure-box h2{
+    margin-top:8px;
+
+    color:#ff6868;
+
+    font-size:32px
+}
+
+.failure-box p{
+    margin-top:10px;
+
+    color:#d8c5ca;
+
+    font-size:12px;
+    line-height:1.6
+}
+
+.failure-stage{
+    margin-top:13px;
+
+    padding:11px;
+
+    border-radius:9px;
+
+    background:
+        rgba(255,255,255,.05);
+
+    font-size:11px;
+    line-height:1.5
+}
+
+.failure-box button{
+    margin-top:18px;
+
+    padding:12px 25px;
+
+    border:0;
+
+    border-radius:9px;
+
+    background:#ff6262;
+
+    color:white;
+
+    font-weight:950;
+
+    cursor:pointer
+}
+
+/* ======================================================
+   FINISH
+====================================================== */
+
+.finish{
+    position:fixed;
+
+    inset:0;
+
+    z-index:90;
+
+    display:none;
+
+    align-items:center;
+    justify-content:center;
+
+    background:
+        rgba(1,7,13,.87);
+
+    backdrop-filter:
+        blur(11px);
+
+    color:white;
+
+    pointer-events:auto
+}
+
+.finish.show{
+    display:flex
+}
+
+.finish-box{
+    width:min(
+        850px,
+        94vw
+    );
+
+    max-height:93vh;
+
+    overflow:auto;
+
+    padding:27px
+}
+
+.finish-box h2{
+    text-align:center;
+
+    font-size:32px
+}
+
+.finish-sub{
+    margin-top:5px;
+
+    text-align:center;
+
+    color:#aabcc8;
+
+    font-size:11px
+}
+
+.final-grid{
+    display:grid;
+
+    grid-template-columns:
+        repeat(4,1fr);
+
+    gap:8px;
+
+    margin-top:15px
+}
+
+.final-card{
+    padding:12px;
+
+    border-radius:10px;
+
+    background:
+        rgba(255,255,255,.055);
+
+    text-align:center
+}
+
+.final-card strong{
+    display:block;
+
+    color:#69e4ff;
+
+    font-size:18px
+}
+
+.final-card span{
+    color:#92a7b5;
+
+    font-size:8px
+}
+
+.final-explanation{
+    margin-top:15px;
+
+    padding:16px;
+
+    border:
+        1px solid
+        rgba(89,220,255,.18);
+
+    border-radius:11px;
+
+    background:
+        rgba(68,212,255,.075);
+
+    font-size:11px;
+    line-height:1.65
+}
+
+.final-explanation b{
+    color:#6ee5ff
+}
+
+.restart{
+    display:block;
+
+    margin:16px auto 0;
+
+    padding:11px 25px;
+
+    border:0;
+
+    border-radius:9px;
+
+    background:#61e1ff;
+
+    color:#03131c;
+
+    font-weight:900;
+
+    cursor:pointer
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="game"></div>
+
+<div class="hud">
+
+<div class="title glass">
+
+    <div class="eyebrow">
+        MY CAMPUS - FINAL PHYSICS LAB
+    </div>
+
+    <h1>
+        Quantum Research Lab
+    </h1>
+
+    <p id="studentText"></p>
+
+</div>
+
+<div class="stage glass">
+
+    <small>
+        CURRENT RESEARCH MISSION
+    </small>
+
+    <strong id="stageName">
+        Atomic Structure
+    </strong>
+
+    <p id="stageObjective">
+        Identify the correct atomic particle.
+    </p>
+
+</div>
+
+<div class="status-panel glass">
+
+    <div class="status-box">
+
+        <small>
+            SCORE
+        </small>
+
+        <strong id="score">
+            0
+        </strong>
+
+    </div>
+
+    <div class="status-box">
+
+        <small>
+            TIME LEFT
+        </small>
+
+        <strong id="timerValue">
+            30
+        </strong>
+
+    </div>
+
+</div>
+
+<div class="controls glass">
+
+    <div class="panel-title">
+        QUANTUM CONTROL PANEL
+    </div>
+
+    <!-- PARTICLES -->
+
+    <div
+        id="particleGroup"
+        class="control-group">
+
+        <div class="control-label">
+            SELECT PARTICLE
+        </div>
+
+        <div
+            id="particleButtons"
+            class="option-row">
+
+            <button
+                data-particle="proton"
+                class="active">
+
+                PROTON
+
+            </button>
+
+            <button data-particle="neutron">
+                NEUTRON
+            </button>
+
+            <button data-particle="electron">
+                ELECTRON
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- ENERGY LEVEL -->
+
+    <div
+        id="levelGroup"
+        class="control-group">
+
+        <div class="control-label">
+            ELECTRON ENERGY LEVEL
+        </div>
+
+        <div
+            id="levelButtons"
+            class="option-row four">
+
+            <button
+                data-level="1"
+                class="active">
+                n = 1
+            </button>
+
+            <button data-level="2">
+                n = 2
+            </button>
+
+            <button data-level="3">
+                n = 3
+            </button>
+
+            <button data-level="4">
+                n = 4
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- PHOTON FREQUENCY -->
+
+    <div
+        id="frequencyGroup"
+        class="control-group">
+
+        <div class="control-label">
+            PHOTON FREQUENCY
+        </div>
+
+        <div
+            id="frequencyButtons"
+            class="option-row four">
+
+            <button data-frequency="3">
+                3
+            </button>
+
+            <button
+                data-frequency="5"
+                class="active">
+                5
+            </button>
+
+            <button data-frequency="7">
+                7
+            </button>
+
+            <button data-frequency="9">
+                9
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- THRESHOLD -->
+
+    <div
+        id="thresholdGroup"
+        class="control-group">
+
+        <div class="control-label">
+            METAL THRESHOLD
+        </div>
+
+        <div
+            id="thresholdButtons"
+            class="option-row">
+
+            <button data-threshold="4">
+                4
+            </button>
+
+            <button
+                data-threshold="6"
+                class="active">
+                6
+            </button>
+
+            <button data-threshold="8">
+                8
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- HALF LIFE -->
+
+    <div
+        id="halfLifeGroup"
+        class="control-group">
+
+        <div class="control-label">
+            ELAPSED HALF-LIVES
+        </div>
+
+        <div
+            id="halfLifeButtons"
+            class="option-row four">
+
+            <button
+                data-half="0"
+                class="active">
+                0
+            </button>
+
+            <button data-half="1">
+                1
+            </button>
+
+            <button data-half="2">
+                2
+            </button>
+
+            <button data-half="3">
+                3
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- FISSION -->
+
+    <div
+        id="fissionGroup"
+        class="control-group">
+
+        <div class="control-label">
+            NUCLEAR EVENT
+        </div>
+
+        <div
+            id="fissionButtons"
+            class="option-row">
+
+            <button
+                data-fission="absorb"
+                class="active">
+
+                ABSORB
+
+            </button>
+
+            <button data-fission="split">
+                SPLIT
+            </button>
+
+            <button data-fission="fuse">
+                FUSE
+            </button>
+
+        </div>
+
+    </div>
+
+    <button
+        id="testButton"
+        class="test-button">
+
+        RUN EXPERIMENT
+
+    </button>
+
+    <div class="control-help">
+        Complete the research task before the countdown reaches zero.
+    </div>
+
+</div>
+
+<div class="values glass">
+
+    <div class="value-grid">
+
+        <div class="value">
+
+            <label>
+                PROTONS
+            </label>
+
+            <strong>
+                <span id="protonValue">
+                    3
+                </span>
+            </strong>
+
+        </div>
+
+        <div class="value">
+
+            <label>
+                NEUTRONS
+            </label>
+
+            <strong>
+                <span id="neutronValue">
+                    4
+                </span>
+            </strong>
+
+        </div>
+
+        <div class="value">
+
+            <label>
+                ELECTRONS
+            </label>
+
+            <strong class="highlight">
+                <span id="electronValue">
+                    3
+                </span>
+            </strong>
+
+        </div>
+
+        <div class="value">
+
+            <label>
+                PHOTON ENERGY
+            </label>
+
+            <strong class="highlight">
+                <span id="photonEnergyValue">
+                    5
+                </span>
+                h-units
+            </strong>
+
+        </div>
+
+        <div class="value">
+
+            <label>
+                ACTIVE NUCLEI
+            </label>
+
+            <strong>
+                <span id="nucleiValue">
+                    64
+                </span>
+            </strong>
+
+        </div>
+
+        <div class="value">
+
+            <label>
+                ENERGY LEVEL
+            </label>
+
+            <strong>
+                n =
+                <span id="levelValue">
+                    1
+                </span>
+            </strong>
+
+        </div>
+
+    </div>
+
+    <div class="energy-title">
+
+        <span>
+            QUANTUM ENERGY
+        </span>
+
+        <span id="energyPercent">
+            50%
+        </span>
+
+    </div>
+
+    <div class="energy-bar">
+        <div id="energyFill"></div>
+    </div>
+
+    <div
+        id="equation"
+        class="equation">
+
+        <b>Photon Energy</b><br>
+
+        E = hf
+
+    </div>
+
+</div>
+
+<div class="coach glass">
+
+    <div id="coachTitle">
+        ATOMIC STRUCTURE
+    </div>
+
+    <div id="coachText">
+        Protons and neutrons occupy the nucleus while electrons occupy the surrounding atomic region.
+    </div>
+
+    <div id="coachFormula">
+        Proton = + | Neutron = 0 | Electron = -
+    </div>
+
+</div>
+
+</div>
+
+<!-- ======================================================
+     START
+====================================================== -->
+
+<div
+    id="startScreen"
+    class="start-screen">
+
+    <div class="start-box glass">
+
+        <h2>
+            Quantum Research Emergency
+        </h2>
+
+        <p>
+            The campus Modern Physics research system has lost calibration.
+            Restore the atomic, photon and nuclear laboratories before
+            the quantum control network shuts down.
+        </p>
+
+        <div class="rules">
+
+            <b>FINAL PHYSICS GAME RULES</b><br>
+
+            Each research experiment:
+            <b>30 seconds</b><br>
+
+            Final quantum locks:
+            <b>20 seconds each</b><br>
+
+            Correct experiment:
+            <b>+100 points</b><br>
+
+            Correct physics answer:
+            <b>+50 points</b><br>
+
+            Wrong physics answer:
+            <b>-50 points</b><br>
+
+            Timer reaches zero:
+            <b>SYSTEM FAILURE</b>
+
+        </div>
+
+        <button id="startButton">
+            Enter Quantum Research Lab
+        </button>
+
+    </div>
+
+</div>
+
+<!-- ======================================================
+     RESULT
+====================================================== -->
+
+<div
+    id="resultBox"
+    class="result glass">
+
+    <div class="result-scroll">
+
+        <div class="result-badge">
+            RESEARCH RESULT
+        </div>
+
+        <h3 id="resultTitle"></h3>
+
+        <div
+            id="resultText"
+            class="result-text">
+        </div>
+
+        <div class="question-label">
+            MODERN PHYSICS CHECK
+        </div>
+
+        <div id="question"></div>
+
+        <div id="questionHint"></div>
+
+        <div
+            id="answers"
+            class="answers">
+        </div>
+
+        <div id="feedback"></div>
+
+    </div>
+
+    <div class="result-footer">
+
+        <button
+            id="nextButton"
+            class="next-button">
+
+            NEXT RESEARCH EXPERIMENT
+
+        </button>
+
+    </div>
+
+</div>
+
+<!-- ======================================================
+     FAILURE
+====================================================== -->
+
+<div
+    id="failure"
+    class="failure">
+
+    <div class="failure-box">
+
+        <div class="failure-icon">
+            ⚠
+        </div>
+
+        <h2>
+            QUANTUM SYSTEM FAILED
+        </h2>
+
+        <p>
+            The Modern Physics research system was not calibrated
+            before the mission timer expired.
+        </p>
+
+        <div
+            id="failureStage"
+            class="failure-stage">
+        </div>
+
+        <button onclick="location.reload()">
+            RESTART QUANTUM MISSION
+        </button>
+
+    </div>
+
+</div>
+
+<!-- ======================================================
+     FINISH
+====================================================== -->
+
+<div
+    id="finish"
+    class="finish">
+
+    <div class="finish-box glass">
+
+        <h2>
+            Quantum Research System Restored!
+        </h2>
+
+        <div class="finish-sub">
+            You completed the final Modern Physics laboratory mission.
+        </div>
+
+        <div class="final-grid">
+
+            <div class="final-card">
+
+                <strong id="finalPhoton">
+                    -
+                </strong>
+
+                <span>
+                    PHOTON FREQUENCY
+                </span>
+
+            </div>
+
+            <div class="final-card">
+
+                <strong id="finalLevel">
+                    -
+                </strong>
+
+                <span>
+                    ENERGY LEVEL
+                </span>
+
+            </div>
+
+            <div class="final-card">
+
+                <strong id="finalNuclei">
+                    -
+                </strong>
+
+                <span>
+                    ACTIVE NUCLEI
+                </span>
+
+            </div>
+
+            <div class="final-card">
+
+                <strong id="finalScore">
+                    -
+                </strong>
+
+                <span>
+                    FINAL SCORE
+                </span>
+
+            </div>
+
+        </div>
+
+        <div
+            id="finalExplanation"
+            class="final-explanation">
+        </div>
+
+        <button
+            class="restart"
+            onclick="location.reload()">
+
+            Run New Quantum Mission
+
+        </button>
+
+    </div>
+
+</div>
+
+<script src="../../vendor/three-0.160.1.min.js"></script>
+
+<script>
+
+(() => {
+
+"use strict";
+
+/* ======================================================
+   CONFIG
+====================================================== */
+
+const STAGE_TIME = 30;
+const FINAL_TIME = 20;
+
+const H_SIM = 1;
+
+const studentName =
+    localStorage.getItem(
+        "student_name"
+    ) ||
+    sessionStorage.getItem(
+        "student_name"
+    ) ||
+    "Student";
+
+document
+.getElementById(
+    "studentText"
+)
+.textContent =
+    studentName +
+    " - stabilize atoms, photons and nuclear systems before time expires.";
+
+/* ======================================================
+   THREE
+====================================================== */
+
+const scene =
+    new THREE.Scene();
+
+scene.background =
+    new THREE.Color(
+        0x060b19
+    );
+
+scene.fog =
+    new THREE.Fog(
+        0x060b19,
+        80,
+        230
+    );
+
+const camera =
+    new THREE.PerspectiveCamera(
+        58,
+        innerWidth/
+        innerHeight,
+        .1,
+        350
+    );
+
+const renderer =
+    new THREE.WebGLRenderer({
+        antialias:true,
+        powerPreference:
+            "high-performance"
+    });
+
+renderer.setSize(
+    innerWidth,
+    innerHeight
+);
+
+renderer.setPixelRatio(
+    Math.min(
+        devicePixelRatio,
+        2
+    )
+);
+
+renderer.shadowMap.enabled =
+    true;
+
+renderer.outputColorSpace =
+    THREE.SRGBColorSpace;
+
+renderer.toneMapping =
+    THREE.ACESFilmicToneMapping;
+
+renderer.toneMappingExposure =
+    1.12;
+
+document
+.getElementById(
+    "game"
+)
+.appendChild(
+    renderer.domElement
+);
+
+/* ======================================================
+   LIGHT
+====================================================== */
+
+scene.add(
+    new THREE.HemisphereLight(
+        0x8ddcff,
+        0x080817,
+        2.5
+    )
+);
+
+const mainLight =
+    new THREE.DirectionalLight(
+        0xffffff,
+        3.5
+    );
+
+mainLight.position.set(
+    -25,
+    45,
+    -20
+);
+
+mainLight.castShadow =
+    true;
+
+scene.add(
+    mainLight
+);
+
+const glowLight =
+    new THREE.PointLight(
+        0x43cfff,
+        35,
+        70
+    );
+
+glowLight.position.set(
+    0,
+    12,
+    15
+);
+
+scene.add(
+    glowLight
+);
+
+/* ======================================================
+   MATERIALS
+====================================================== */
+
+const MAT = {
+
+    floor:
+    new THREE.MeshStandardMaterial({
+        color:0x101a28,
+        roughness:.78,
+        metalness:.18
+    }),
+
+    platform:
+    new THREE.MeshStandardMaterial({
+        color:0x263847,
+        roughness:.7,
+        metalness:.2
+    }),
+
+    dark:
+    new THREE.MeshStandardMaterial({
+        color:0x10151d,
+        roughness:.5,
+        metalness:.35
+    }),
+
+    proton:
+    new THREE.MeshStandardMaterial({
+        color:0xef5555,
+        emissive:0x5a1010,
+        emissiveIntensity:.65
+    }),
+
+    neutron:
+    new THREE.MeshStandardMaterial({
+        color:0xb9c2ca,
+        emissive:0x1b2025,
+        emissiveIntensity:.25
+    }),
+
+    electron:
+    new THREE.MeshStandardMaterial({
+        color:0x56dfff,
+        emissive:0x075f80,
+        emissiveIntensity:1.8
+    }),
+
+    photon:
+    new THREE.MeshBasicMaterial({
+        color:0xffdf55
+    }),
+
+    nucleus:
+    new THREE.MeshStandardMaterial({
+        color:0x8d6fe5,
+        emissive:0x241560,
+        emissiveIntensity:.7
+    }),
+
+    radioactive:
+    new THREE.MeshStandardMaterial({
+        color:0xb96fff,
+        emissive:0x4b1672,
+        emissiveIntensity:1
+    }),
+
+    decay:
+    new THREE.MeshStandardMaterial({
+        color:0x59616c,
+        roughness:.7
+    }),
+
+    green:
+    new THREE.MeshStandardMaterial({
+        color:0x44d27d,
+        emissive:0x0d6536,
+        emissiveIntensity:1.6
+    }),
+
+    orange:
+    new THREE.MeshStandardMaterial({
+        color:0xf09b45,
+        emissive:0x67310b,
+        emissiveIntensity:.8
+    })
+};
+
+function box(
+    width,
+    height,
+    depth,
+    material,
+    x,
+    y,
+    z,
+    parent=scene
+){
+
+    const mesh =
+        new THREE.Mesh(
+            new THREE.BoxGeometry(
+                width,
+                height,
+                depth
+            ),
+            material
+        );
+
+    mesh.position.set(
+        x,y,z
+    );
+
+    mesh.castShadow =
+        true;
+
+    mesh.receiveShadow =
+        true;
+
+    parent.add(
+        mesh
+    );
+
+    return mesh;
+}
+
+/* ======================================================
+   WORLD
+====================================================== */
+
+box(
+    58,
+    .25,
+    100,
+    MAT.floor,
+    0,
+    -.15,
+    28
+);
+
+for(
+    let z=-5;
+    z<75;
+    z+=18
+){
+
+    box(
+        25,
+        .4,
+        14,
+        MAT.platform,
+        0,
+        .05,
+        z
+    );
+}
+
+/* ======================================================
+   ATOM LAB
+====================================================== */
+
+const atomLab =
+    new THREE.Group();
+
+atomLab.position.set(
+    0,
+    5,
+    3
+);
+
+scene.add(
+    atomLab
+);
+
+/* nucleus */
+
+const nucleusGroup =
+    new THREE.Group();
+
+atomLab.add(
+    nucleusGroup
+);
+
+function nucleon(
+    x,
+    y,
+    z,
+    material
+){
+
+    const mesh =
+        new THREE.Mesh(
+            new THREE.SphereGeometry(
+                .7,
+                18,
+                14
+            ),
+            material
+        );
+
+    mesh.position.set(
+        x,y,z
+    );
+
+    nucleusGroup.add(
+        mesh
+    );
+
+    return mesh;
+}
+
+nucleon(
+    -.65,
+    .4,
+    0,
+    MAT.proton
+);
+
+nucleon(
+    .65,
+    .4,
+    0,
+    MAT.neutron
+);
+
+nucleon(
+    0,
+    -.55,
+    .5,
+    MAT.proton
+);
+
+nucleon(
+    0,
+    -.55,
+    -.5,
+    MAT.neutron
+);
+
+/* orbit rings */
+
+const orbitRadii = [
+    4,
+    6.3,
+    8.5,
+    10.5
+];
+
+const orbitLines = [];
+
+orbitRadii.forEach(
+    radius=>{
+
+        const curve =
+            new THREE.EllipseCurve(
+                0,
+                0,
+                radius,
+                radius*.55,
+                0,
+                Math.PI*2
+            );
+
+        const points =
+            curve.getPoints(
+                100
+            )
+            .map(
+                point=>
+                new THREE.Vector3(
+                    point.x,
+                    0,
+                    point.y
+                )
+            );
+
+        const geometry =
+            new THREE.BufferGeometry()
+            .setFromPoints(
+                points
+            );
+
+        const material =
+            new THREE.LineBasicMaterial({
+                color:0x4e7792,
+                transparent:true,
+                opacity:.4
+            });
+
+        const line =
+            new THREE.LineLoop(
+                geometry,
+                material
+            );
+
+        atomLab.add(
+            line
+        );
+
+        orbitLines.push(
+            line
+        );
+    }
+);
+
+const electron =
+    new THREE.Mesh(
+        new THREE.SphereGeometry(
+            .38,
+            14,
+            10
+        ),
+        MAT.electron
+    );
+
+atomLab.add(
+    electron
+);
+
+/* photons */
+
+const photons = [];
+
+for(
+    let i=0;
+    i<12;
+    i++
+){
+
+    const photon =
+        new THREE.Mesh(
+            new THREE.SphereGeometry(
+                .16,
+                10,
+                8
+            ),
+            MAT.photon
+        );
+
+    photon.visible =
+        false;
+
+    scene.add(
+        photon
+    );
+
+    photons.push({
+        mesh:photon,
+        t:i/12
+    });
+}
+
+/* ======================================================
+   PHOTOELECTRIC LAB
+====================================================== */
+
+const photoLab =
+    new THREE.Group();
+
+photoLab.position.set(
+    0,
+    4,
+    30
+);
+
+scene.add(
+    photoLab
+);
+
+box(
+    10,
+    6,
+    1,
+    MAT.dark,
+    0,
+    0,
+    0,
+    photoLab
+);
+
+const metalPlate =
+    box(
+        8,
+        5,
+        .35,
+        MAT.neutron,
+        0,
+        0,
+        -.7,
+        photoLab
+    );
+
+const emittedElectron =
+    new THREE.Mesh(
+        new THREE.SphereGeometry(
+            .38,
+            14,
+            10
+        ),
+        MAT.electron
+    );
+
+emittedElectron.visible =
+    false;
+
+photoLab.add(
+    emittedElectron
+);
+
+/* photon beam */
+
+const beamParticles = [];
+
+for(
+    let i=0;
+    i<18;
+    i++
+){
+
+    const particle =
+        new THREE.Mesh(
+            new THREE.SphereGeometry(
+                .13,
+                8,
+                6
+            ),
+            MAT.photon
+        );
+
+    photoLab.add(
+        particle
+    );
+
+    beamParticles.push({
+        mesh:particle,
+        offset:i/18
+    });
+}
+
+/* ======================================================
+   RADIOACTIVITY LAB
+====================================================== */
+
+const decayLab =
+    new THREE.Group();
+
+decayLab.position.set(
+    0,
+    1.2,
+    51
+);
+
+scene.add(
+    decayLab
+);
+
+const decayNuclei = [];
+
+for(
+    let i=0;
+    i<64;
+    i++
+){
+
+    const row =
+        Math.floor(
+            i/8
+        );
+
+    const col =
+        i%8;
+
+    const sphere =
+        new THREE.Mesh(
+            new THREE.SphereGeometry(
+                .36,
+                10,
+                8
+            ),
+            MAT.radioactive
+        );
+
+    sphere.position.set(
+        (
+            col-3.5
+        )*
+        1.15,
+
+        (
+            row-3.5
+        )*
+        .9,
+
+        0
+    );
+
+    decayLab.add(
+        sphere
+    );
+
+    decayNuclei.push(
+        sphere
+    );
+}
+
+/* ======================================================
+   FISSION LAB
+====================================================== */
+
+const fissionLab =
+    new THREE.Group();
+
+fissionLab.position.set(
+    0,
+    5,
+    71
+);
+
+scene.add(
+    fissionLab
+);
+
+const heavyNucleus =
+    new THREE.Mesh(
+        new THREE.SphereGeometry(
+            2.3,
+            24,
+            18
+        ),
+        MAT.nucleus
+    );
+
+fissionLab.add(
+    heavyNucleus
+);
+
+const fragmentA =
+    new THREE.Mesh(
+        new THREE.SphereGeometry(
+            1.35,
+            20,
+            14
+        ),
+        MAT.orange
+    );
+
+const fragmentB =
+    new THREE.Mesh(
+        new THREE.SphereGeometry(
+            1.15,
+            20,
+            14
+        ),
+        MAT.green
+    );
+
+fragmentA.visible =
+    false;
+
+fragmentB.visible =
+    false;
+
+fissionLab.add(
+    fragmentA
+);
+
+fissionLab.add(
+    fragmentB
+);
+
+const neutrons = [];
+
+for(
+    let i=0;
+    i<3;
+    i++
+){
+
+    const neutron =
+        new THREE.Mesh(
+            new THREE.SphereGeometry(
+                .34,
+                12,
+                8
+            ),
+            MAT.neutron
+        );
+
+    neutron.visible =
+        false;
+
+    fissionLab.add(
+        neutron
+    );
+
+    neutrons.push(
+        neutron
+    );
+}
+
+/* ======================================================
+   STATE
+====================================================== */
+
+let started = false;
+let failed = false;
+let finished = false;
+
+let stage = 1;
+
+let score = 0;
+
+let animationTime = 0;
+
+let timerRemaining =
+    STAGE_TIME;
+
+let timerRunning =
+    false;
+
+let stageComplete =
+    false;
+
+let selectedParticle =
+    "proton";
+
+let selectedLevel =
+    1;
+
+let selectedFrequency =
+    5;
+
+let selectedThreshold =
+    6;
+
+let selectedHalfLives =
+    0;
+
+let selectedFission =
+    "absorb";
+
+let targetParticle =
+    "electron";
+
+let targetLevel =
+    3;
+
+let targetFrequency =
+    7;
+
+let targetThresholdResult =
+    "emit";
+
+let targetRemaining =
+    16;
+
+let targetFission =
+    "split";
+
+let finalTargets = [];
+
+let finalIndex =
+    0;
+
+let electronEmission =
+    false;
+
+let fissionTriggered =
+    false;
+
+/* ======================================================
+   CONTROLS
+====================================================== */
+
+const particleButtons =
+    [
+        ...document.querySelectorAll(
+            "#particleButtons button"
+        )
+    ];
+
+const levelButtons =
+    [
+        ...document.querySelectorAll(
+            "#levelButtons button"
+        )
+    ];
+
+const frequencyButtons =
+    [
+        ...document.querySelectorAll(
+            "#frequencyButtons button"
+        )
+    ];
+
+const thresholdButtons =
+    [
+        ...document.querySelectorAll(
+            "#thresholdButtons button"
+        )
+    ];
+
+const halfLifeButtons =
+    [
+        ...document.querySelectorAll(
+            "#halfLifeButtons button"
+        )
+    ];
+
+const fissionButtons =
+    [
+        ...document.querySelectorAll(
+            "#fissionButtons button"
+        )
+    ];
+
+function activate(
+    buttons,
+    key,
+    value
+){
+
+    buttons.forEach(
+        button=>{
+
+            button.classList.toggle(
+                "active",
+
+                String(
+                    button.dataset[key]
+                )===
+                String(value)
+            );
+        }
+    );
+}
+
+particleButtons.forEach(
+    button=>{
+
+        button.onclick =
+        ()=>{
+
+            selectedParticle =
+                button.dataset.particle;
+
+            activate(
+                particleButtons,
+                "particle",
+                selectedParticle
+            );
+
+            updateHUD();
+        };
+    }
+);
+
+levelButtons.forEach(
+    button=>{
+
+        button.onclick =
+        ()=>{
+
+            selectedLevel =
+                Number(
+                    button.dataset.level
+                );
+
+            activate(
+                levelButtons,
+                "level",
+                selectedLevel
+            );
+
+            updateHUD();
+        };
+    }
+);
+
+frequencyButtons.forEach(
+    button=>{
+
+        button.onclick =
+        ()=>{
+
+            selectedFrequency =
+                Number(
+                    button.dataset.frequency
+                );
+
+            activate(
+                frequencyButtons,
+                "frequency",
+                selectedFrequency
+            );
+
+            updateHUD();
+        };
+    }
+);
+
+thresholdButtons.forEach(
+    button=>{
+
+        button.onclick =
+        ()=>{
+
+            selectedThreshold =
+                Number(
+                    button.dataset.threshold
+                );
+
+            activate(
+                thresholdButtons,
+                "threshold",
+                selectedThreshold
+            );
+
+            updateHUD();
+        };
+    }
+);
+
+halfLifeButtons.forEach(
+    button=>{
+
+        button.onclick =
+        ()=>{
+
+            selectedHalfLives =
+                Number(
+                    button.dataset.half
+                );
+
+            activate(
+                halfLifeButtons,
+                "half",
+                selectedHalfLives
+            );
+
+            updateDecayVisual();
+
+            updateHUD();
+        };
+    }
+);
+
+fissionButtons.forEach(
+    button=>{
+
+        button.onclick =
+        ()=>{
+
+            selectedFission =
+                button.dataset.fission;
+
+            activate(
+                fissionButtons,
+                "fission",
+                selectedFission
+            );
+
+            updateHUD();
+        };
+    }
+);
+
+/* ======================================================
+   START
+====================================================== */
+
+document
+.getElementById(
+    "startButton"
+)
+.onclick =
+()=>{
+
+    started =
+        true;
+
+    document
+    .getElementById(
+        "startScreen"
+    )
+    .style.display =
+        "none";
+
+    prepareStage();
+};
+
+/* ======================================================
+   TEST
+====================================================== */
+
+document
+.getElementById(
+    "testButton"
+)
+.onclick =
+()=>{
+
+    if(
+        !started ||
+        failed ||
+        finished ||
+        stageComplete
+    ){
+
+        return;
+    }
+
+    evaluateStage();
+};
+
+/* ======================================================
+   TIMER
+====================================================== */
+
+function startTimer(
+    seconds
+){
+
+    timerRemaining =
+        seconds;
+
+    timerRunning =
+        true;
+
+    updateTimerDisplay();
+}
+
+function pauseTimer(){
+
+    timerRunning =
+        false;
+}
+
+function updateMissionTimer(
+    dt
+){
+
+    if(
+        !started ||
+        failed ||
+        finished ||
+        !timerRunning
+    ){
+
+        return;
+    }
+
+    timerRemaining -=
+        dt;
+
+    if(
+        timerRemaining<=0
+    ){
+
+        timerRemaining =
+            0;
+
+        updateTimerDisplay();
+
+        failMission();
+
+        return;
+    }
+
+    updateTimerDisplay();
+}
+
+function updateTimerDisplay(){
+
+    const timer =
+        document.getElementById(
+            "timerValue"
+        );
+
+    timer.textContent =
+        Math.ceil(
+            Math.max(
+                0,
+                timerRemaining
+            )
+        );
+
+    timer.classList.remove(
+        "warning",
+        "danger"
+    );
+
+    if(
+        timerRemaining<=5
+    ){
+
+        timer.classList.add(
+            "danger"
+        );
+    }
+
+    else if(
+        timerRemaining<=10
+    ){
+
+        timer.classList.add(
+            "warning"
+        );
+    }
+}
+
+/* ======================================================
+   FAILURE
+====================================================== */
+
+function failMission(){
+
+    if(
+        failed ||
+        finished
+    ){
+
+        return;
+    }
+
+    failed =
+        true;
+
+    pauseTimer();
+
+    document
+    .getElementById(
+        "testButton"
+    )
+    .disabled =
+        true;
+
+    document
+    .getElementById(
+        "failureStage"
+    )
+    .innerHTML =
+    `
+    Failed during:<br>
+
+    <b>
+    ${
+        document
+        .getElementById(
+            "stageName"
+        )
+        .textContent
+    }
+    </b><br><br>
+
+    Final score:
+    <b>${score}</b>
+    `;
+
+    document
+    .getElementById(
+        "failure"
+    )
+    .classList.add(
+        "show"
+    );
+}
+
+/* ======================================================
+   RANDOM
+====================================================== */
+
+function randomItem(
+    array
+){
+
+    return array[
+        Math.floor(
+            Math.random()*
+            array.length
+        )
+    ];
+}
+
+/* ======================================================
+   VISIBILITY
+====================================================== */
+
+function showGroup(
+    id,
+    visible
+){
+
+    document
+    .getElementById(
+        id
+    )
+    .style.display =
+        visible
+        ?
+        "block"
+        :
+        "none";
+}
+
+/* ======================================================
+   STAGE SETUP
+====================================================== */
+
+function prepareStage(){
+
+    stageComplete =
+        false;
+
+    electronEmission =
+        false;
+
+    fissionTriggered =
+        false;
+
+    emittedElectron.visible =
+        false;
+
+    resetFissionVisual();
+
+    document
+    .getElementById(
+        "testButton"
+    )
+    .disabled =
+        false;
+
+    showGroup(
+        "particleGroup",
+        stage===1
+    );
+
+    showGroup(
+        "levelGroup",
+        stage===2 ||
+        stage===7
+    );
+
+    showGroup(
+        "frequencyGroup",
+        stage===3 ||
+        stage===4 ||
+        stage===7
+    );
+
+    showGroup(
+        "thresholdGroup",
+        stage===4 ||
+        stage===7
+    );
+
+    showGroup(
+        "halfLifeGroup",
+        stage===5 ||
+        stage===7
+    );
+
+    showGroup(
+        "fissionGroup",
+        stage===6 ||
+        stage===7
+    );
+
+    atomLab.visible =
+        stage===1 ||
+        stage===2 ||
+        stage===3 ||
+        stage===7;
+
+    photoLab.visible =
+        stage===4 ||
+        stage===7;
+
+    decayLab.visible =
+        stage===5 ||
+        stage===7;
+
+    fissionLab.visible =
+        stage===6 ||
+        stage===7;
+
+    if(
+        stage===1
+    ){
+
+        targetParticle =
+            randomItem([
+                "proton",
+                "neutron",
+                "electron"
+            ]);
+
+        document
+        .getElementById(
+            "stageName"
+        )
+        .textContent =
+            "Stage 1 - Atomic Structure";
+
+        document
+        .getElementById(
+            "stageObjective"
+        )
+        .textContent =
+            `Identify the ${targetParticle.toUpperCase()} in the atomic model.`;
+
+        document
+        .getElementById(
+            "coachTitle"
+        )
+        .textContent =
+            "ATOMIC STRUCTURE";
+
+        document
+        .getElementById(
+            "coachText"
+        )
+        .textContent =
+            "Protons and neutrons are in the nucleus. Electrons occupy the surrounding atomic region.";
+
+        document
+        .getElementById(
+            "coachFormula"
+        )
+        .textContent =
+            "Proton + | Neutron 0 | Electron -";
+    }
+
+    else if(
+        stage===2
+    ){
+
+        targetLevel =
+            randomItem([
+                2,
+                3,
+                4
+            ]);
+
+        document
+        .getElementById(
+            "stageName"
+        )
+        .textContent =
+            "Stage 2 - Quantum Energy Levels";
+
+        document
+        .getElementById(
+            "stageObjective"
+        )
+        .textContent =
+            `Excite the electron to energy level n = ${targetLevel}.`;
+
+        document
+        .getElementById(
+            "coachTitle"
+        )
+        .textContent =
+            "QUANTIZED ENERGY";
+
+        document
+        .getElementById(
+            "coachText"
+        )
+        .textContent =
+            "Electrons in atoms occupy allowed energy states rather than arbitrary energies.";
+
+        document
+        .getElementById(
+            "coachFormula"
+        )
+        .textContent =
+            "Energy absorbed -> electron moves to higher allowed level";
+    }
+
+    else if(
+        stage===3
+    ){
+
+        targetFrequency =
+            randomItem([
+                3,
+                5,
+                7,
+                9
+            ]);
+
+        document
+        .getElementById(
+            "stageName"
+        )
+        .textContent =
+            "Stage 3 - Photon Energy";
+
+        document
+        .getElementById(
+            "stageObjective"
+        )
+        .textContent =
+            `Create photon energy ${targetFrequency} h-units.`;
+
+        document
+        .getElementById(
+            "coachTitle"
+        )
+        .textContent =
+            "PHOTONS";
+
+        document
+        .getElementById(
+            "coachText"
+        )
+        .textContent =
+            "Photon energy increases directly with electromagnetic frequency.";
+
+        document
+        .getElementById(
+            "coachFormula"
+        )
+        .textContent =
+            "E = hf";
+    }
+
+    else if(
+        stage===4
+    ){
+
+        selectedThreshold =
+            randomItem([
+                4,
+                6,
+                8
+            ]);
+
+        targetThresholdResult =
+            randomItem([
+                "emit",
+                "noemit"
+            ]);
+
+        document
+        .getElementById(
+            "stageName"
+        )
+        .textContent =
+            "Stage 4 - Photoelectric Effect";
+
+        document
+        .getElementById(
+            "stageObjective"
+        )
+        .textContent =
+            targetThresholdResult===
+            "emit"
+            ?
+            `Make an electron leave the metal. Threshold frequency = ${selectedThreshold}.`
+            :
+            `Keep the electron bound. Threshold frequency = ${selectedThreshold}.`;
+
+        document
+        .getElementById(
+            "coachTitle"
+        )
+        .textContent =
+            "PHOTOELECTRIC EFFECT";
+
+        document
+        .getElementById(
+            "coachText"
+        )
+        .textContent =
+            "Electrons are emitted only when photon frequency reaches or exceeds the material's threshold frequency.";
+
+        document
+        .getElementById(
+            "coachFormula"
+        )
+        .textContent =
+            "Photon energy = hf | threshold must be reached";
+    }
+
+    else if(
+        stage===5
+    ){
+
+        targetRemaining =
+            randomItem([
+                32,
+                16,
+                8
+            ]);
+
+        document
+        .getElementById(
+            "stageName"
+        )
+        .textContent =
+            "Stage 5 - Radioactive Half-Life";
+
+        document
+        .getElementById(
+            "stageObjective"
+        )
+        .textContent =
+            `Start with 64 radioactive nuclei. Select the number of half-lives that leaves ${targetRemaining}.`;
+
+        document
+        .getElementById(
+            "coachTitle"
+        )
+        .textContent =
+            "RADIOACTIVE DECAY";
+
+        document
+        .getElementById(
+            "coachText"
+        )
+        .textContent =
+            "After each half-life, half of the undecayed nuclei remain on average.";
+
+        document
+        .getElementById(
+            "coachFormula"
+        )
+        .textContent =
+            "N = N0 × (1/2)^n";
+    }
+
+    else if(
+        stage===6
+    ){
+
+        targetFission =
+            "split";
+
+        document
+        .getElementById(
+            "stageName"
+        )
+        .textContent =
+            "Stage 6 - Nuclear Fission";
+
+        document
+        .getElementById(
+            "stageObjective"
+        )
+        .textContent =
+            "Choose the event in which a heavy nucleus divides into smaller nuclei.";
+
+        document
+        .getElementById(
+            "coachTitle"
+        )
+        .textContent =
+            "NUCLEAR FISSION";
+
+        document
+        .getElementById(
+            "coachText"
+        )
+        .textContent =
+            "In fission, a heavy nucleus splits into smaller nuclei and can release energy and neutrons.";
+
+        document
+        .getElementById(
+            "coachFormula"
+        )
+        .textContent =
+            "Heavy nucleus -> smaller nuclei + energy + neutrons";
+    }
+
+    else{
+
+        const targets = [
+
+            {
+                level:2,
+                frequency:5,
+                threshold:4,
+                half:1,
+                fission:"split"
+            },
+
+            {
+                level:3,
+                frequency:7,
+                threshold:6,
+                half:2,
+                fission:"split"
+            },
+
+            {
+                level:4,
+                frequency:9,
+                threshold:8,
+                half:3,
+                fission:"split"
+            },
+
+            {
+                level:2,
+                frequency:3,
+                threshold:4,
+                half:2,
+                fission:"split"
+            }
+        ];
+
+        finalTargets = [];
+
+        while(
+            finalTargets.length<3
+        ){
+
+            const candidate =
+                randomItem(
+                    targets
+                );
+
+            if(
+                !finalTargets.some(
+                    item=>
+                    item.level===
+                    candidate.level &&
+                    item.frequency===
+                    candidate.frequency &&
+                    item.threshold===
+                    candidate.threshold &&
+                    item.half===
+                    candidate.half
+                )
+            ){
+
+                finalTargets.push({
+                    ...candidate
+                });
+            }
+        }
+
+        finalIndex =
+            0;
+
+        document
+        .getElementById(
+            "stageName"
+        )
+        .textContent =
+            "Final - Quantum Research Lock";
+
+        updateFinalObjective();
+
+        document
+        .getElementById(
+            "coachTitle"
+        )
+        .textContent =
+            "FINAL MODERN PHYSICS MISSION";
+
+        document
+        .getElementById(
+            "coachText"
+        )
+        .textContent =
+            "Configure atomic, photon and nuclear parameters before each quantum lock expires.";
+
+        document
+        .getElementById(
+            "coachFormula"
+        )
+        .textContent =
+            "Atoms + Photons + Decay + Nuclear Physics";
+    }
+
+    updateDecayVisual();
+
+    updateHUD();
+
+    startTimer(
+        stage===7
+        ?
+        FINAL_TIME
+        :
+        STAGE_TIME
+    );
+}
+
+function updateFinalObjective(){
+
+    const target =
+        finalTargets[
+            finalIndex
+        ];
+
+    document
+    .getElementById(
+        "stageObjective"
+    )
+    .textContent =
+        `Lock ${finalIndex+1}/3: n=${target.level}, photon f=${target.frequency}, threshold=${target.threshold}, half-lives=${target.half}, fission=SPLIT.`;
+}
+
+/* ======================================================
+   EVALUATE STAGE
+====================================================== */
+
+function evaluateStage(){
+
+    let success =
+        false;
+
+    let title =
+        "";
+
+    let explanation =
+        "";
+
+    if(
+        stage===1
+    ){
+
+        success =
+            selectedParticle===
+            targetParticle;
+
+        title =
+            success
+            ?
+            "PARTICLE IDENTIFIED!"
+            :
+            "WRONG PARTICLE";
+
+        explanation =
+        `
+        Target particle =
+        <b>${targetParticle.toUpperCase()}</b><br>
+
+        Selected particle =
+        <b>${selectedParticle.toUpperCase()}</b><br><br>
+
+        <b>Proton:</b>
+        positive charge, nucleus.<br>
+
+        <b>Neutron:</b>
+        neutral, nucleus.<br>
+
+        <b>Electron:</b>
+        negative charge, surrounding atomic region.
+        `;
+    }
+
+    else if(
+        stage===2
+    ){
+
+        success =
+            selectedLevel===
+            targetLevel;
+
+        title =
+            success
+            ?
+            "ENERGY LEVEL LOCKED!"
+            :
+            "ENERGY LEVEL INCORRECT";
+
+        explanation =
+        `
+        Required state =
+        <b>n = ${targetLevel}</b><br>
+
+        Selected state =
+        <b>n = ${selectedLevel}</b><br><br>
+
+        Atomic electrons occupy allowed energy levels.
+
+        Moving to a higher level requires energy absorption.
+        `;
+
+        if(
+            success
+        ){
+
+            emitPhotonBurst();
+        }
+    }
+
+    else if(
+        stage===3
+    ){
+
+        const energy =
+            H_SIM*
+            selectedFrequency;
+
+        success =
+            selectedFrequency===
+            targetFrequency;
+
+        title =
+            success
+            ?
+            "PHOTON ENERGY CALIBRATED!"
+            :
+            "PHOTON ENERGY INCORRECT";
+
+        explanation =
+        `
+        Frequency =
+        <b>${selectedFrequency}</b> frequency units.<br><br>
+
+        E = hf<br>
+
+        h =
+        1 simulation unit<br><br>
+
+        E =
+        1 ×
+        ${selectedFrequency}<br>
+
+        =
+        <b>
+        ${energy} h-units
+        </b><br><br>
+
+        Required photon energy =
+        <b>${targetFrequency} h-units</b>.
+        `;
+    }
+
+    else if(
+        stage===4
+    ){
+
+        const emits =
+            selectedFrequency>=
+            selectedThreshold;
+
+        electronEmission =
+            emits;
+
+        emittedElectron.visible =
+            emits;
+
+        success =
+            targetThresholdResult===
+            "emit"
+            ?
+            emits
+            :
+            !emits;
+
+        title =
+            success
+            ?
+            "PHOTOELECTRIC CONDITION ACHIEVED!"
+            :
+            "PHOTOELECTRIC CONDITION INCORRECT";
+
+        explanation =
+        `
+        Photon frequency =
+        <b>${selectedFrequency}</b><br>
+
+        Threshold frequency =
+        <b>${selectedThreshold}</b><br><br>
+
+        ${
+            emits
+            ?
+            `
+            Photon frequency reached or exceeded the threshold.
+
+            The model therefore ejects an electron.
+            `
+            :
+            `
+            Photon frequency is below threshold.
+
+            The model keeps the electron bound.
+            `
+        }
+        `;
+    }
+
+    else if(
+        stage===5
+    ){
+
+        const remaining =
+            64/
+            Math.pow(
+                2,
+                selectedHalfLives
+            );
+
+        success =
+            remaining===
+            targetRemaining;
+
+        title =
+            success
+            ?
+            "HALF-LIFE TARGET REACHED!"
+            :
+            "DECAY COUNT INCORRECT";
+
+        explanation =
+        `
+        Initial nuclei =
+        <b>64</b><br>
+
+        Number of half-lives =
+        <b>${selectedHalfLives}</b><br><br>
+
+        N =
+        N0 ×
+        (1/2)^n<br><br>
+
+        =
+        64 ×
+        (1/2)^${selectedHalfLives}<br><br>
+
+        =
+        <b>
+        ${remaining}
+        nuclei
+        </b><br><br>
+
+        Required =
+        <b>${targetRemaining}</b>.
+        `;
+    }
+
+    else if(
+        stage===6
+    ){
+
+        success =
+            selectedFission===
+            "split";
+
+        title =
+            success
+            ?
+            "FISSION EVENT VISUALIZED!"
+            :
+            "NUCLEAR EVENT INCORRECT";
+
+        explanation =
+        `
+        Selected process =
+        <b>
+        ${selectedFission.toUpperCase()}
+        </b><br><br>
+
+        Nuclear fission is the process in which a heavy nucleus
+        splits into smaller nuclei.
+
+        Energy and additional neutrons can also be released.
+        `;
+
+        if(
+            success
+        ){
+
+            triggerFission();
+        }
+    }
+
+    else{
+
+        const target =
+            finalTargets[
+                finalIndex
+            ];
+
+        success =
+            selectedLevel===
+            target.level &&
+            selectedFrequency===
+            target.frequency &&
+            selectedThreshold===
+            target.threshold &&
+            selectedHalfLives===
+            target.half &&
+            selectedFission===
+            target.fission;
+
+        if(
+            success
+        ){
+
+            score +=
+                100;
+
+            updateScore();
+
+            emitPhotonBurst();
+
+            triggerFission();
+
+            finalIndex++;
+
+            if(
+                finalIndex<3
+            ){
+
+                updateFinalObjective();
+
+                startTimer(
+                    FINAL_TIME
+                );
+
+                return;
+            }
+
+            pauseTimer();
+
+            stageComplete =
+                true;
+
+            finishGame();
+
+            return;
+        }
+
+        showRetry(
+            "QUANTUM LOCK INCORRECT",
+
+            `
+            Required configuration:<br><br>
+
+            Energy level:
+            <b>n = ${target.level}</b><br>
+
+            Photon frequency:
+            <b>${target.frequency}</b><br>
+
+            Threshold:
+            <b>${target.threshold}</b><br>
+
+            Half-lives:
+            <b>${target.half}</b><br>
+
+            Nuclear event:
+            <b>SPLIT</b><br><br>
+
+            Reconfigure the research system before time reaches zero.
+            `
+        );
+
+        return;
+    }
+
+    if(
+        success
+    ){
+
+        score +=
+            100;
+
+        updateScore();
+
+        stageComplete =
+            true;
+
+        pauseTimer();
+
+        document
+        .getElementById(
+            "testButton"
+        )
+        .disabled =
+            true;
+
+        showStageResult(
+            title,
+            explanation
+        );
+    }
+
+    else{
+
+        showRetry(
+            title,
+            explanation
+        );
+    }
+}
+
+/* ======================================================
+   RETRY
+====================================================== */
+
+function showRetry(
+    title,
+    explanation
+){
+
+    const resultBox =
+        document.getElementById(
+            "resultBox"
+        );
+
+    document
+    .getElementById(
+        "resultTitle"
+    )
+    .textContent =
+        title;
+
+    document
+    .getElementById(
+        "resultText"
+    )
+    .innerHTML =
+        explanation;
+
+    document
+    .getElementById(
+        "question"
+    )
+    .textContent =
+        "Adjust the research controls and try again before time expires.";
+
+    document
+    .getElementById(
+        "questionHint"
+    )
+    .textContent =
+        "";
+
+    document
+    .getElementById(
+        "answers"
+    )
+    .innerHTML =
+        "";
+
+    document
+    .getElementById(
+        "feedback"
+    )
+    .style.display =
+        "none";
+
+    const next =
+        document
+        .getElementById(
+            "nextButton"
+        );
+
+    next.style.display =
+        "block";
+
+    next.textContent =
+        "TRY AGAIN";
+
+    next.onclick =
+        ()=>{
+
+            resultBox
+            .classList
+            .remove(
+                "show"
+            );
+        };
+
+    resultBox
+    .classList
+    .add(
+        "show"
+    );
+}
+
+/* ======================================================
+   QUESTION HELPERS
+====================================================== */
+
+function shuffle(
+    array
+){
+
+    const copy =
+        [...array];
+
+    for(
+        let i=
+            copy.length-1;
+
+        i>0;
+
+        i--
+    ){
+
+        const j =
+            Math.floor(
+                Math.random()*
+                (i+1)
+            );
+
+        [
+            copy[i],
+            copy[j]
+        ]=[
+            copy[j],
+            copy[i]
+        ];
+    }
+
+    return copy;
+}
+
+function options(
+    correct,
+    wrong1,
+    wrong2
+){
+
+    const list =
+        shuffle([
+            correct,
+            wrong1,
+            wrong2
+        ]);
+
+    return {
+
+        list,
+
+        correct:
+            list.indexOf(
+                correct
+            )
+    };
+}
+
+/* ======================================================
+   QUESTIONS
+====================================================== */
+
+function atomicQuestion(){
+
+    return {
+
+        q:
+        "Which atomic particle has negative electric charge?",
+
+        hint:
+        "Think about the particle outside the nucleus.",
+
+        answers:[
+            "Electron",
+            "Proton",
+            "Neutron"
+        ],
+
+        correct:0,
+
+        explanation:
+        `
+        The
+        <b>electron</b>
+        has negative electric charge.
+
+        Protons are positive and neutrons are neutral.
+        `
+    };
+}
+
+function energyQuestion(){
+
+    return {
+
+        q:
+        "What happens when an atomic electron absorbs sufficient energy?",
+
+        hint:
+        "Think about allowed higher-energy states.",
+
+        answers:[
+            "It can move to a higher energy level",
+            "It must become a proton",
+            "The nucleus disappears"
+        ],
+
+        correct:0,
+
+        explanation:
+        `
+        When an electron absorbs appropriate energy,
+        it can move from a lower allowed energy state
+        to a higher allowed energy state.
+        `
+    };
+}
+
+function photonQuestion(){
+
+    const f =
+        randomItem([
+            3,
+            5,
+            7,
+            9
+        ]);
+
+    const answer =
+        f+
+        " h-units";
+
+    const option =
+        options(
+            answer,
+            f*2+
+            " h-units",
+            Math.max(
+                1,
+                f-2
+            )+
+            " h-units"
+        );
+
+    return {
+
+        q:
+        `Using E = hf and h = 1 simulation unit, what is the photon energy when f = ${f}?`,
+
+        hint:
+        "E = h × f",
+
+        answers:
+            option.list,
+
+        correct:
+            option.correct,
+
+        explanation:
+        `
+        E =
+        hf<br><br>
+
+        =
+        1 ×
+        ${f}<br><br>
+
+        =
+        <b>
+        ${f} h-units
+        </b>.
+        `
+    };
+}
+
+function photoelectricQuestion(){
+
+    return {
+
+        q:
+        "What is required for photoelectron emission in the basic photoelectric-effect model?",
+
+        hint:
+        "Compare photon frequency with the threshold frequency.",
+
+        answers:[
+            "Photon frequency must reach or exceed threshold",
+            "Any photon frequency always ejects electrons",
+            "The metal must have zero electrons"
+        ],
+
+        correct:0,
+
+        explanation:
+        `
+        The incoming photon must have sufficient energy.
+
+        In frequency terms,
+        the incident frequency must reach or exceed
+        the material's threshold frequency.
+        `
+    };
+}
+
+function halfLifeQuestion(){
+
+    return {
+
+        q:
+        "A sample starts with 64 radioactive nuclei. How many remain after 2 half-lives?",
+
+        hint:
+        "64 -> 32 -> ?",
+
+        answers:[
+            "16",
+            "32",
+            "8"
+        ],
+
+        correct:0,
+
+        explanation:
+        `
+        After one half-life:<br>
+
+        64 -> 32<br><br>
+
+        After two half-lives:<br>
+
+        32 -> 16<br><br>
+
+        Therefore
+        <b>16 nuclei</b>
+        remain on average.
+        `
+    };
+}
+
+function fissionQuestion(){
+
+    return {
+
+        q:
+        "Which statement best describes nuclear fission?",
+
+        hint:
+        "Think about what happens to a heavy nucleus.",
+
+        answers:[
+            "A heavy nucleus splits into smaller nuclei",
+            "Two light nuclei must always merge",
+            "An electron becomes a neutron"
+        ],
+
+        correct:0,
+
+        explanation:
+        `
+        In nuclear fission,
+        a heavy nucleus divides into smaller nuclei.
+
+        The process can also release energy and neutrons.
+        `
+    };
+}
+
+function questionForStage(){
+
+    if(
+        stage===1
+    ){
+
+        return atomicQuestion();
+    }
+
+    if(
+        stage===2
+    ){
+
+        return energyQuestion();
+    }
+
+    if(
+        stage===3
+    ){
+
+        return photonQuestion();
+    }
+
+    if(
+        stage===4
+    ){
+
+        return photoelectricQuestion();
+    }
+
+    if(
+        stage===5
+    ){
+
+        return halfLifeQuestion();
+    }
+
+    return fissionQuestion();
+}
+
+/* ======================================================
+   RESULT + QUIZ
+====================================================== */
+
+function showStageResult(
+    title,
+    explanation
+){
+
+    const resultBox =
+        document.getElementById(
+            "resultBox"
+        );
+
+    document
+    .getElementById(
+        "resultTitle"
+    )
+    .textContent =
+        title;
+
+    document
+    .getElementById(
+        "resultText"
+    )
+    .innerHTML =
+        explanation;
+
+    const question =
+        questionForStage();
+
+    document
+    .getElementById(
+        "question"
+    )
+    .textContent =
+        question.q;
+
+    document
+    .getElementById(
+        "questionHint"
+    )
+    .textContent =
+        question.hint;
+
+    const answers =
+        document.getElementById(
+            "answers"
+        );
+
+    const feedback =
+        document.getElementById(
+            "feedback"
+        );
+
+    const next =
+        document.getElementById(
+            "nextButton"
+        );
+
+    answers.innerHTML =
+        "";
+
+    feedback.style.display =
+        "none";
+
+    next.style.display =
+        "none";
+
+    question.answers.forEach(
+        (answer,index)=>{
+
+            const button =
+                document.createElement(
+                    "button"
+                );
+
+            button.className =
+                "answer";
+
+            button.textContent =
+                answer;
+
+            button.onclick =
+            ()=>{
+
+                answers
+                .querySelectorAll(
+                    "button"
+                )
+                .forEach(
+                    item=>
+                    item.disabled=
+                        true
+                );
+
+                feedback.style.display =
+                    "block";
+
+                if(
+                    index===
+                    question.correct
+                ){
+
+                    button.classList.add(
+                        "correct"
+                    );
+
+                    score +=
+                        50;
+
+                    feedback.innerHTML =
+                    `
+                    <b>
+                    CORRECT +50 POINTS
+                    </b><br><br>
+
+                    ${question.explanation}
+                    `;
+                }
+
+                else{
+
+                    button.classList.add(
+                        "wrong"
+                    );
+
+                    score -=
+                        50;
+
+                    feedback.innerHTML =
+                    `
+                    <b>
+                    WRONG ANSWER -50 POINTS
+                    </b><br><br>
+
+                    ${question.explanation}
+                    `;
+                }
+
+                updateScore();
+
+                next.style.display =
+                    "block";
+            };
+
+            answers.appendChild(
+                button
+            );
+        }
+    );
+
+    next.textContent =
+        stage<6
+        ?
+        "NEXT RESEARCH EXPERIMENT"
+        :
+        "START FINAL QUANTUM LOCK";
+
+    next.onclick =
+    ()=>{
+
+        resultBox
+        .classList
+        .remove(
+            "show"
+        );
+
+        stage++;
+
+        prepareStage();
+    };
+
+    resultBox
+    .classList
+    .add(
+        "show"
+    );
+}
+
+/* ======================================================
+   ATOM ANIMATION
+====================================================== */
+
+function updateAtom(){
+
+    const radius =
+        orbitRadii[
+            selectedLevel-1
+        ];
+
+    const speed =
+        1.2+
+        selectedLevel*
+        .25;
+
+    const angle =
+        animationTime*
+        speed;
+
+    electron.position.set(
+        Math.cos(angle)*
+        radius,
+
+        0,
+
+        Math.sin(angle)*
+        radius*
+        .55
+    );
+}
+
+/* ======================================================
+   PHOTON BURST
+====================================================== */
+
+function emitPhotonBurst(){
+
+    photons.forEach(
+        item=>{
+
+            item.mesh.visible =
+                true;
+        }
+    );
+
+    setTimeout(
+        ()=>{
+
+            photons.forEach(
+                item=>{
+
+                    item.mesh.visible =
+                        false;
+                }
+            );
+
+        },
+        1600
+    );
+}
+
+function updatePhotons(){
+
+    photons.forEach(
+        item=>{
+
+            if(
+                !item.mesh.visible
+            ){
+
+                return;
+            }
+
+            const t =
+                (
+                    animationTime*
+                    .7+
+                    item.t
+                )%1;
+
+            const radius =
+                3+
+                t*
+                14;
+
+            const angle =
+                item.t*
+                Math.PI*
+                2+
+                animationTime*
+                .4;
+
+            item.mesh.position.set(
+                Math.cos(angle)*
+                radius,
+
+                5+
+                Math.sin(
+                    angle*2
+                )*
+                1.5,
+
+                3+
+                Math.sin(angle)*
+                radius
+            );
+        }
+    );
+}
+
+/* ======================================================
+   PHOTOELECTRIC ANIMATION
+====================================================== */
+
+function updatePhotoelectric(){
+
+    beamParticles.forEach(
+        item=>{
+
+            const t =
+                (
+                    animationTime*
+                    (
+                        .25+
+                        selectedFrequency*
+                        .035
+                    )+
+                    item.offset
+                )%1;
+
+            item.mesh.position.set(
+                -12+
+                t*
+                12,
+
+                Math.sin(
+                    t*
+                    Math.PI*
+                    8
+                )*
+                .5,
+
+                -2
+            );
+
+            const scale =
+                .7+
+                selectedFrequency/
+                12;
+
+            item.mesh.scale.setScalar(
+                scale
+            );
+        }
+    );
+
+    if(
+        emittedElectron.visible
+    ){
+
+        const t =
+            (
+                animationTime*
+                .45
+            )%1;
+
+        emittedElectron.position.set(
+            2+
+            t*
+            7,
+
+            1+
+            t*
+            4,
+
+            -1
+        );
+    }
+}
+
+/* ======================================================
+   DECAY VISUAL
+====================================================== */
+
+function updateDecayVisual(){
+
+    const remaining =
+        Math.round(
+            64/
+            Math.pow(
+                2,
+                selectedHalfLives
+            )
+        );
+
+    decayNuclei.forEach(
+        (sphere,index)=>{
+
+            sphere.material =
+                index<remaining
+                ?
+                MAT.radioactive
+                :
+                MAT.decay;
+        }
+    );
+}
+
+/* ======================================================
+   FISSION
+====================================================== */
+
+function resetFissionVisual(){
+
+    heavyNucleus.visible =
+        true;
+
+    heavyNucleus.position.set(
+        0,0,0
+    );
+
+    fragmentA.visible =
+        false;
+
+    fragmentB.visible =
+        false;
+
+    neutrons.forEach(
+        item=>{
+
+            item.visible =
+                false;
+        }
+    );
+}
+
+function triggerFission(){
+
+    fissionTriggered =
+        true;
+
+    heavyNucleus.visible =
+        false;
+
+    fragmentA.visible =
+        true;
+
+    fragmentB.visible =
+        true;
+
+    fragmentA.position.set(
+        -1.5,
+        .7,
+        0
+    );
+
+    fragmentB.position.set(
+        1.6,
+        -.5,
+        0
+    );
+
+    neutrons.forEach(
+        item=>{
+
+            item.visible =
+                true;
+        }
+    );
+}
+
+function updateFission(
+    dt
+){
+
+    if(
+        !fissionTriggered
+    ){
+
+        return;
+    }
+
+    fragmentA.position.x -=
+        dt*
+        1.8;
+
+    fragmentB.position.x +=
+        dt*
+        1.8;
+
+    neutrons.forEach(
+        (item,index)=>{
+
+            const directions = [
+                new THREE.Vector3(
+                    1,.5,.35
+                ),
+
+                new THREE.Vector3(
+                    -1,.7,-.2
+                ),
+
+                new THREE.Vector3(
+                    .3,-.8,1
+                )
+            ];
+
+            item.position.add(
+                directions[
+                    index
+                ]
+                .clone()
+                .multiplyScalar(
+                    dt*
+                    3.3
+                )
+            );
+        }
+    );
+}
+
+/* ======================================================
+   HUD
+====================================================== */
+
+function updateHUD(){
+
+    const photonEnergy =
+        H_SIM*
+        selectedFrequency;
+
+    const remaining =
+        Math.round(
+            64/
+            Math.pow(
+                2,
+                selectedHalfLives
+            )
+        );
+
+    document
+    .getElementById(
+        "levelValue"
+    )
+    .textContent =
+        selectedLevel;
+
+    document
+    .getElementById(
+        "photonEnergyValue"
+    )
+    .textContent =
+        photonEnergy;
+
+    document
+    .getElementById(
+        "nucleiValue"
+    )
+    .textContent =
+        remaining;
+
+    let percent =
+        0;
+
+    if(
+        stage===2
+    ){
+
+        percent =
+            selectedLevel/
+            4*
+            100;
+    }
+
+    else if(
+        stage===3 ||
+        stage===4
+    ){
+
+        percent =
+            selectedFrequency/
+            9*
+            100;
+    }
+
+    else if(
+        stage===5
+    ){
+
+        percent =
+            remaining/
+            64*
+            100;
+    }
+
+    else{
+
+        percent =
+            60;
+    }
+
+    document
+    .getElementById(
+        "energyFill"
+    )
+    .style.width =
+        percent+
+        "%";
+
+    document
+    .getElementById(
+        "energyPercent"
+    )
+    .textContent =
+        Math.round(
+            percent
+        )+
+        "%";
+
+    if(
+        stage===1
+    ){
+
+        document
+        .getElementById(
+            "equation"
+        )
+        .innerHTML =
+        `
+        <b>Atomic Particle</b><br>
+
+        Selected =
+        ${selectedParticle.toUpperCase()}<br><br>
+
+        Proton = +1<br>
+
+        Neutron = 0<br>
+
+        Electron = -1
+        `;
+    }
+
+    else if(
+        stage===2
+    ){
+
+        document
+        .getElementById(
+            "equation"
+        )
+        .innerHTML =
+        `
+        <b>Quantized State</b><br>
+
+        Electron level =
+        n = ${selectedLevel}<br><br>
+
+        Higher n ->
+        higher atomic energy state
+        `;
+    }
+
+    else if(
+        stage===3
+    ){
+
+        document
+        .getElementById(
+            "equation"
+        )
+        .innerHTML =
+        `
+        <b>Photon Energy</b><br>
+
+        E = hf<br><br>
+
+        E =
+        1 ×
+        ${selectedFrequency}<br>
+
+        =
+        <b>
+        ${photonEnergy}
+        h-units
+        </b>
+        `;
+    }
+
+    else if(
+        stage===4
+    ){
+
+        document
+        .getElementById(
+            "equation"
+        )
+        .innerHTML =
+        `
+        <b>Photoelectric Threshold</b><br>
+
+        Photon f =
+        ${selectedFrequency}<br>
+
+        Threshold f =
+        ${selectedThreshold}<br><br>
+
+        ${
+            selectedFrequency>=
+            selectedThreshold
+            ?
+            "<b>Electron emission possible</b>"
+            :
+            "<b>No emission</b>"
+        }
+        `;
+    }
+
+    else if(
+        stage===5
+    ){
+
+        document
+        .getElementById(
+            "equation"
+        )
+        .innerHTML =
+        `
+        <b>Half-Life</b><br>
+
+        N =
+        N0 ×
+        (1/2)^n<br><br>
+
+        =
+        64 ×
+        (1/2)^${selectedHalfLives}<br>
+
+        =
+        <b>${remaining}</b>
+        `;
+    }
+
+    else{
+
+        document
+        .getElementById(
+            "equation"
+        )
+        .innerHTML =
+        `
+        <b>Nuclear Event</b><br>
+
+        Selected =
+        ${selectedFission.toUpperCase()}<br><br>
+
+        Fission =
+        heavy nucleus splits
+        `;
+    }
+}
+
+function updateScore(){
+
+    document
+    .getElementById(
+        "score"
+    )
+    .textContent =
+        score;
+}
+
+/* ======================================================
+   CAMERA
+====================================================== */
+
+function updateCamera(){
+
+    if(
+        stage<=3
+    ){
+
+        camera.position.set(
+            17,
+            15,
+            -17
+        );
+
+        camera.lookAt(
+            0,
+            5,
+            3
+        );
+    }
+
+    else if(
+        stage===4
+    ){
+
+        camera.position.set(
+            17,
+            13,
+            12
+        );
+
+        camera.lookAt(
+            0,
+            4,
+            30
+        );
+    }
+
+    else if(
+        stage===5
+    ){
+
+        camera.position.set(
+            15,
+            12,
+            34
+        );
+
+        camera.lookAt(
+            0,
+            1,
+            51
+        );
+    }
+
+    else if(
+        stage===6
+    ){
+
+        camera.position.set(
+            15,
+            12,
+            53
+        );
+
+        camera.lookAt(
+            0,
+            5,
+            71
+        );
+    }
+
+    else{
+
+        camera.position.set(
+            32,
+            28,
+            -18
+        );
+
+        camera.lookAt(
+            0,
+            4,
+            34
+        );
+    }
+}
+
+/* ======================================================
+   FINISH
+====================================================== */
+
+function finishGame(){
+
+    finished =
+        true;
+
+    pauseTimer();
+
+    const remaining =
+        Math.round(
+            64/
+            Math.pow(
+                2,
+                selectedHalfLives
+            )
+        );
+
+    document
+    .getElementById(
+        "finalPhoton"
+    )
+    .textContent =
+        selectedFrequency+
+        " units";
+
+    document
+    .getElementById(
+        "finalLevel"
+    )
+    .textContent =
+        "n = "+
+        selectedLevel;
+
+    document
+    .getElementById(
+        "finalNuclei"
+    )
+    .textContent =
+        remaining;
+
+    document
+    .getElementById(
+        "finalScore"
+    )
+    .textContent =
+        score;
+
+    document
+    .getElementById(
+        "finalExplanation"
+    )
+    .innerHTML =
+    `
+    <b>
+    FINAL MODERN PHYSICS MISSION
+    </b><br><br>
+
+    Correct experiment =
+    <b>+100</b><br>
+
+    Correct physics answer =
+    <b>+50</b><br>
+
+    Wrong physics answer =
+    <b>-50</b><br><br>
+
+    Final score =
+    <b>${score}</b><br><br>
+
+
+    <b>
+    1. ATOMIC STRUCTURE
+    </b><br><br>
+
+    Atoms contain a very small nucleus made primarily
+    of protons and neutrons.
+
+    Electrons occupy the region around the nucleus.<br><br>
+
+    Proton:
+    positive charge.<br>
+
+    Neutron:
+    zero net charge.<br>
+
+    Electron:
+    negative charge.<br><br>
+
+
+    <b>
+    2. QUANTIZED ENERGY LEVELS
+    </b><br><br>
+
+    Atomic electrons do not take arbitrary energy values
+    in the simple atomic model.
+
+    They occupy allowed energy states.<br><br>
+
+    When suitable energy is absorbed,
+    an electron can move to a higher state.
+
+    When it moves to a lower state,
+    energy can be released as a photon.<br><br>
+
+
+    <b>
+    3. PHOTONS
+    </b><br><br>
+
+    A photon is a quantum of electromagnetic radiation.
+
+    Photon energy is related to frequency by:<br><br>
+
+    <b>
+    E = hf
+    </b><br><br>
+
+    Your final simulation frequency was
+    <b>${selectedFrequency}</b> units.
+
+    Therefore in the game's normalized model:<br><br>
+
+    E =
+    1 ×
+    ${selectedFrequency}
+
+    =
+    <b>
+    ${selectedFrequency}
+    h-units
+    </b>.<br><br>
+
+    Higher-frequency photons carry more energy.<br><br>
+
+
+    <b>
+    4. PHOTOELECTRIC EFFECT
+    </b><br><br>
+
+    In the basic photoelectric model,
+    electrons are emitted from a material only when
+    the incoming photons have sufficient energy.<br><br>
+
+    This corresponds to reaching a threshold frequency.
+
+    Increasing intensity alone does not replace
+    the need to satisfy the threshold-energy condition.<br><br>
+
+
+    <b>
+    5. RADIOACTIVITY
+    </b><br><br>
+
+    Radioactive nuclei undergo spontaneous nuclear transformations.
+
+    The exact decay time of one particular nucleus
+    cannot normally be predicted.
+
+    However, a large collection follows statistical decay behaviour.<br><br>
+
+
+    <b>
+    6. HALF-LIFE
+    </b><br><br>
+
+    Half-life is the time required for half
+    of the undecayed radioactive nuclei in a large sample
+    to decay on average.<br><br>
+
+    The model used:<br><br>
+
+    <b>
+    N =
+    N0 ×
+    (1/2)^n
+    </b><br><br>
+
+    Starting nuclei =
+    64<br>
+
+    Selected half-lives =
+    ${selectedHalfLives}<br>
+
+    Remaining nuclei =
+    <b>${remaining}</b>.<br><br>
+
+
+    <b>
+    7. NUCLEAR FISSION
+    </b><br><br>
+
+    Nuclear fission occurs when a heavy nucleus divides
+    into smaller nuclei.
+
+    The event can release energy and additional neutrons.<br><br>
+
+    The visual stage represented this concept only;
+    it was not a model of reactor design or operation.<br><br>
+
+
+    <b>
+    MODERN TECHNOLOGY CONNECTION
+    </b><br><br>
+
+    Modern physics concepts appear in technologies such as
+    semiconductor devices, LEDs, lasers, medical imaging,
+    radiation detection and solar-energy systems.<br><br>
+
+    Solar cells, for example, interact with photons from sunlight
+    to help generate electrical energy.<br><br>
+
+
+    <b>
+    FINAL CONNECTION
+    </b><br>
+
+    Matter contains atoms.<br>
+
+    Atoms contain quantized electronic states.<br>
+
+    Light behaves in terms of photons.<br>
+
+    Photon energy depends on frequency.<br>
+
+    Threshold energy explains photoelectric emission.<br>
+
+    Radioactive samples follow statistical decay.<br>
+
+    Half-life describes that decay quantitatively.<br>
+
+    Nuclear fission involves splitting heavy nuclei.<br><br>
+
+    You completed the final Physics topic by controlling
+    atomic, photon and nuclear behaviour under timed conditions.
+    `;
+
+    document
+    .getElementById(
+        "finish"
+    )
+    .classList.add(
+        "show"
+    );
+}
+
+/* ======================================================
+   LOOP
+====================================================== */
+
+let lastTime =
+    performance.now();
+
+function animate(
+    now
+){
+
+    requestAnimationFrame(
+        animate
+    );
+
+    const dt =
+        Math.min(
+            (
+                now-
+                lastTime
+            )/
+            1000,
+            .035
+        );
+
+    lastTime =
+        now;
+
+    if(
+        started &&
+        !failed &&
+        !finished
+    ){
+
+        animationTime +=
+            dt;
+
+        updateMissionTimer(
+            dt
+        );
+
+        updateAtom();
+
+        updatePhotons();
+
+        updatePhotoelectric();
+
+        updateFission(
+            dt
+        );
+    }
+
+    updateCamera();
+
+    renderer.render(
+        scene,
+        camera
+    );
+}
+
+/* ======================================================
+   INITIAL
+====================================================== */
+
+atomLab.visible =
+    true;
+
+photoLab.visible =
+    false;
+
+decayLab.visible =
+    false;
+
+fissionLab.visible =
+    false;
+
+showGroup(
+    "particleGroup",
+    true
+);
+
+updateDecayVisual();
+
+updateHUD();
+
+updateScore();
+
+updateTimerDisplay();
+
+updateCamera();
+
+requestAnimationFrame(
+    animate
+);
+
+/* ======================================================
+   RESIZE
+====================================================== */
+
+addEventListener(
+    "resize",
+    ()=>{
+
+        camera.aspect =
+            innerWidth/
+            innerHeight;
+
+        camera.updateProjectionMatrix();
+
+        renderer.setSize(
+            innerWidth,
+            innerHeight
+        );
+    }
+);
+
+})();
+
+</script>
+
+</body>
+</html>

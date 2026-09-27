@@ -1,0 +1,5364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+<title>My Campus - Optics Lab</title>
+
+<style>
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0
+}
+
+html,body{
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    background:#06121c;
+    font-family:Segoe UI,Arial,sans-serif
+}
+
+#game{
+    position:fixed;
+    inset:0
+}
+
+canvas{
+    display:block
+}
+
+.hud{
+    position:fixed;
+    inset:0;
+    z-index:10;
+    color:#fff;
+    pointer-events:none
+}
+
+.glass{
+    background:linear-gradient(
+        135deg,
+        rgba(5,20,32,.95),
+        rgba(7,29,44,.83)
+    );
+
+    border:1px solid rgba(255,255,255,.13);
+    border-radius:15px;
+
+    box-shadow:0 14px 40px rgba(0,0,0,.28);
+    backdrop-filter:blur(13px)
+}
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.title{
+    position:absolute;
+    top:18px;
+    left:18px;
+
+    width:350px;
+    padding:14px 17px
+}
+
+.eyebrow{
+    color:#66e3ff;
+    font-size:10px;
+    font-weight:900;
+    letter-spacing:1.5px
+}
+
+.title h1{
+    margin-top:4px;
+    font-size:20px
+}
+
+.title p{
+    margin-top:5px;
+    color:#aec0cc;
+    font-size:11px;
+    line-height:1.4
+}
+
+/* =========================================================
+   STAGE
+========================================================= */
+
+.stage{
+    position:absolute;
+    top:18px;
+    left:50%;
+
+    transform:translateX(-50%);
+
+    width:430px;
+
+    padding:12px;
+
+    text-align:center
+}
+
+.stage small{
+    color:#98adbc;
+    font-size:9px;
+    font-weight:900
+}
+
+.stage strong{
+    display:block;
+
+    margin-top:3px;
+
+    color:#69e4ff;
+    font-size:18px
+}
+
+.stage p{
+    margin-top:3px;
+
+    color:#b8c8d2;
+    font-size:9px
+}
+
+/* =========================================================
+   SCORE + TIMER
+========================================================= */
+
+.status-panel{
+    position:absolute;
+    top:18px;
+    right:18px;
+
+    width:220px;
+
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+
+    padding:10px
+}
+
+.status-box{
+    padding:6px;
+
+    border-radius:9px;
+
+    background:rgba(255,255,255,.05);
+
+    text-align:center
+}
+
+.status-box small{
+    display:block;
+
+    color:#98adbc;
+    font-size:8px;
+    font-weight:900
+}
+
+.status-box strong{
+    display:block;
+
+    margin-top:2px;
+
+    font-size:22px
+}
+
+#score{
+    color:#ffe16a
+}
+
+#timerValue{
+    color:#69e4ff
+}
+
+#timerValue.warning{
+    color:#ffca5b
+}
+
+#timerValue.danger{
+    color:#ff6262;
+    animation:pulse .55s infinite alternate
+}
+
+@keyframes pulse{
+    from{
+        transform:scale(1)
+    }
+
+    to{
+        transform:scale(1.13)
+    }
+}
+
+/* =========================================================
+   CONTROL PANEL
+========================================================= */
+
+.controls{
+    position:absolute;
+    top:150px;
+    left:18px;
+
+    width:315px;
+
+    padding:14px;
+
+    pointer-events:auto
+}
+
+.panel-title{
+    color:#69e5ff;
+
+    font-size:10px;
+    font-weight:950;
+    letter-spacing:1px
+}
+
+.control-group{
+    margin-top:10px
+}
+
+.control-label{
+    color:#a9bac6;
+
+    font-size:9px;
+    font-weight:900
+}
+
+.option-row{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+
+    gap:6px;
+
+    margin-top:5px
+}
+
+.option-row.four{
+    grid-template-columns:repeat(4,1fr)
+}
+
+.option-row.two{
+    grid-template-columns:repeat(2,1fr)
+}
+
+.option-row button{
+    min-height:38px;
+
+    padding:7px 3px;
+
+    border:1px solid rgba(255,255,255,.14);
+    border-radius:8px;
+
+    background:rgba(255,255,255,.06);
+
+    color:#fff;
+
+    font-size:9px;
+    font-weight:900;
+
+    cursor:pointer
+}
+
+.option-row button.active{
+    background:#63e1ff;
+    color:#03131c
+}
+
+#mirrorGroup,
+#angleGroup,
+#mediumGroup,
+#lensGroup,
+#focalGroup{
+    display:none
+}
+
+.test-button{
+    width:100%;
+
+    margin-top:13px;
+    padding:11px;
+
+    border:0;
+    border-radius:9px;
+
+    background:#63e1ff;
+    color:#03131c;
+
+    font-weight:950;
+
+    cursor:pointer
+}
+
+.test-button:disabled{
+    opacity:.45;
+    cursor:not-allowed
+}
+
+.control-help{
+    margin-top:8px;
+
+    color:#95a9b7;
+
+    font-size:9px;
+    line-height:1.45
+}
+
+/* =========================================================
+   VALUES
+========================================================= */
+
+.values{
+    position:absolute;
+    right:18px;
+    bottom:18px;
+
+    width:355px;
+
+    padding:15px
+}
+
+.value-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+
+    gap:7px
+}
+
+.value{
+    padding:9px;
+
+    border-radius:9px;
+
+    background:rgba(255,255,255,.05)
+}
+
+.value label{
+    display:block;
+
+    color:#92a7b5;
+
+    font-size:8px;
+    font-weight:900
+}
+
+.value strong{
+    display:block;
+
+    margin-top:2px;
+
+    font-size:14px
+}
+
+.value strong.highlight{
+    color:#69e4ff
+}
+
+.signal-title{
+    display:flex;
+    justify-content:space-between;
+
+    margin-top:10px;
+
+    color:#9cafbc;
+
+    font-size:8px;
+    font-weight:900
+}
+
+.signal-bar{
+    height:7px;
+
+    margin-top:4px;
+
+    overflow:hidden;
+
+    border-radius:20px;
+
+    background:rgba(255,255,255,.08)
+}
+
+#signalFill{
+    width:0%;
+    height:100%;
+
+    background:linear-gradient(
+        90deg,
+        #ff6464,
+        #ffe368,
+        #6cff98
+    )
+}
+
+.equation{
+    margin-top:10px;
+
+    padding:10px;
+
+    border:1px solid rgba(83,220,255,.17);
+    border-radius:10px;
+
+    background:rgba(71,216,255,.07);
+
+    font-size:10px;
+    line-height:1.5
+}
+
+.equation b{
+    color:#69e4ff
+}
+
+/* =========================================================
+   COACH
+========================================================= */
+
+.coach{
+    position:absolute;
+
+    left:50%;
+    bottom:15px;
+
+    transform:translateX(-50%);
+
+    width:min(680px,41vw);
+
+    padding:12px 16px;
+
+    text-align:center
+}
+
+#coachTitle{
+    color:#66e3ff;
+
+    font-size:10px;
+    font-weight:950;
+    letter-spacing:1px
+}
+
+#coachText{
+    margin-top:4px;
+
+    color:#e2ecf2;
+
+    font-size:11px;
+    line-height:1.45
+}
+
+#coachFormula{
+    margin-top:4px;
+
+    color:#93a9b7;
+    font-size:10px
+}
+
+/* =========================================================
+   START
+========================================================= */
+
+.start-screen{
+    position:fixed;
+    inset:0;
+
+    z-index:40;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    background:rgba(2,8,14,.76);
+
+    backdrop-filter:blur(8px);
+
+    color:#fff;
+
+    pointer-events:auto
+}
+
+.start-box{
+    width:min(680px,92vw);
+
+    padding:27px;
+
+    text-align:center
+}
+
+.start-box h2{
+    font-size:31px
+}
+
+.start-box p{
+    margin-top:10px;
+
+    color:#b7c8d3;
+
+    font-size:12px;
+    line-height:1.6
+}
+
+.rules{
+    margin-top:13px;
+
+    padding:11px;
+
+    border-radius:10px;
+
+    background:rgba(255,255,255,.05);
+
+    color:#d7e6ed;
+
+    font-size:11px;
+    line-height:1.6
+}
+
+.rules b{
+    color:#69e4ff
+}
+
+.start-box button{
+    margin-top:18px;
+
+    padding:12px 26px;
+
+    border:0;
+    border-radius:10px;
+
+    background:#61e1ff;
+    color:#03131c;
+
+    font-weight:950;
+
+    cursor:pointer
+}
+
+/* =========================================================
+   RESULT
+========================================================= */
+
+.result{
+    position:fixed;
+
+    top:78px;
+    left:50%;
+
+    transform:translateX(-50%);
+
+    z-index:70;
+
+    width:min(760px,92vw);
+    max-height:calc(100vh - 98px);
+
+    display:none;
+    flex-direction:column;
+
+    padding:18px;
+
+    overflow:hidden;
+
+    color:#fff;
+
+    pointer-events:auto
+}
+
+.result.show{
+    display:flex
+}
+
+.result-scroll{
+    min-height:0;
+
+    overflow-y:auto;
+
+    padding-right:6px
+}
+
+.result-badge{
+    color:#ffe16b;
+
+    font-size:10px;
+    font-weight:950;
+    letter-spacing:1.1px
+}
+
+.result h3{
+    margin-top:5px;
+    font-size:20px
+}
+
+.result-text{
+    margin-top:8px;
+
+    padding:11px;
+
+    border-radius:9px;
+
+    background:rgba(255,255,255,.05);
+
+    color:#dce8ef;
+
+    font-size:11px;
+    line-height:1.55
+}
+
+.question-label{
+    margin-top:12px;
+
+    color:#69e4ff;
+
+    font-size:10px;
+    font-weight:950
+}
+
+#question{
+    margin-top:5px;
+    font-size:16px
+}
+
+#questionHint{
+    margin-top:4px;
+
+    color:#a2b5c2;
+    font-size:10px
+}
+
+.answers{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+
+    gap:8px;
+
+    margin-top:10px
+}
+
+.answer{
+    padding:10px;
+
+    border:1px solid rgba(255,255,255,.14);
+    border-radius:9px;
+
+    background:rgba(255,255,255,.07);
+
+    color:#fff;
+
+    font-weight:900;
+
+    cursor:pointer
+}
+
+.answer.correct{
+    background:rgba(63,207,116,.24);
+    border-color:#6aed98
+}
+
+.answer.wrong{
+    background:rgba(255,72,72,.24);
+    border-color:#ff7676
+}
+
+.answer:disabled{
+    opacity:.75
+}
+
+#feedback{
+    display:none;
+
+    max-height:135px;
+
+    overflow-y:auto;
+
+    margin-top:10px;
+
+    padding:11px;
+
+    border:1px solid rgba(80,218,255,.17);
+    border-radius:10px;
+
+    background:rgba(69,214,255,.08);
+
+    font-size:11px;
+    line-height:1.55
+}
+
+#feedback b{
+    color:#6de4ff
+}
+
+.result-footer{
+    flex:0 0 auto;
+
+    padding-top:11px
+}
+
+.next-button{
+    display:none;
+
+    width:min(310px,90%);
+
+    margin:0 auto;
+
+    padding:12px;
+
+    border:0;
+    border-radius:9px;
+
+    background:#61e1ff;
+    color:#03131c;
+
+    font-weight:950;
+
+    cursor:pointer
+}
+
+/* =========================================================
+   FAILURE
+========================================================= */
+
+.failure{
+    position:fixed;
+    inset:0;
+
+    z-index:100;
+
+    display:none;
+    align-items:center;
+    justify-content:center;
+
+    background:rgba(13,3,7,.93);
+
+    backdrop-filter:blur(11px);
+
+    color:#fff;
+
+    pointer-events:auto
+}
+
+.failure.show{
+    display:flex
+}
+
+.failure-box{
+    width:min(620px,92vw);
+
+    padding:30px;
+
+    text-align:center;
+
+    border:1px solid rgba(255,90,90,.35);
+    border-radius:16px;
+
+    background:linear-gradient(
+        135deg,
+        rgba(40,8,14,.96),
+        rgba(18,12,20,.95)
+    )
+}
+
+.failure-icon{
+    font-size:52px
+}
+
+.failure-box h2{
+    margin-top:8px;
+
+    color:#ff6868;
+
+    font-size:32px
+}
+
+.failure-box p{
+    margin-top:10px;
+
+    color:#d8c5ca;
+
+    font-size:12px;
+    line-height:1.6
+}
+
+.failure-stage{
+    margin-top:13px;
+
+    padding:11px;
+
+    border-radius:9px;
+
+    background:rgba(255,255,255,.05);
+
+    font-size:11px;
+    line-height:1.5
+}
+
+.failure-box button{
+    margin-top:18px;
+
+    padding:12px 25px;
+
+    border:0;
+    border-radius:9px;
+
+    background:#ff6262;
+    color:#fff;
+
+    font-weight:950;
+
+    cursor:pointer
+}
+
+/* =========================================================
+   FINISH
+========================================================= */
+
+.finish{
+    position:fixed;
+    inset:0;
+
+    z-index:90;
+
+    display:none;
+
+    align-items:center;
+    justify-content:center;
+
+    background:rgba(1,7,13,.86);
+
+    backdrop-filter:blur(11px);
+
+    color:#fff;
+
+    pointer-events:auto
+}
+
+.finish.show{
+    display:flex
+}
+
+.finish-box{
+    width:min(840px,94vw);
+
+    max-height:93vh;
+
+    overflow:auto;
+
+    padding:27px
+}
+
+.finish-box h2{
+    text-align:center;
+    font-size:32px
+}
+
+.finish-sub{
+    margin-top:5px;
+
+    text-align:center;
+
+    color:#aabcc8;
+
+    font-size:11px
+}
+
+.final-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+
+    gap:8px;
+
+    margin-top:15px
+}
+
+.final-card{
+    padding:12px;
+
+    border-radius:10px;
+
+    background:rgba(255,255,255,.055);
+
+    text-align:center
+}
+
+.final-card strong{
+    display:block;
+
+    color:#69e4ff;
+
+    font-size:18px
+}
+
+.final-card span{
+    color:#92a7b5;
+    font-size:8px
+}
+
+.final-explanation{
+    margin-top:15px;
+
+    padding:16px;
+
+    border:1px solid rgba(89,220,255,.18);
+    border-radius:11px;
+
+    background:rgba(68,212,255,.075);
+
+    font-size:11px;
+    line-height:1.65
+}
+
+.final-explanation b{
+    color:#6ee5ff
+}
+
+.restart{
+    display:block;
+
+    margin:16px auto 0;
+
+    padding:11px 25px;
+
+    border:0;
+    border-radius:9px;
+
+    background:#61e1ff;
+    color:#03131c;
+
+    font-weight:900;
+
+    cursor:pointer
+}
+</style>
+</head>
+
+<body>
+
+<div id="game"></div>
+
+<div class="hud">
+
+<div class="title glass">
+
+    <div class="eyebrow">
+        MY CAMPUS - PHYSICS GAME
+    </div>
+
+    <h1>
+        Optics Lab Rescue
+    </h1>
+
+    <p id="studentText"></p>
+
+</div>
+
+<div class="stage glass">
+
+    <small>
+        CURRENT OPTICAL MISSION
+    </small>
+
+    <strong id="stageName">
+        Reflection
+    </strong>
+
+    <p id="stageObjective">
+        Redirect the laser into the receiver.
+    </p>
+
+</div>
+
+<div class="status-panel glass">
+
+    <div class="status-box">
+
+        <small>
+            SCORE
+        </small>
+
+        <strong id="score">
+            0
+        </strong>
+
+    </div>
+
+    <div class="status-box">
+
+        <small>
+            TIME LEFT
+        </small>
+
+        <strong id="timerValue">
+            30
+        </strong>
+
+    </div>
+
+</div>
+
+<div class="controls glass">
+
+    <div class="panel-title">
+        OPTICAL CONTROL PANEL
+    </div>
+
+    <div
+        id="mirrorGroup"
+        class="control-group">
+
+        <div class="control-label">
+            MIRROR ANGLE
+        </div>
+
+        <div
+            id="mirrorButtons"
+            class="option-row four">
+
+            <button data-mirror="15">
+                15°
+            </button>
+
+            <button
+                data-mirror="30"
+                class="active">
+                30°
+            </button>
+
+            <button data-mirror="45">
+                45°
+            </button>
+
+            <button data-mirror="60">
+                60°
+            </button>
+
+        </div>
+
+    </div>
+
+    <div
+        id="angleGroup"
+        class="control-group">
+
+        <div class="control-label">
+            INCIDENT ANGLE
+        </div>
+
+        <div
+            id="angleButtons"
+            class="option-row">
+
+            <button data-angle="20">
+                20°
+            </button>
+
+            <button
+                data-angle="30"
+                class="active">
+                30°
+            </button>
+
+            <button data-angle="40">
+                40°
+            </button>
+
+        </div>
+
+    </div>
+
+    <div
+        id="mediumGroup"
+        class="control-group">
+
+        <div class="control-label">
+            OPTICAL MEDIUM
+        </div>
+
+        <div
+            id="mediumButtons"
+            class="option-row">
+
+            <button data-medium="air">
+                AIR
+            </button>
+
+            <button
+                data-medium="water"
+                class="active">
+                WATER
+            </button>
+
+            <button data-medium="glass">
+                GLASS
+            </button>
+
+        </div>
+
+    </div>
+
+    <div
+        id="lensGroup"
+        class="control-group">
+
+        <div class="control-label">
+            LENS TYPE
+        </div>
+
+        <div
+            id="lensButtons"
+            class="option-row two">
+
+            <button
+                data-lens="convex"
+                class="active">
+                CONVEX
+            </button>
+
+            <button data-lens="concave">
+                CONCAVE
+            </button>
+
+        </div>
+
+    </div>
+
+    <div
+        id="focalGroup"
+        class="control-group">
+
+        <div class="control-label">
+            FOCAL LENGTH
+        </div>
+
+        <div
+            id="focalButtons"
+            class="option-row">
+
+            <button data-focal="5">
+                5
+            </button>
+
+            <button
+                data-focal="10"
+                class="active">
+                10
+            </button>
+
+            <button data-focal="15">
+                15
+            </button>
+
+        </div>
+
+    </div>
+
+    <button
+        id="testButton"
+        class="test-button">
+
+        TEST OPTICAL SYSTEM
+
+    </button>
+
+    <div class="control-help">
+        Adjust the optical system before the timer reaches zero.
+    </div>
+
+</div>
+
+<div class="values glass">
+
+    <div class="value-grid">
+
+        <div class="value">
+
+            <label>
+                MIRROR ANGLE
+            </label>
+
+            <strong>
+                <span id="mirrorValue">
+                    30
+                </span>
+                °
+            </strong>
+
+        </div>
+
+        <div class="value">
+
+            <label>
+                INCIDENT ANGLE
+            </label>
+
+            <strong>
+                <span id="incidentValue">
+                    30
+                </span>
+                °
+            </strong>
+
+        </div>
+
+        <div class="value">
+
+            <label>
+                REFLECTED ANGLE
+            </label>
+
+            <strong class="highlight">
+                <span id="reflectionValue">
+                    30
+                </span>
+                °
+            </strong>
+
+        </div>
+
+        <div class="value">
+
+            <label>
+                REFRACTED ANGLE
+            </label>
+
+            <strong class="highlight">
+                <span id="refractionValue">
+                    22.08
+                </span>
+                °
+            </strong>
+
+        </div>
+
+        <div class="value">
+
+            <label>
+                REFRACTIVE INDEX
+            </label>
+
+            <strong>
+                <span id="indexValue">
+                    1.33
+                </span>
+            </strong>
+
+        </div>
+
+        <div class="value">
+
+            <label>
+                FOCAL LENGTH
+            </label>
+
+            <strong>
+                <span id="focalValue">
+                    10
+                </span>
+                units
+            </strong>
+
+        </div>
+
+    </div>
+
+    <div class="signal-title">
+
+        <span>
+            OPTICAL ALIGNMENT
+        </span>
+
+        <span id="signalPercent">
+            0%
+        </span>
+
+    </div>
+
+    <div class="signal-bar">
+        <div id="signalFill"></div>
+    </div>
+
+    <div
+        id="equation"
+        class="equation">
+
+        <b>Law of Reflection</b><br>
+        angle i = angle r
+
+    </div>
+
+</div>
+
+<div class="coach glass">
+
+    <div id="coachTitle">
+        REFLECTION
+    </div>
+
+    <div id="coachText">
+        Rotate the mirror and observe how the laser direction changes.
+    </div>
+
+    <div id="coachFormula">
+        Angle of incidence = Angle of reflection
+    </div>
+
+</div>
+
+</div>
+
+<!-- =====================================================
+     START
+===================================================== -->
+
+<div
+    id="startScreen"
+    class="start-screen">
+
+    <div class="start-box glass">
+
+        <h2>
+            Optical Communication Failure!
+        </h2>
+
+        <p>
+            The campus laser communication system is offline.
+            Repair mirrors, refraction channels and lens systems
+            before the optical network shuts down.
+        </p>
+
+        <div class="rules">
+
+            <b>MISSION RULES</b><br>
+
+            Each experiment:
+            <b>30 seconds</b><br>
+
+            Final optical locks:
+            <b>20 seconds each</b><br>
+
+            Correct experiment:
+            <b>+100 points</b><br>
+
+            Correct physics answer:
+            <b>+50 points</b><br>
+
+            Wrong physics answer:
+            <b>-50 points</b><br>
+
+            Timer reaches zero:
+            <b>SYSTEM FAILURE</b>
+
+        </div>
+
+        <button id="startButton">
+            Start Optics Mission
+        </button>
+
+    </div>
+
+</div>
+
+<!-- =====================================================
+     RESULT
+===================================================== -->
+
+<div
+    id="resultBox"
+    class="result glass">
+
+    <div class="result-scroll">
+
+        <div class="result-badge">
+            OPTICAL TEST RESULT
+        </div>
+
+        <h3 id="resultTitle"></h3>
+
+        <div
+            id="resultText"
+            class="result-text">
+        </div>
+
+        <div class="question-label">
+            PHYSICS CHECK
+        </div>
+
+        <div id="question"></div>
+
+        <div id="questionHint"></div>
+
+        <div
+            id="answers"
+            class="answers">
+        </div>
+
+        <div id="feedback"></div>
+
+    </div>
+
+    <div class="result-footer">
+
+        <button
+            id="nextButton"
+            class="next-button">
+
+            NEXT EXPERIMENT
+
+        </button>
+
+    </div>
+
+</div>
+
+<!-- =====================================================
+     FAILURE
+===================================================== -->
+
+<div
+    id="failure"
+    class="failure">
+
+    <div class="failure-box">
+
+        <div class="failure-icon">
+            ⚠
+        </div>
+
+        <h2>
+            OPTICAL SYSTEM FAILED
+        </h2>
+
+        <p>
+            The optical channel was not stabilized before
+            the mission timer reached zero.
+        </p>
+
+        <div
+            id="failureStage"
+            class="failure-stage">
+        </div>
+
+        <button onclick="location.reload()">
+            RESTART OPTICS MISSION
+        </button>
+
+    </div>
+
+</div>
+
+<!-- =====================================================
+     FINISH
+===================================================== -->
+
+<div
+    id="finish"
+    class="finish">
+
+    <div class="finish-box glass">
+
+        <h2>
+            Optical Network Restored!
+        </h2>
+
+        <div class="finish-sub">
+            Your experiments now explain Reflection, Refraction, Mirrors and Lenses.
+        </div>
+
+        <div class="final-grid">
+
+            <div class="final-card">
+
+                <strong id="finalReflection">
+                    -
+                </strong>
+
+                <span>
+                    REFLECTION ANGLE
+                </span>
+
+            </div>
+
+            <div class="final-card">
+
+                <strong id="finalRefraction">
+                    -
+                </strong>
+
+                <span>
+                    REFRACTION ANGLE
+                </span>
+
+            </div>
+
+            <div class="final-card">
+
+                <strong id="finalLens">
+                    -
+                </strong>
+
+                <span>
+                    FINAL LENS
+                </span>
+
+            </div>
+
+            <div class="final-card">
+
+                <strong id="finalScore">
+                    -
+                </strong>
+
+                <span>
+                    FINAL SCORE
+                </span>
+
+            </div>
+
+        </div>
+
+        <div
+            id="finalExplanation"
+            class="final-explanation">
+        </div>
+
+        <button
+            class="restart"
+            onclick="location.reload()">
+
+            Run New Optics Mission
+
+        </button>
+
+    </div>
+
+</div>
+
+<script src="../../vendor/three-0.160.1.min.js"></script>
+
+<script>
+(() => {
+
+"use strict";
+
+/* =========================================================
+   CONFIG
+========================================================= */
+
+const STAGE_TIME = 30;
+const FINAL_TIME = 20;
+
+const MEDIUMS = {
+
+    air:{
+        name:"Air",
+        n:1.00
+    },
+
+    water:{
+        name:"Water",
+        n:1.33
+    },
+
+    glass:{
+        name:"Glass",
+        n:1.50
+    }
+};
+
+const studentName =
+    localStorage.getItem(
+        "student_name"
+    ) ||
+    sessionStorage.getItem(
+        "student_name"
+    ) ||
+    "Student";
+
+document
+.getElementById(
+    "studentText"
+)
+.textContent =
+    studentName +
+    " - restore the campus optical communication system before time expires.";
+
+/* =========================================================
+   THREE
+========================================================= */
+
+const scene =
+    new THREE.Scene();
+
+scene.background =
+    new THREE.Color(
+        0x7dbfe1
+    );
+
+scene.fog =
+    new THREE.Fog(
+        0x7dbfe1,
+        100,
+        250
+    );
+
+const camera =
+    new THREE.PerspectiveCamera(
+        58,
+        innerWidth/innerHeight,
+        .1,
+        400
+    );
+
+const renderer =
+    new THREE.WebGLRenderer({
+        antialias:true,
+        powerPreference:"high-performance"
+    });
+
+renderer.setSize(
+    innerWidth,
+    innerHeight
+);
+
+renderer.setPixelRatio(
+    Math.min(
+        devicePixelRatio,
+        2
+    )
+);
+
+renderer.shadowMap.enabled =
+    true;
+
+renderer.outputColorSpace =
+    THREE.SRGBColorSpace;
+
+renderer.toneMapping =
+    THREE.ACESFilmicToneMapping;
+
+renderer.toneMappingExposure =
+    1.05;
+
+document
+.getElementById(
+    "game"
+)
+.appendChild(
+    renderer.domElement
+);
+
+/* =========================================================
+   LIGHTING
+========================================================= */
+
+scene.add(
+    new THREE.HemisphereLight(
+        0xe0f6ff,
+        0x405f43,
+        2.7
+    )
+);
+
+const sun =
+    new THREE.DirectionalLight(
+        0xffefd0,
+        4
+    );
+
+sun.position.set(
+    -35,
+    70,
+    -30
+);
+
+sun.castShadow =
+    true;
+
+sun.shadow.mapSize.set(
+    2048,
+    2048
+);
+
+scene.add(
+    sun
+);
+
+/* =========================================================
+   MATERIALS
+========================================================= */
+
+const MAT = {
+
+    floor:
+    new THREE.MeshStandardMaterial({
+        color:0x38434a,
+        roughness:.9
+    }),
+
+    platform:
+    new THREE.MeshStandardMaterial({
+        color:0xb0b9be,
+        roughness:.85
+    }),
+
+    dark:
+    new THREE.MeshStandardMaterial({
+        color:0x151a20,
+        roughness:.55,
+        metalness:.3
+    }),
+
+    mirror:
+    new THREE.MeshStandardMaterial({
+        color:0xdce8ec,
+        roughness:.12,
+        metalness:.85
+    }),
+
+    laser:
+    new THREE.LineBasicMaterial({
+        color:0xff3131
+    }),
+
+    normal:
+    new THREE.LineBasicMaterial({
+        color:0xf4f4f4,
+        transparent:true,
+        opacity:.55
+    }),
+
+    water:
+    new THREE.MeshStandardMaterial({
+        color:0x3c9ed8,
+        transparent:true,
+        opacity:.38,
+        roughness:.15
+    }),
+
+    glass:
+    new THREE.MeshStandardMaterial({
+        color:0xa7e9ff,
+        transparent:true,
+        opacity:.32,
+        roughness:.08
+    }),
+
+    air:
+    new THREE.MeshStandardMaterial({
+        color:0xdceeff,
+        transparent:true,
+        opacity:.08
+    }),
+
+    lens:
+    new THREE.MeshStandardMaterial({
+        color:0x73d9ff,
+        transparent:true,
+        opacity:.5,
+        roughness:.08
+    }),
+
+    green:
+    new THREE.MeshStandardMaterial({
+        color:0x4cd882,
+        emissive:0x0b6a36,
+        emissiveIntensity:1.8
+    }),
+
+    yellow:
+    new THREE.MeshStandardMaterial({
+        color:0xf4c445,
+        emissive:0x5e4700,
+        emissiveIntensity:.6
+    })
+};
+
+function box(
+    width,
+    height,
+    depth,
+    material,
+    x,
+    y,
+    z,
+    parent=scene
+){
+
+    const mesh =
+        new THREE.Mesh(
+            new THREE.BoxGeometry(
+                width,
+                height,
+                depth
+            ),
+            material
+        );
+
+    mesh.position.set(
+        x,y,z
+    );
+
+    mesh.castShadow =
+        true;
+
+    mesh.receiveShadow =
+        true;
+
+    parent.add(
+        mesh
+    );
+
+    return mesh;
+}
+
+/* =========================================================
+   WORLD
+========================================================= */
+
+box(
+    65,
+    .25,
+    105,
+    MAT.floor,
+    0,
+    -.15,
+    30
+);
+
+/* =========================================================
+   LINE HELPER
+========================================================= */
+
+function createLine(
+    parent,
+    material=MAT.laser
+){
+
+    const geometry =
+        new THREE.BufferGeometry()
+        .setFromPoints([
+            new THREE.Vector3(),
+            new THREE.Vector3()
+        ]);
+
+    const line =
+        new THREE.Line(
+            geometry,
+            material
+        );
+
+    parent.add(
+        line
+    );
+
+    return line;
+}
+
+function setLine(
+    line,
+    points
+){
+
+    line.geometry.dispose();
+
+    line.geometry =
+        new THREE.BufferGeometry()
+        .setFromPoints(
+            points
+        );
+}
+
+/* =========================================================
+   REFLECTION LAB
+========================================================= */
+
+const reflectionLab =
+    new THREE.Group();
+
+reflectionLab.position.z =
+    0;
+
+scene.add(
+    reflectionLab
+);
+
+box(
+    25,
+    .5,
+    24,
+    MAT.platform,
+    0,
+    .1,
+    0,
+    reflectionLab
+);
+
+/* LASER EMITTER */
+
+box(
+    2.4,
+    1.8,
+    3,
+    MAT.dark,
+    0,
+    1.1,
+    -9,
+    reflectionLab
+);
+
+const emitterGlow =
+    new THREE.Mesh(
+        new THREE.SphereGeometry(
+            .35,
+            14,
+            10
+        ),
+        new THREE.MeshBasicMaterial({
+            color:0xff2929
+        })
+    );
+
+emitterGlow.position.set(
+    0,
+    2,
+    -7.35
+);
+
+reflectionLab.add(
+    emitterGlow
+);
+
+/* MIRROR */
+
+const mirror =
+    box(
+        9,
+        4,
+        .22,
+        MAT.mirror,
+        0,
+        2,
+        0,
+        reflectionLab
+);
+
+/* RECEIVER */
+
+const reflectionReceiver =
+    new THREE.Mesh(
+        new THREE.SphereGeometry(
+            .75,
+            18,
+            14
+        ),
+        MAT.green
+    );
+
+reflectionReceiver.position.set(
+    8,
+    2,
+    0
+);
+
+reflectionLab.add(
+    reflectionReceiver
+);
+
+const reflectionIncidentLine =
+    createLine(
+        reflectionLab
+    );
+
+const reflectionOutgoingLine =
+    createLine(
+        reflectionLab
+    );
+
+const reflectionNormalLine =
+    createLine(
+        reflectionLab,
+        MAT.normal
+    );
+
+/* =========================================================
+   REFRACTION LAB
+========================================================= */
+
+const refractionLab =
+    new THREE.Group();
+
+refractionLab.position.z =
+    32;
+
+scene.add(
+    refractionLab
+);
+
+box(
+    25,
+    .5,
+    24,
+    MAT.platform,
+    0,
+    .1,
+    0,
+    refractionLab
+);
+
+const mediumBlock =
+    box(
+        19,
+        4,
+        10,
+        MAT.water,
+        0,
+        2,
+        5,
+        refractionLab
+);
+
+const refractionIncident =
+    createLine(
+        refractionLab
+    );
+
+const refractionRay =
+    createLine(
+        refractionLab
+    );
+
+const refractionNormal =
+    createLine(
+        refractionLab,
+        MAT.normal
+    );
+
+const refractionTarget =
+    new THREE.Mesh(
+        new THREE.SphereGeometry(
+            .7,
+            18,
+            14
+        ),
+        MAT.green
+    );
+
+refractionLab.add(
+    refractionTarget
+);
+
+/* =========================================================
+   LENS LAB
+========================================================= */
+
+const lensLab =
+    new THREE.Group();
+
+lensLab.position.z =
+    65;
+
+scene.add(
+    lensLab
+);
+
+box(
+    25,
+    .5,
+    27,
+    MAT.platform,
+    0,
+    .1,
+    0,
+    lensLab
+);
+
+/* LENS */
+
+const lensMesh =
+    new THREE.Mesh(
+        new THREE.CylinderGeometry(
+            4,
+            4,
+            .75,
+            32
+        ),
+        MAT.lens
+    );
+
+lensMesh.rotation.x =
+    Math.PI/2;
+
+lensMesh.position.set(
+    0,
+    4,
+    0
+);
+
+lensLab.add(
+    lensMesh
+);
+
+/* LENS HOLDER */
+
+box(
+    .5,
+    4,
+    .5,
+    MAT.dark,
+    0,
+    2,
+    0,
+    lensLab
+);
+
+const lensRayLines = [];
+
+for(
+    let i=0;
+    i<6;
+    i++
+){
+
+    lensRayLines.push(
+        createLine(
+            lensLab
+        )
+    );
+}
+
+const focalPoint =
+    new THREE.Mesh(
+        new THREE.SphereGeometry(
+            .65,
+            18,
+            14
+        ),
+        MAT.green
+    );
+
+lensLab.add(
+    focalPoint
+);
+
+/* =========================================================
+   STATE
+========================================================= */
+
+let started = false;
+let failed = false;
+let finished = false;
+
+let stage = 1;
+
+let score = 0;
+
+let timerRemaining =
+    STAGE_TIME;
+
+let timerRunning =
+    false;
+
+let stageComplete =
+    false;
+
+let selectedMirrorAngle =
+    30;
+
+let selectedIncidentAngle =
+    30;
+
+let selectedMedium =
+    "water";
+
+let selectedLens =
+    "convex";
+
+let selectedFocalLength =
+    10;
+
+let targetMirrorAngle =
+    45;
+
+let targetReflectionAngle =
+    30;
+
+let targetMedium =
+    "glass";
+
+let targetRefractionAngle =
+    0;
+
+let targetRefractionPair =
+    null;
+
+let targetFocalLength =
+    10;
+
+let finalTargets = [];
+let finalIndex = 0;
+
+let opticalAlignment =
+    0;
+
+/* =========================================================
+   BUTTONS
+========================================================= */
+
+const mirrorButtons =
+    [
+        ...document.querySelectorAll(
+            "#mirrorButtons button"
+        )
+    ];
+
+const angleButtons =
+    [
+        ...document.querySelectorAll(
+            "#angleButtons button"
+        )
+    ];
+
+const mediumButtons =
+    [
+        ...document.querySelectorAll(
+            "#mediumButtons button"
+        )
+    ];
+
+const lensButtons =
+    [
+        ...document.querySelectorAll(
+            "#lensButtons button"
+        )
+    ];
+
+const focalButtons =
+    [
+        ...document.querySelectorAll(
+            "#focalButtons button"
+        )
+    ];
+
+function activate(
+    buttons,
+    key,
+    value
+){
+
+    buttons.forEach(
+        button=>{
+
+            button.classList.toggle(
+                "active",
+
+                String(
+                    button.dataset[key]
+                )===
+                String(value)
+            );
+        }
+    );
+}
+
+mirrorButtons.forEach(
+    button=>{
+
+        button.onclick =
+        ()=>{
+
+            selectedMirrorAngle =
+                Number(
+                    button.dataset.mirror
+                );
+
+            activate(
+                mirrorButtons,
+                "mirror",
+                selectedMirrorAngle
+            );
+
+            updateVisuals();
+        };
+    }
+);
+
+angleButtons.forEach(
+    button=>{
+
+        button.onclick =
+        ()=>{
+
+            selectedIncidentAngle =
+                Number(
+                    button.dataset.angle
+                );
+
+            activate(
+                angleButtons,
+                "angle",
+                selectedIncidentAngle
+            );
+
+            updateVisuals();
+        };
+    }
+);
+
+mediumButtons.forEach(
+    button=>{
+
+        button.onclick =
+        ()=>{
+
+            selectedMedium =
+                button.dataset.medium;
+
+            activate(
+                mediumButtons,
+                "medium",
+                selectedMedium
+            );
+
+            updateMediumVisual();
+
+            updateVisuals();
+        };
+    }
+);
+
+lensButtons.forEach(
+    button=>{
+
+        button.onclick =
+        ()=>{
+
+            selectedLens =
+                button.dataset.lens;
+
+            activate(
+                lensButtons,
+                "lens",
+                selectedLens
+            );
+
+            updateLensVisual();
+            updateVisuals();
+        };
+    }
+);
+
+focalButtons.forEach(
+    button=>{
+
+        button.onclick =
+        ()=>{
+
+            selectedFocalLength =
+                Number(
+                    button.dataset.focal
+                );
+
+            activate(
+                focalButtons,
+                "focal",
+                selectedFocalLength
+            );
+
+            updateVisuals();
+        };
+    }
+);
+
+/* =========================================================
+   START
+========================================================= */
+
+document
+.getElementById(
+    "startButton"
+)
+.onclick =
+()=>{
+
+    started =
+        true;
+
+    document
+    .getElementById(
+        "startScreen"
+    )
+    .style.display =
+        "none";
+
+    prepareStage();
+};
+
+/* =========================================================
+   TEST
+========================================================= */
+
+document
+.getElementById(
+    "testButton"
+)
+.onclick =
+()=>{
+
+    if(
+        !started ||
+        failed ||
+        finished ||
+        stageComplete
+    ){
+
+        return;
+    }
+
+    evaluateStage();
+};
+
+/* =========================================================
+   TIMER
+========================================================= */
+
+function startTimer(
+    seconds
+){
+
+    timerRemaining =
+        seconds;
+
+    timerRunning =
+        true;
+
+    updateTimerDisplay();
+}
+
+function pauseTimer(){
+
+    timerRunning =
+        false;
+}
+
+function updateTimer(
+    dt
+){
+
+    if(
+        !started ||
+        failed ||
+        finished ||
+        !timerRunning
+    ){
+
+        return;
+    }
+
+    timerRemaining -=
+        dt;
+
+    if(
+        timerRemaining<=0
+    ){
+
+        timerRemaining =
+            0;
+
+        updateTimerDisplay();
+
+        systemFailure();
+
+        return;
+    }
+
+    updateTimerDisplay();
+}
+
+function updateTimerDisplay(){
+
+    const timer =
+        document.getElementById(
+            "timerValue"
+        );
+
+    timer.textContent =
+        Math.ceil(
+            Math.max(
+                timerRemaining,
+                0
+            )
+        );
+
+    timer.classList.remove(
+        "warning",
+        "danger"
+    );
+
+    if(
+        timerRemaining<=5
+    ){
+
+        timer.classList.add(
+            "danger"
+        );
+    }
+
+    else if(
+        timerRemaining<=10
+    ){
+
+        timer.classList.add(
+            "warning"
+        );
+    }
+}
+
+/* =========================================================
+   FAILURE
+========================================================= */
+
+function systemFailure(){
+
+    if(
+        failed ||
+        finished
+    ){
+
+        return;
+    }
+
+    failed =
+        true;
+
+    pauseTimer();
+
+    document
+    .getElementById(
+        "testButton"
+    )
+    .disabled =
+        true;
+
+    document
+    .getElementById(
+        "failureStage"
+    )
+    .innerHTML =
+    `
+    Failed during:<br>
+
+    <b>
+    ${
+        document
+        .getElementById(
+            "stageName"
+        )
+        .textContent
+    }
+    </b><br><br>
+
+    Final score:
+    <b>${score}</b>
+    `;
+
+    document
+    .getElementById(
+        "failure"
+    )
+    .classList.add(
+        "show"
+    );
+}
+
+/* =========================================================
+   RANDOM
+========================================================= */
+
+function randomItem(
+    array
+){
+
+    return array[
+        Math.floor(
+            Math.random()*
+            array.length
+        )
+    ];
+}
+
+/* =========================================================
+   PHYSICS
+========================================================= */
+
+function rad(
+    degrees
+){
+
+    return degrees*
+           Math.PI/
+           180;
+}
+
+function deg(
+    radians
+){
+
+    return radians*
+           180/
+           Math.PI;
+}
+
+function refractedAngle(
+    incidence,
+    medium
+){
+
+    const n1 =
+        1;
+
+    const n2 =
+        MEDIUMS[
+            medium
+        ].n;
+
+    const value =
+        n1*
+        Math.sin(
+            rad(incidence)
+        )/
+        n2;
+
+    return deg(
+        Math.asin(
+            THREE.MathUtils.clamp(
+                value,
+                -1,
+                1
+            )
+        )
+    );
+}
+
+/* =========================================================
+   REFLECTION VISUAL
+========================================================= */
+
+function reflectedDirectionForMirror(
+    angle
+){
+
+    const a =
+        rad(angle);
+
+    const incoming =
+        new THREE.Vector3(
+            0,
+            0,
+            1
+        );
+
+    const normal =
+        new THREE.Vector3(
+            Math.sin(a),
+            0,
+            -Math.cos(a)
+        );
+
+    const reflected =
+        incoming.clone()
+        .sub(
+            normal.clone()
+            .multiplyScalar(
+                2*
+                incoming.dot(
+                    normal
+                )
+            )
+        );
+
+    return reflected.normalize();
+}
+
+function updateReflectionVisual(){
+
+    if(
+        stage===2
+    ){
+
+        const theta =
+            rad(
+                selectedIncidentAngle
+            );
+
+        const distance =
+            10;
+
+        const source =
+            new THREE.Vector3(
+                -Math.sin(theta)*
+                distance,
+                2,
+                -Math.cos(theta)*
+                distance
+            );
+
+        const mirrorPoint =
+            new THREE.Vector3(
+                0,
+                2,
+                0
+            );
+
+        const reflectedEnd =
+            new THREE.Vector3(
+                Math.sin(theta)*
+                distance,
+                2,
+                -Math.cos(theta)*
+                distance
+            );
+
+        setLine(
+            reflectionIncidentLine,
+            [
+                source,
+                mirrorPoint
+            ]
+        );
+
+        setLine(
+            reflectionOutgoingLine,
+            [
+                mirrorPoint,
+                reflectedEnd
+            ]
+        );
+
+        setLine(
+            reflectionNormalLine,
+            [
+                new THREE.Vector3(
+                    0,
+                    2,
+                    -5
+                ),
+
+                new THREE.Vector3(
+                    0,
+                    2,
+                    5
+                )
+            ]
+        );
+
+        mirror.rotation.y =
+            0;
+
+        reflectionReceiver.position.copy(
+            reflectedEnd
+        );
+
+        opticalAlignment =
+            selectedIncidentAngle===
+            targetReflectionAngle
+            ?
+            100
+            :
+            35;
+
+        return;
+    }
+
+    const source =
+        new THREE.Vector3(
+            0,
+            2,
+            -7.3
+        );
+
+    const mirrorPoint =
+        new THREE.Vector3(
+            0,
+            2,
+            0
+        );
+
+    const selectedDirection =
+        reflectedDirectionForMirror(
+            selectedMirrorAngle
+        );
+
+    const targetDirection =
+        reflectedDirectionForMirror(
+            targetMirrorAngle
+        );
+
+    const selectedEnd =
+        mirrorPoint.clone()
+        .add(
+            selectedDirection
+            .multiplyScalar(
+                11
+            )
+        );
+
+    const targetEnd =
+        mirrorPoint.clone()
+        .add(
+            targetDirection
+            .multiplyScalar(
+                11
+            )
+        );
+
+    setLine(
+        reflectionIncidentLine,
+        [
+            source,
+            mirrorPoint
+        ]
+    );
+
+    setLine(
+        reflectionOutgoingLine,
+        [
+            mirrorPoint,
+            selectedEnd
+        ]
+    );
+
+    setLine(
+        reflectionNormalLine,
+        [
+            mirrorPoint.clone()
+            .add(
+                new THREE.Vector3(
+                    -4*
+                    Math.sin(
+                        rad(
+                            selectedMirrorAngle
+                        )
+                    ),
+                    0,
+                    4*
+                    Math.cos(
+                        rad(
+                            selectedMirrorAngle
+                        )
+                    )
+                )
+            ),
+
+            mirrorPoint.clone()
+            .add(
+                new THREE.Vector3(
+                    4*
+                    Math.sin(
+                        rad(
+                            selectedMirrorAngle
+                        )
+                    ),
+                    0,
+                    -4*
+                    Math.cos(
+                        rad(
+                            selectedMirrorAngle
+                        )
+                    )
+                )
+            )
+        ]
+    );
+
+    mirror.rotation.y =
+        rad(
+            selectedMirrorAngle
+        );
+
+    reflectionReceiver.position.copy(
+        targetEnd
+    );
+
+    opticalAlignment =
+        selectedMirrorAngle===
+        targetMirrorAngle
+        ?
+        100
+        :
+        Math.max(
+            15,
+            100-
+            Math.abs(
+                selectedMirrorAngle-
+                targetMirrorAngle
+            )*2
+        );
+}
+
+/* =========================================================
+   REFRACTION VISUAL
+========================================================= */
+
+function updateMediumVisual(){
+
+    mediumBlock.material =
+        MAT[
+            selectedMedium
+        ];
+}
+
+function updateRefractionVisual(){
+
+    const theta1 =
+        rad(
+            selectedIncidentAngle
+        );
+
+    const theta2 =
+        rad(
+            refractedAngle(
+                selectedIncidentAngle,
+                selectedMedium
+            )
+        );
+
+    const incidentLength =
+        10;
+
+    const refractedLength =
+        11;
+
+    const source =
+        new THREE.Vector3(
+            -Math.sin(theta1)*
+            incidentLength,
+            2,
+            -Math.cos(theta1)*
+            incidentLength
+        );
+
+    const boundary =
+        new THREE.Vector3(
+            0,
+            2,
+            0
+        );
+
+    const end =
+        new THREE.Vector3(
+            Math.sin(theta2)*
+            refractedLength,
+            2,
+            Math.cos(theta2)*
+            refractedLength
+        );
+
+    setLine(
+        refractionIncident,
+        [
+            source,
+            boundary
+        ]
+    );
+
+    setLine(
+        refractionRay,
+        [
+            boundary,
+            end
+        ]
+    );
+
+    setLine(
+        refractionNormal,
+        [
+            new THREE.Vector3(
+                0,
+                2,
+                -8
+            ),
+
+            new THREE.Vector3(
+                0,
+                2,
+                10
+            )
+        ]
+    );
+
+    if(
+        stage===3
+    ){
+
+        const targetTheta =
+            rad(
+                targetRefractionAngle
+            );
+
+        refractionTarget.position.set(
+            Math.sin(targetTheta)*
+            refractedLength,
+            2,
+            Math.cos(targetTheta)*
+            refractedLength
+        );
+
+        opticalAlignment =
+            Math.abs(
+                refractedAngle(
+                    selectedIncidentAngle,
+                    selectedMedium
+                )-
+                targetRefractionAngle
+            )<.15
+            ?
+            100
+            :
+            40;
+    }
+
+    else if(
+        stage===4
+    ){
+
+        const targetTheta =
+            rad(
+                targetRefractionAngle
+            );
+
+        refractionTarget.position.set(
+            Math.sin(targetTheta)*
+            refractedLength,
+            2,
+            Math.cos(targetTheta)*
+            refractedLength
+        );
+
+        const error =
+            Math.abs(
+                refractedAngle(
+                    selectedIncidentAngle,
+                    selectedMedium
+                )-
+                targetRefractionAngle
+            );
+
+        opticalAlignment =
+            error<.15
+            ?
+            100
+            :
+            Math.max(
+                10,
+                100-error*5
+            );
+    }
+}
+
+/* =========================================================
+   LENS VISUAL
+========================================================= */
+
+function updateLensVisual(){
+
+    if(
+        selectedLens===
+        "convex"
+    ){
+
+        lensMesh.scale.set(
+            .75,
+            1,
+            1.35
+        );
+    }
+
+    else{
+
+        lensMesh.scale.set(
+            1.25,
+            1,
+            .55
+        );
+    }
+}
+
+function updateLensRays(){
+
+    const xValues = [
+        -3,
+        0,
+        3
+    ];
+
+    let lineIndex =
+        0;
+
+    xValues.forEach(
+        x=>{
+
+            const start =
+                new THREE.Vector3(
+                    x,
+                    4,
+                    -11
+                );
+
+            const lensPoint =
+                new THREE.Vector3(
+                    x,
+                    4,
+                    0
+                );
+
+            setLine(
+                lensRayLines[
+                    lineIndex++
+                ],
+                [
+                    start,
+                    lensPoint
+                ]
+            );
+
+            if(
+                selectedLens===
+                "convex"
+            ){
+
+                const focus =
+                    new THREE.Vector3(
+                        0,
+                        4,
+                        selectedFocalLength
+                    );
+
+                const direction =
+                    focus.clone()
+                    .sub(
+                        lensPoint
+                    )
+                    .normalize();
+
+                const beyond =
+                    lensPoint.clone()
+                    .add(
+                        direction.multiplyScalar(
+                            18
+                        )
+                    );
+
+                setLine(
+                    lensRayLines[
+                        lineIndex++
+                    ],
+                    [
+                        lensPoint,
+                        focus,
+                        beyond
+                    ]
+                );
+            }
+
+            else{
+
+                const virtualFocus =
+                    new THREE.Vector3(
+                        0,
+                        4,
+                        -selectedFocalLength
+                    );
+
+                const direction =
+                    lensPoint.clone()
+                    .sub(
+                        virtualFocus
+                    )
+                    .normalize();
+
+                const beyond =
+                    lensPoint.clone()
+                    .add(
+                        direction.multiplyScalar(
+                            18
+                        )
+                    );
+
+                setLine(
+                    lensRayLines[
+                        lineIndex++
+                    ],
+                    [
+                        lensPoint,
+                        beyond
+                    ]
+                );
+            }
+        }
+    );
+
+    if(
+        selectedLens===
+        "convex"
+    ){
+
+        focalPoint.position.set(
+            0,
+            4,
+            selectedFocalLength
+        );
+    }
+
+    else{
+
+        focalPoint.position.set(
+            0,
+            4,
+            -selectedFocalLength
+        );
+    }
+
+    opticalAlignment =
+        selectedFocalLength===
+        targetFocalLength
+        ?
+        100
+        :
+        45;
+}
+
+/* =========================================================
+   CONTROL VISIBILITY
+========================================================= */
+
+function showGroup(
+    id,
+    visible
+){
+
+    document
+    .getElementById(
+        id
+    )
+    .style.display =
+        visible
+        ?
+        "block"
+        :
+        "none";
+}
+
+/* =========================================================
+   STAGES
+========================================================= */
+
+function prepareStage(){
+
+    stageComplete =
+        false;
+
+    document
+    .getElementById(
+        "testButton"
+    )
+    .disabled =
+        false;
+
+    showGroup(
+        "mirrorGroup",
+        stage===1 ||
+        stage===7
+    );
+
+    showGroup(
+        "angleGroup",
+        stage===2 ||
+        stage===3 ||
+        stage===4 ||
+        stage===7
+    );
+
+    showGroup(
+        "mediumGroup",
+        stage===3 ||
+        stage===4 ||
+        stage===7
+    );
+
+    showGroup(
+        "lensGroup",
+        stage===5 ||
+        stage===6 ||
+        stage===7
+    );
+
+    showGroup(
+        "focalGroup",
+        stage===5 ||
+        stage===6 ||
+        stage===7
+    );
+
+    reflectionLab.visible =
+        stage===1 ||
+        stage===2 ||
+        stage===7;
+
+    refractionLab.visible =
+        stage===3 ||
+        stage===4 ||
+        stage===7;
+
+    lensLab.visible =
+        stage===5 ||
+        stage===6 ||
+        stage===7;
+
+    if(
+        stage===1
+    ){
+
+        targetMirrorAngle =
+            randomItem([
+                15,
+                30,
+                45,
+                60
+            ]);
+
+        document
+        .getElementById(
+            "stageName"
+        )
+        .textContent =
+            "Stage 1 - Laser Reflection";
+
+        document
+        .getElementById(
+            "stageObjective"
+        )
+        .textContent =
+            "Rotate the mirror until the red laser hits the green receiver.";
+
+        document
+        .getElementById(
+            "coachTitle"
+        )
+        .textContent =
+            "REFLECTION";
+
+        document
+        .getElementById(
+            "coachText"
+        )
+        .textContent =
+            "Changing the mirror orientation changes the direction of the reflected light ray.";
+
+        document
+        .getElementById(
+            "coachFormula"
+        )
+        .textContent =
+            "Angle of incidence = Angle of reflection";
+    }
+
+    else if(
+        stage===2
+    ){
+
+        targetReflectionAngle =
+            randomItem([
+                20,
+                30,
+                40
+            ]);
+
+        document
+        .getElementById(
+            "stageName"
+        )
+        .textContent =
+            "Stage 2 - Law of Reflection";
+
+        document
+        .getElementById(
+            "stageObjective"
+        )
+        .textContent =
+            `Produce a reflected angle of ${targetReflectionAngle} degrees.`;
+
+        document
+        .getElementById(
+            "coachTitle"
+        )
+        .textContent =
+            "LAW OF REFLECTION";
+
+        document
+        .getElementById(
+            "coachText"
+        )
+        .textContent =
+            "Both angles are measured from the normal line.";
+
+        document
+        .getElementById(
+            "coachFormula"
+        )
+        .textContent =
+            "i = r";
+    }
+
+    else if(
+        stage===3
+    ){
+
+        selectedIncidentAngle =
+            40;
+
+        targetMedium =
+            randomItem([
+                "air",
+                "water",
+                "glass"
+            ]);
+
+        targetRefractionAngle =
+            refractedAngle(
+                40,
+                targetMedium
+            );
+
+        document
+        .getElementById(
+            "stageName"
+        )
+        .textContent =
+            "Stage 3 - Refraction";
+
+        document
+        .getElementById(
+            "stageObjective"
+        )
+        .textContent =
+            `At 40 degrees incidence, produce a refracted angle of ${targetRefractionAngle.toFixed(2)} degrees.`;
+
+        document
+        .getElementById(
+            "coachTitle"
+        )
+        .textContent =
+            "REFRACTION";
+
+        document
+        .getElementById(
+            "coachText"
+        )
+        .textContent =
+            "Light changes direction when it enters a medium with a different refractive index.";
+
+        document
+        .getElementById(
+            "coachFormula"
+        )
+        .textContent =
+            "n1 sin(i) = n2 sin(r)";
+    }
+
+    else if(
+        stage===4
+    ){
+
+        const pairs = [
+
+            {
+                angle:20,
+                medium:"glass"
+            },
+
+            {
+                angle:30,
+                medium:"water"
+            },
+
+            {
+                angle:40,
+                medium:"glass"
+            },
+
+            {
+                angle:40,
+                medium:"water"
+            }
+        ];
+
+        targetRefractionPair =
+            randomItem(
+                pairs
+            );
+
+        targetRefractionAngle =
+            refractedAngle(
+                targetRefractionPair.angle,
+                targetRefractionPair.medium
+            );
+
+        document
+        .getElementById(
+            "stageName"
+        )
+        .textContent =
+            "Stage 4 - Refractive Index Challenge";
+
+        document
+        .getElementById(
+            "stageObjective"
+        )
+        .textContent =
+            `Use angle + medium controls to produce ${targetRefractionAngle.toFixed(2)} degrees refraction.`;
+
+        document
+        .getElementById(
+            "coachTitle"
+        )
+        .textContent =
+            "REFRACTIVE INDEX";
+
+        document
+        .getElementById(
+            "coachText"
+        )
+        .textContent =
+            "Higher refractive index normally bends the ray closer to the normal when light enters from air.";
+
+        document
+        .getElementById(
+            "coachFormula"
+        )
+        .textContent =
+            "n1 sin(i) = n2 sin(r)";
+    }
+
+    else if(
+        stage===5
+    ){
+
+        targetFocalLength =
+            randomItem([
+                5,
+                10,
+                15
+            ]);
+
+        selectedLens =
+            "convex";
+
+        document
+        .getElementById(
+            "stageName"
+        )
+        .textContent =
+            "Stage 5 - Convex Lens";
+
+        document
+        .getElementById(
+            "stageObjective"
+        )
+        .textContent =
+            `Focus the parallel rays onto the sensor at +${targetFocalLength} units.`;
+
+        document
+        .getElementById(
+            "coachTitle"
+        )
+        .textContent =
+            "CONVEX LENS";
+
+        document
+        .getElementById(
+            "coachText"
+        )
+        .textContent =
+            "A convex lens makes parallel rays converge toward its principal focus.";
+
+        document
+        .getElementById(
+            "coachFormula"
+        )
+        .textContent =
+            "Parallel rays -> Convex lens -> Real focus";
+    }
+
+    else if(
+        stage===6
+    ){
+
+        targetFocalLength =
+            randomItem([
+                5,
+                10,
+                15
+            ]);
+
+        document
+        .getElementById(
+            "stageName"
+        )
+        .textContent =
+            "Stage 6 - Concave Lens";
+
+        document
+        .getElementById(
+            "stageObjective"
+        )
+        .textContent =
+            `Create a diverging beam with virtual focus ${targetFocalLength} units behind the lens.`;
+
+        document
+        .getElementById(
+            "coachTitle"
+        )
+        .textContent =
+            "CONCAVE LENS";
+
+        document
+        .getElementById(
+            "coachText"
+        )
+        .textContent =
+            "A concave lens causes parallel rays to diverge as though they came from a virtual focal point.";
+
+        document
+        .getElementById(
+            "coachFormula"
+        )
+        .textContent =
+            "Parallel rays -> Concave lens -> Divergence";
+    }
+
+    else{
+
+        const combinations = [
+
+            {
+                mirror:30,
+                angle:20,
+                medium:"glass",
+                lens:"convex",
+                focal:5
+            },
+
+            {
+                mirror:45,
+                angle:30,
+                medium:"water",
+                lens:"convex",
+                focal:10
+            },
+
+            {
+                mirror:60,
+                angle:40,
+                medium:"glass",
+                lens:"concave",
+                focal:15
+            },
+
+            {
+                mirror:15,
+                angle:40,
+                medium:"water",
+                lens:"convex",
+                focal:15
+            }
+        ];
+
+        finalTargets =
+            [];
+
+        while(
+            finalTargets.length<3
+        ){
+
+            const candidate =
+                randomItem(
+                    combinations
+                );
+
+            if(
+                !finalTargets.some(
+                    item=>
+                    item.mirror===
+                    candidate.mirror &&
+                    item.angle===
+                    candidate.angle &&
+                    item.medium===
+                    candidate.medium &&
+                    item.lens===
+                    candidate.lens &&
+                    item.focal===
+                    candidate.focal
+                )
+            ){
+
+                finalTargets.push({
+                    ...candidate
+                });
+            }
+        }
+
+        finalIndex =
+            0;
+
+        document
+        .getElementById(
+            "stageName"
+        )
+        .textContent =
+            "Final - Optical Network Lock";
+
+        updateFinalObjective();
+
+        document
+        .getElementById(
+            "coachTitle"
+        )
+        .textContent =
+            "FINAL OPTICAL NETWORK";
+
+        document
+        .getElementById(
+            "coachText"
+        )
+        .textContent =
+            "Configure mirror, refraction channel and lens before each 20-second lock expires.";
+
+        document
+        .getElementById(
+            "coachFormula"
+        )
+        .textContent =
+            "Reflection + Refraction + Lens";
+    }
+
+    activate(
+        mirrorButtons,
+        "mirror",
+        selectedMirrorAngle
+    );
+
+    activate(
+        angleButtons,
+        "angle",
+        selectedIncidentAngle
+    );
+
+    activate(
+        mediumButtons,
+        "medium",
+        selectedMedium
+    );
+
+    activate(
+        lensButtons,
+        "lens",
+        selectedLens
+    );
+
+    activate(
+        focalButtons,
+        "focal",
+        selectedFocalLength
+    );
+
+    updateMediumVisual();
+    updateLensVisual();
+    updateVisuals();
+
+    startTimer(
+        stage===7
+        ?
+        FINAL_TIME
+        :
+        STAGE_TIME
+    );
+}
+
+function updateFinalObjective(){
+
+    const target =
+        finalTargets[
+            finalIndex
+        ];
+
+    document
+    .getElementById(
+        "stageObjective"
+    )
+    .textContent =
+    `Lock ${finalIndex+1}/3: mirror ${target.mirror}°, incidence ${target.angle}°, ${MEDIUMS[target.medium].name}, ${target.lens} lens, f=${target.focal}.`;
+}
+
+/* =========================================================
+   EVALUATE
+========================================================= */
+
+function evaluateStage(){
+
+    let success = false;
+
+    let title = "";
+
+    let explanation = "";
+
+    const currentRefraction =
+        refractedAngle(
+            selectedIncidentAngle,
+            selectedMedium
+        );
+
+    if(
+        stage===1
+    ){
+
+        success =
+            selectedMirrorAngle===
+            targetMirrorAngle;
+
+        title =
+            success
+            ?
+            "LASER RECEIVER HIT!"
+            :
+            "LASER MISALIGNED";
+
+        explanation =
+        `
+        Selected mirror angle:
+        <b>${selectedMirrorAngle}°</b><br><br>
+
+        ${
+            success
+            ?
+            `
+            The reflected laser reached the receiver.
+
+            Rotating the mirror changed the direction
+            of the normal and therefore the reflected ray.
+            `
+            :
+            `
+            The reflected laser missed the receiver.
+
+            Watch the red ray and adjust the mirror angle.
+            `
+        }
+        `;
+    }
+
+    else if(
+        stage===2
+    ){
+
+        success =
+            selectedIncidentAngle===
+            targetReflectionAngle;
+
+        title =
+            success
+            ?
+            "REFLECTION LAW VERIFIED!"
+            :
+            "REFLECTION ANGLE INCORRECT";
+
+        explanation =
+        `
+        Incident angle =
+        <b>${selectedIncidentAngle}°</b><br>
+
+        Reflected angle =
+        <b>${selectedIncidentAngle}°</b><br><br>
+
+        According to the law of reflection:<br><br>
+
+        <b>
+        angle i = angle r
+        </b><br><br>
+
+        Target reflected angle =
+        <b>${targetReflectionAngle}°</b>.
+        `;
+    }
+
+    else if(
+        stage===3
+    ){
+
+        success =
+            selectedMedium===
+            targetMedium &&
+            selectedIncidentAngle===
+            40;
+
+        title =
+            success
+            ?
+            "REFRACTION CHANNEL CALIBRATED!"
+            :
+            "REFRACTED RAY MISALIGNED";
+
+        explanation =
+        `
+        Incident angle =
+        <b>${selectedIncidentAngle}°</b><br>
+
+        Medium =
+        <b>${MEDIUMS[selectedMedium].name}</b><br>
+
+        Refractive index =
+        <b>${MEDIUMS[selectedMedium].n}</b><br><br>
+
+        Using Snell's law:<br><br>
+
+        n1 sin(i) =
+        n2 sin(r)<br><br>
+
+        r =
+        <b>
+        ${currentRefraction.toFixed(2)}°
+        </b><br><br>
+
+        Target =
+        <b>
+        ${targetRefractionAngle.toFixed(2)}°
+        </b>.
+        `;
+    }
+
+    else if(
+        stage===4
+    ){
+
+        success =
+            selectedIncidentAngle===
+            targetRefractionPair.angle &&
+            selectedMedium===
+            targetRefractionPair.medium;
+
+        title =
+            success
+            ?
+            "REFRACTIVE INDEX TARGET HIT!"
+            :
+            "REFRACTION TARGET MISSED";
+
+        explanation =
+        `
+        Your values:<br><br>
+
+        Incident angle =
+        <b>${selectedIncidentAngle}°</b><br>
+
+        Medium =
+        <b>${MEDIUMS[selectedMedium].name}</b><br>
+
+        n =
+        <b>${MEDIUMS[selectedMedium].n}</b><br><br>
+
+        Calculated refracted angle =
+        <b>${currentRefraction.toFixed(2)}°</b><br><br>
+
+        Required =
+        <b>${targetRefractionAngle.toFixed(2)}°</b>.
+        `;
+    }
+
+    else if(
+        stage===5
+    ){
+
+        success =
+            selectedLens===
+            "convex" &&
+            selectedFocalLength===
+            targetFocalLength;
+
+        title =
+            success
+            ?
+            "RAYS FOCUSED ON SENSOR!"
+            :
+            "FOCUS MISALIGNED";
+
+        explanation =
+        `
+        Lens type =
+        <b>${selectedLens.toUpperCase()}</b><br>
+
+        Selected focal length =
+        <b>${selectedFocalLength}</b> units<br><br>
+
+        Sensor position =
+        <b>+${targetFocalLength}</b> units.<br><br>
+
+        A convex lens converges incoming parallel rays
+        toward its real focal point.
+        `;
+    }
+
+    else if(
+        stage===6
+    ){
+
+        success =
+            selectedLens===
+            "concave" &&
+            selectedFocalLength===
+            targetFocalLength;
+
+        title =
+            success
+            ?
+            "DIVERGING LENS CALIBRATED!"
+            :
+            "VIRTUAL FOCUS INCORRECT";
+
+        explanation =
+        `
+        Lens type =
+        <b>${selectedLens.toUpperCase()}</b><br>
+
+        Focal distance =
+        <b>${selectedFocalLength}</b> units.<br><br>
+
+        A concave lens causes parallel rays to diverge.
+
+        The rays appear to originate from a
+        <b>virtual focal point</b>
+        on the incident-light side of the lens.
+        `;
+    }
+
+    else{
+
+        const target =
+            finalTargets[
+                finalIndex
+            ];
+
+        success =
+            selectedMirrorAngle===
+            target.mirror &&
+            selectedIncidentAngle===
+            target.angle &&
+            selectedMedium===
+            target.medium &&
+            selectedLens===
+            target.lens &&
+            selectedFocalLength===
+            target.focal;
+
+        if(
+            success
+        ){
+
+            score += 100;
+
+            updateScore();
+
+            finalIndex++;
+
+            if(
+                finalIndex<3
+            ){
+
+                updateFinalObjective();
+
+                startTimer(
+                    FINAL_TIME
+                );
+
+                updateVisuals();
+
+                return;
+            }
+
+            pauseTimer();
+
+            stageComplete =
+                true;
+
+            finishGame();
+
+            return;
+        }
+
+        showRetry(
+            "OPTICAL LOCK INCORRECT",
+
+            `
+            Required configuration:<br><br>
+
+            Mirror:
+            <b>${target.mirror}°</b><br>
+
+            Incidence:
+            <b>${target.angle}°</b><br>
+
+            Medium:
+            <b>${MEDIUMS[target.medium].name}</b><br>
+
+            Lens:
+            <b>${target.lens.toUpperCase()}</b><br>
+
+            Focal length:
+            <b>${target.focal}</b><br><br>
+
+            Adjust the optical components before time reaches zero.
+            `
+        );
+
+        return;
+    }
+
+    if(
+        success
+    ){
+
+        score += 100;
+
+        updateScore();
+
+        stageComplete =
+            true;
+
+        pauseTimer();
+
+        document
+        .getElementById(
+            "testButton"
+        )
+        .disabled =
+            true;
+
+        showStageResult(
+            title,
+            explanation
+        );
+    }
+
+    else{
+
+        showRetry(
+            title,
+            explanation
+        );
+    }
+}
+
+/* =========================================================
+   RETRY
+========================================================= */
+
+function showRetry(
+    title,
+    explanation
+){
+
+    const resultBox =
+        document.getElementById(
+            "resultBox"
+        );
+
+    document
+    .getElementById(
+        "resultTitle"
+    )
+    .textContent =
+        title;
+
+    document
+    .getElementById(
+        "resultText"
+    )
+    .innerHTML =
+        explanation;
+
+    document
+    .getElementById(
+        "question"
+    )
+    .textContent =
+        "Adjust the optical controls and try again before time runs out.";
+
+    document
+    .getElementById(
+        "questionHint"
+    )
+    .textContent =
+        "";
+
+    document
+    .getElementById(
+        "answers"
+    )
+    .innerHTML =
+        "";
+
+    document
+    .getElementById(
+        "feedback"
+    )
+    .style.display =
+        "none";
+
+    const next =
+        document.getElementById(
+            "nextButton"
+        );
+
+    next.style.display =
+        "block";
+
+    next.textContent =
+        "TRY AGAIN";
+
+    next.onclick =
+        ()=>{
+
+            resultBox
+            .classList
+            .remove(
+                "show"
+            );
+        };
+
+    resultBox
+    .classList
+    .add(
+        "show"
+    );
+}
+
+/* =========================================================
+   QUESTION HELPERS
+========================================================= */
+
+function shuffle(
+    array
+){
+
+    const copy =
+        [...array];
+
+    for(
+        let i=copy.length-1;
+        i>0;
+        i--
+    ){
+
+        const j =
+            Math.floor(
+                Math.random()*
+                (i+1)
+            );
+
+        [
+            copy[i],
+            copy[j]
+        ]=[
+            copy[j],
+            copy[i]
+        ];
+    }
+
+    return copy;
+}
+
+function options(
+    correct,
+    wrong1,
+    wrong2
+){
+
+    const list =
+        shuffle([
+            correct,
+            wrong1,
+            wrong2
+        ]);
+
+    return {
+
+        list,
+
+        correct:
+            list.indexOf(
+                correct
+            )
+    };
+}
+
+/* =========================================================
+   QUESTIONS
+========================================================= */
+
+function reflectionQuestion(){
+
+    const incidence =
+        randomItem([
+            20,
+            30,
+            40,
+            50
+        ]);
+
+    const answer =
+        incidence+
+        "°";
+
+    const option =
+        options(
+            answer,
+            incidence+10+
+            "°",
+            Math.max(
+                0,
+                incidence-10
+            )+
+            "°"
+        );
+
+    return {
+
+        q:
+        `A light ray strikes a mirror at ${incidence}° from the normal. What is the reflection angle?`,
+
+        hint:
+        "Law of reflection: i = r.",
+
+        answers:
+            option.list,
+
+        correct:
+            option.correct,
+
+        explanation:
+        `
+        <b>Law of Reflection</b><br><br>
+
+        Angle of incidence =
+        Angle of reflection.<br><br>
+
+        i =
+        ${incidence}°<br><br>
+
+        Therefore:<br>
+
+        r =
+        <b>${incidence}°</b>.
+        `
+    };
+}
+
+function refractionQuestion(){
+
+    return {
+
+        q:
+        "Light travels from air into glass. In which direction does it normally bend?",
+
+        hint:
+        "Glass has a higher refractive index than air.",
+
+        answers:[
+            "Toward the normal",
+            "Away from the normal",
+            "It always turns exactly 90 degrees"
+        ],
+
+        correct:0,
+
+        explanation:
+        `
+        When light enters an optically denser medium
+        such as glass from air,
+        its speed decreases and the ray bends
+        <b>toward the normal</b>.
+        `
+    };
+}
+
+function snellQuestion(){
+
+    const incidence =
+        30;
+
+    const n =
+        1.5;
+
+    const theta =
+        deg(
+            Math.asin(
+                Math.sin(
+                    rad(incidence)
+                )/
+                n
+            )
+        );
+
+    const answer =
+        theta.toFixed(1)+
+        "°";
+
+    const option =
+        options(
+            answer,
+            "30.0°",
+            "45.0°"
+        );
+
+    return {
+
+        q:
+        "Light enters glass (n = 1.5) from air at 30°. Approximately what is the refracted angle?",
+
+        hint:
+        "Use n1 sin(i) = n2 sin(r).",
+
+        answers:
+            option.list,
+
+        correct:
+            option.correct,
+
+        explanation:
+        `
+        <b>Snell's Law</b><br>
+
+        n1 sin(i) =
+        n2 sin(r)<br><br>
+
+        1 x sin(30°) =
+        1.5 x sin(r)<br><br>
+
+        sin(r) =
+        0.5 / 1.5<br><br>
+
+        r =
+        <b>${theta.toFixed(1)}°</b>.
+        `
+    };
+}
+
+function convexQuestion(){
+
+    return {
+
+        q:
+        "What happens to parallel light rays passing through a convex lens?",
+
+        hint:
+        "Think about a converging lens.",
+
+        answers:[
+            "They converge toward the focal point",
+            "They remain parallel forever",
+            "They always reflect backward"
+        ],
+
+        correct:0,
+
+        explanation:
+        `
+        A convex lens is a
+        <b>converging lens</b>.
+
+        Parallel rays passing through it converge
+        toward the principal focal point.
+        `
+    };
+}
+
+function concaveQuestion(){
+
+    return {
+
+        q:
+        "What does a concave lens do to parallel rays?",
+
+        hint:
+        "A concave lens is a diverging lens.",
+
+        answers:[
+            "It makes them diverge",
+            "It focuses them to a real point",
+            "It stops all light"
+        ],
+
+        correct:0,
+
+        explanation:
+        `
+        A concave lens is a
+        <b>diverging lens</b>.
+
+        Parallel rays spread apart after passing through it
+        and appear to originate from a virtual focus.
+        `
+    };
+}
+
+function questionForStage(){
+
+    if(
+        stage<=2
+    ){
+
+        return reflectionQuestion();
+    }
+
+    if(
+        stage===3
+    ){
+
+        return refractionQuestion();
+    }
+
+    if(
+        stage===4
+    ){
+
+        return randomItem([
+            refractionQuestion,
+            snellQuestion
+        ])();
+    }
+
+    if(
+        stage===5
+    ){
+
+        return convexQuestion();
+    }
+
+    return concaveQuestion();
+}
+
+/* =========================================================
+   RESULT + QUIZ
+========================================================= */
+
+function showStageResult(
+    title,
+    explanation
+){
+
+    const resultBox =
+        document.getElementById(
+            "resultBox"
+        );
+
+    document
+    .getElementById(
+        "resultTitle"
+    )
+    .textContent =
+        title;
+
+    document
+    .getElementById(
+        "resultText"
+    )
+    .innerHTML =
+        explanation;
+
+    const question =
+        questionForStage();
+
+    document
+    .getElementById(
+        "question"
+    )
+    .textContent =
+        question.q;
+
+    document
+    .getElementById(
+        "questionHint"
+    )
+    .textContent =
+        question.hint;
+
+    const answers =
+        document.getElementById(
+            "answers"
+        );
+
+    const feedback =
+        document.getElementById(
+            "feedback"
+        );
+
+    const next =
+        document.getElementById(
+            "nextButton"
+        );
+
+    answers.innerHTML =
+        "";
+
+    feedback.style.display =
+        "none";
+
+    next.style.display =
+        "none";
+
+    question.answers.forEach(
+        (answer,index)=>{
+
+            const button =
+                document.createElement(
+                    "button"
+                );
+
+            button.className =
+                "answer";
+
+            button.textContent =
+                answer;
+
+            button.onclick =
+            ()=>{
+
+                answers
+                .querySelectorAll(
+                    "button"
+                )
+                .forEach(
+                    item=>
+                    item.disabled=
+                        true
+                );
+
+                feedback.style.display =
+                    "block";
+
+                if(
+                    index===
+                    question.correct
+                ){
+
+                    button.classList.add(
+                        "correct"
+                    );
+
+                    score += 50;
+
+                    feedback.innerHTML =
+                    `
+                    <b>
+                    CORRECT +50 POINTS
+                    </b><br><br>
+
+                    ${question.explanation}
+                    `;
+                }
+
+                else{
+
+                    button.classList.add(
+                        "wrong"
+                    );
+
+                    score -= 50;
+
+                    feedback.innerHTML =
+                    `
+                    <b>
+                    WRONG ANSWER -50 POINTS
+                    </b><br><br>
+
+                    ${question.explanation}
+                    `;
+                }
+
+                updateScore();
+
+                next.style.display =
+                    "block";
+            };
+
+            answers.appendChild(
+                button
+            );
+        }
+    );
+
+    next.textContent =
+        stage<6
+        ?
+        "NEXT EXPERIMENT"
+        :
+        "START FINAL OPTICAL LOCK";
+
+    next.onclick =
+    ()=>{
+
+        resultBox
+        .classList
+        .remove(
+            "show"
+        );
+
+        stage++;
+
+        prepareStage();
+    };
+
+    resultBox
+    .classList
+    .add(
+        "show"
+    );
+}
+
+/* =========================================================
+   HUD
+========================================================= */
+
+function updateHUD(){
+
+    const currentRefraction =
+        refractedAngle(
+            selectedIncidentAngle,
+            selectedMedium
+        );
+
+    document
+    .getElementById(
+        "mirrorValue"
+    )
+    .textContent =
+        selectedMirrorAngle;
+
+    document
+    .getElementById(
+        "incidentValue"
+    )
+    .textContent =
+        selectedIncidentAngle;
+
+    document
+    .getElementById(
+        "reflectionValue"
+    )
+    .textContent =
+        selectedIncidentAngle;
+
+    document
+    .getElementById(
+        "refractionValue"
+    )
+    .textContent =
+        currentRefraction
+        .toFixed(
+            2
+        );
+
+    document
+    .getElementById(
+        "indexValue"
+    )
+    .textContent =
+        MEDIUMS[
+            selectedMedium
+        ].n.toFixed(
+            2
+        );
+
+    document
+    .getElementById(
+        "focalValue"
+    )
+    .textContent =
+        selectedFocalLength;
+
+    document
+    .getElementById(
+        "signalFill"
+    )
+    .style.width =
+        Math.min(
+            100,
+            opticalAlignment
+        )+
+        "%";
+
+    document
+    .getElementById(
+        "signalPercent"
+    )
+    .textContent =
+        Math.round(
+            opticalAlignment
+        )+
+        "%";
+
+    if(
+        stage<=2
+    ){
+
+        document
+        .getElementById(
+            "equation"
+        )
+        .innerHTML =
+        `
+        <b>Law of Reflection</b><br>
+
+        angle i =
+        angle r<br><br>
+
+        i =
+        ${selectedIncidentAngle}°<br>
+
+        r =
+        ${selectedIncidentAngle}°
+        `;
+    }
+
+    else if(
+        stage===3 ||
+        stage===4
+    ){
+
+        document
+        .getElementById(
+            "equation"
+        )
+        .innerHTML =
+        `
+        <b>Snell's Law</b><br>
+
+        n1 sin(i) =
+        n2 sin(r)<br><br>
+
+        n2 =
+        ${MEDIUMS[selectedMedium].n.toFixed(2)}<br>
+
+        i =
+        ${selectedIncidentAngle}°<br>
+
+        r =
+        <b>
+        ${currentRefraction.toFixed(2)}°
+        </b>
+        `;
+    }
+
+    else{
+
+        document
+        .getElementById(
+            "equation"
+        )
+        .innerHTML =
+        `
+        <b>Lens Behaviour</b><br>
+
+        Type =
+        ${selectedLens.toUpperCase()}<br><br>
+
+        Focal length =
+        ${selectedFocalLength}
+        units<br><br>
+
+        ${
+            selectedLens==="convex"
+            ?
+            "Parallel rays converge."
+            :
+            "Parallel rays diverge."
+        }
+        `;
+    }
+}
+
+function updateScore(){
+
+    document
+    .getElementById(
+        "score"
+    )
+    .textContent =
+        score;
+}
+
+/* =========================================================
+   UPDATE ALL VISUALS
+========================================================= */
+
+function updateVisuals(){
+
+    if(
+        stage===1 ||
+        stage===2 ||
+        stage===7
+    ){
+
+        updateReflectionVisual();
+    }
+
+    if(
+        stage===3 ||
+        stage===4 ||
+        stage===7
+    ){
+
+        updateRefractionVisual();
+    }
+
+    if(
+        stage===5 ||
+        stage===6 ||
+        stage===7
+    ){
+
+        updateLensRays();
+    }
+
+    if(
+        stage===7
+    ){
+
+        const target =
+            finalTargets[
+                finalIndex
+            ];
+
+        if(
+            target
+        ){
+
+            let matched = 0;
+
+            if(
+                selectedMirrorAngle===
+                target.mirror
+            ){
+                matched++;
+            }
+
+            if(
+                selectedIncidentAngle===
+                target.angle
+            ){
+                matched++;
+            }
+
+            if(
+                selectedMedium===
+                target.medium
+            ){
+                matched++;
+            }
+
+            if(
+                selectedLens===
+                target.lens
+            ){
+                matched++;
+            }
+
+            if(
+                selectedFocalLength===
+                target.focal
+            ){
+                matched++;
+            }
+
+            opticalAlignment =
+                matched/
+                5*
+                100;
+        }
+    }
+
+    updateHUD();
+}
+
+/* =========================================================
+   CAMERA
+========================================================= */
+
+function updateCamera(){
+
+    if(
+        stage<=2
+    ){
+
+        camera.position.set(
+            16,
+            12,
+            -17
+        );
+
+        camera.lookAt(
+            0,
+            2,
+            0
+        );
+    }
+
+    else if(
+        stage<=4
+    ){
+
+        camera.position.set(
+            16,
+            12,
+            15
+        );
+
+        camera.lookAt(
+            0,
+            2,
+            32
+        );
+    }
+
+    else if(
+        stage<=6
+    ){
+
+        camera.position.set(
+            16,
+            13,
+            46
+        );
+
+        camera.lookAt(
+            0,
+            4,
+            65
+        );
+    }
+
+    else{
+
+        camera.position.set(
+            29,
+            28,
+            -22
+        );
+
+        camera.lookAt(
+            0,
+            2,
+            32
+        );
+    }
+}
+
+/* =========================================================
+   FINAL
+========================================================= */
+
+function finishGame(){
+
+    finished =
+        true;
+
+    pauseTimer();
+
+    const currentRefraction =
+        refractedAngle(
+            selectedIncidentAngle,
+            selectedMedium
+        );
+
+    document
+    .getElementById(
+        "finalReflection"
+    )
+    .textContent =
+        selectedIncidentAngle+
+        "°";
+
+    document
+    .getElementById(
+        "finalRefraction"
+    )
+    .textContent =
+        currentRefraction
+        .toFixed(2)+
+        "°";
+
+    document
+    .getElementById(
+        "finalLens"
+    )
+    .textContent =
+        selectedLens.toUpperCase();
+
+    document
+    .getElementById(
+        "finalScore"
+    )
+    .textContent =
+        score;
+
+    document
+    .getElementById(
+        "finalExplanation"
+    )
+    .innerHTML =
+    `
+    <b>
+    MISSION PERFORMANCE
+    </b><br><br>
+
+    Correct experiment =
+    <b>+100 points</b><br>
+
+    Correct physics answer =
+    <b>+50 points</b><br>
+
+    Wrong physics answer =
+    <b>-50 points</b><br><br>
+
+    Final score =
+    <b>${score}</b><br><br>
+
+
+    <b>
+    1. REFLECTION
+    </b><br><br>
+
+    Reflection occurs when light returns from a surface.<br><br>
+
+    The law of reflection states:<br><br>
+
+    <b>
+    Angle of incidence =
+    Angle of reflection
+    </b>.<br><br>
+
+    The angles are measured from the normal to the reflecting surface.<br><br>
+
+    During the laser stage,
+    rotating the mirror changed the direction of the reflected ray
+    and allowed you to aim the beam at the receiver.<br><br>
+
+
+    <b>
+    2. REFRACTION
+    </b><br><br>
+
+    Refraction occurs when light changes direction
+    while moving between media with different refractive indices.<br><br>
+
+    The relationship is described by Snell's law:<br><br>
+
+    <b>
+    n1 sin(i) = n2 sin(r)
+    </b>.<br><br>
+
+    Your final medium was
+    <b>${MEDIUMS[selectedMedium].name}</b>
+    with refractive index
+    <b>${MEDIUMS[selectedMedium].n.toFixed(2)}</b>.<br><br>
+
+    Incident angle =
+    ${selectedIncidentAngle}°<br>
+
+    Refracted angle =
+    <b>${currentRefraction.toFixed(2)}°</b>.<br><br>
+
+
+    <b>
+    3. REFRACTIVE INDEX
+    </b><br><br>
+
+    Refractive index describes how strongly a medium affects
+    the propagation of light compared with vacuum.<br><br>
+
+    When light enters a higher-index medium from air,
+    it normally bends toward the normal.<br><br>
+
+
+    <b>
+    4. CONVEX LENS
+    </b><br><br>
+
+    A convex lens is a converging lens.
+
+    Parallel incident rays are bent toward the principal axis
+    and meet at a real focal point.<br><br>
+
+    The distance between the lens and this focus
+    is called the focal length.<br><br>
+
+
+    <b>
+    5. CONCAVE LENS
+    </b><br><br>
+
+    A concave lens is a diverging lens.
+
+    Parallel rays spread apart after passing through it.
+
+    When the diverging rays are extended backward,
+    they appear to originate from a virtual focal point
+    on the incident-light side of the lens.<br><br>
+
+
+    <b>
+    6. FOCAL LENGTH
+    </b><br><br>
+
+    Your final selected focal length was
+    <b>${selectedFocalLength} units</b>.<br><br>
+
+    Changing focal length changed where the rays converged
+    for a convex lens or how strongly they diverged
+    for a concave lens.<br><br>
+
+
+    <b>
+    FINAL CONNECTION
+    </b><br>
+
+    Reflection redirects light from surfaces.<br>
+
+    Incident angle equals reflected angle.<br>
+
+    Refraction bends light at boundaries between media.<br>
+
+    Refractive index controls the amount of bending.<br>
+
+    Convex lenses converge rays.<br>
+
+    Concave lenses diverge rays.<br>
+
+    Focal length determines optical focusing behaviour.<br><br>
+
+    You used all these principles together
+    to restore the timed campus optical network.
+    `;
+
+    document
+    .getElementById(
+        "finish"
+    )
+    .classList.add(
+        "show"
+    );
+}
+
+/* =========================================================
+   LOOP
+========================================================= */
+
+let lastTime =
+    performance.now();
+
+function animate(
+    now
+){
+
+    requestAnimationFrame(
+        animate
+    );
+
+    const dt =
+        Math.min(
+            (
+                now-
+                lastTime
+            )/
+            1000,
+            .035
+        );
+
+    lastTime =
+        now;
+
+    if(
+        started &&
+        !failed &&
+        !finished
+    ){
+
+        updateTimer(
+            dt
+        );
+    }
+
+    updateCamera();
+
+    renderer.render(
+        scene,
+        camera
+    );
+}
+
+/* =========================================================
+   INITIAL
+========================================================= */
+
+reflectionLab.visible =
+    true;
+
+refractionLab.visible =
+    false;
+
+lensLab.visible =
+    false;
+
+showGroup(
+    "mirrorGroup",
+    true
+);
+
+updateMediumVisual();
+
+updateLensVisual();
+
+updateVisuals();
+
+updateScore();
+
+updateTimerDisplay();
+
+updateCamera();
+
+requestAnimationFrame(
+    animate
+);
+
+/* =========================================================
+   RESIZE
+========================================================= */
+
+addEventListener(
+    "resize",
+    ()=>{
+
+        camera.aspect =
+            innerWidth/
+            innerHeight;
+
+        camera.updateProjectionMatrix();
+
+        renderer.setSize(
+            innerWidth,
+            innerHeight
+        );
+    }
+);
+
+})();
+</script>
+
+</body>
+</html>

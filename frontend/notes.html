@@ -1,0 +1,2577 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>My Campus | Rich Notes</title>
+
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+
+        :root {
+
+            --primary: #5b5cf0;
+            --primary-dark: #4647d6;
+
+            --background: #f5f7fb;
+            --card: #ffffff;
+
+            --text: #172033;
+            --muted: #6b7280;
+
+            --border: #e5e7eb;
+
+            --success: #16a34a;
+            --danger: #dc2626;
+
+            --sidebar: #111827;
+
+        }
+
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+
+        body {
+
+            font-family:
+                Inter,
+                system-ui,
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                sans-serif;
+
+            background: var(--background);
+
+            color: var(--text);
+
+        }
+
+
+        button {
+            font-family: inherit;
+            cursor: pointer;
+        }
+
+
+        /* =====================================================
+           TOP BAR
+        ===================================================== */
+
+
+        .topbar {
+
+            position: sticky;
+
+            top: 0;
+
+            z-index: 100;
+
+            min-height: 76px;
+
+            background:
+                rgba(255, 255, 255, 0.97);
+
+            backdrop-filter:
+                blur(14px);
+
+            border-bottom:
+                1px solid
+                var(--border);
+
+            display: flex;
+
+            justify-content: space-between;
+            align-items: center;
+
+            padding:
+                12px 32px;
+
+        }
+
+
+        .brand-row {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 14px;
+
+        }
+
+
+        .back-button {
+
+            width: 44px;
+            height: 44px;
+
+            border: none;
+
+            border-radius: 12px;
+
+            background: #eef2ff;
+
+            color: #4f46e5;
+
+            font-size: 21px;
+
+            font-weight: 900;
+
+        }
+
+
+        .back-button:hover {
+
+            background: #e0e7ff;
+
+        }
+
+
+        .brand-logo {
+
+            width: 44px;
+            height: 44px;
+
+            border-radius: 13px;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            color: white;
+
+            font-weight: 900;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #6366f1,
+                    #8b5cf6
+                );
+
+        }
+
+
+        .brand-text h3 {
+
+            font-size: 17px;
+
+            font-weight: 900;
+
+        }
+
+
+        .brand-text p {
+
+            margin-top: 3px;
+
+            color: var(--muted);
+
+            font-size: 11px;
+
+            font-weight: 600;
+
+        }
+
+
+        .top-actions {
+
+            display: flex;
+
+            gap: 10px;
+
+            align-items: center;
+
+        }
+
+
+        .action-button {
+
+            min-height: 42px;
+
+            padding:
+                11px 16px;
+
+            border: none;
+
+            border-radius: 11px;
+
+            font-size: 12px;
+
+            font-weight: 900;
+
+        }
+
+
+        .download-button {
+
+            background: var(--primary);
+
+            color: white;
+
+        }
+
+
+        .download-button:hover:not(:disabled) {
+
+            background: var(--primary-dark);
+
+        }
+
+
+        .download-button:disabled {
+
+            background: #e5e7eb;
+
+            color: #6b7280;
+
+            cursor: not-allowed;
+
+        }
+
+
+        .print-button {
+
+            background: #eef2ff;
+
+            color: #4f46e5;
+
+        }
+
+
+
+        /* =====================================================
+           PAGE LAYOUT
+        ===================================================== */
+
+
+        .layout {
+
+            display: grid;
+
+            grid-template-columns:
+                295px minmax(0, 1fr);
+
+            max-width: 1600px;
+
+            margin: auto;
+
+        }
+
+
+
+        /* =====================================================
+           LEFT SECTION NAVIGATION
+        ===================================================== */
+
+
+        .section-nav {
+
+            position: sticky;
+
+            top: 76px;
+
+            height:
+                calc(100vh - 76px);
+
+            overflow-y: auto;
+
+            padding:
+                28px 18px;
+
+            background: var(--sidebar);
+
+            color: white;
+
+        }
+
+
+        .nav-topic {
+
+            padding:
+                5px 8px 23px;
+
+            border-bottom:
+                1px solid
+                #263244;
+
+            margin-bottom: 19px;
+
+        }
+
+
+        .nav-topic span {
+
+            color: #818cf8;
+
+            font-size: 10px;
+
+            font-weight: 900;
+
+            letter-spacing: 1.2px;
+
+        }
+
+
+        .nav-topic h3 {
+
+            margin-top: 9px;
+
+            font-size: 16px;
+
+            font-weight: 900;
+
+            line-height: 1.5;
+
+        }
+
+
+        .section-link {
+
+            width: 100%;
+
+            display: flex;
+
+            gap: 11px;
+
+            align-items: flex-start;
+
+            margin-bottom: 7px;
+
+            padding: 12px;
+
+            border: none;
+
+            border-radius: 11px;
+
+            background: transparent;
+
+            color: #cbd5e1;
+
+            text-align: left;
+
+            font-size: 11px;
+
+            font-weight: 650;
+
+            line-height: 1.5;
+
+        }
+
+
+        .section-link:hover {
+
+            background: #1f2937;
+
+            color: white;
+
+        }
+
+
+        .section-link.active {
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #4f46e5,
+                    #7c3aed
+                );
+
+            color: white;
+
+        }
+
+
+        .nav-number {
+
+            min-width: 26px;
+            height: 26px;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 8px;
+
+            background:
+                rgba(255, 255, 255, 0.12);
+
+            font-size: 10px;
+
+            font-weight: 900;
+
+        }
+
+
+
+        /* =====================================================
+           MAIN CONTENT
+        ===================================================== */
+
+
+        .content {
+
+            min-width: 0;
+
+            padding:
+                42px 52px 110px;
+
+        }
+
+
+
+        /* =====================================================
+           HERO
+        ===================================================== */
+
+
+        .hero {
+
+            padding: 44px;
+
+            margin-bottom: 34px;
+
+            border-radius: 28px;
+
+            color: white;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #312e81,
+                    #5b21b6
+                );
+
+        }
+
+
+        .hero-badge {
+
+            display: inline-flex;
+
+            padding:
+                8px 13px;
+
+            margin-bottom: 19px;
+
+            border-radius: 999px;
+
+            background:
+                rgba(255, 255, 255, 0.12);
+
+            font-size: 11px;
+
+            font-weight: 900;
+
+            letter-spacing: 0.4px;
+
+        }
+
+
+        .hero h1 {
+
+            max-width: 1000px;
+
+            font-size: 46px;
+
+            line-height: 1.12;
+
+            font-weight: 950;
+
+            letter-spacing: -1px;
+
+        }
+
+
+        .hero h2 {
+
+            margin-top: 15px;
+
+            color: #c7d2fe;
+
+            font-size: 21px;
+
+            line-height: 1.5;
+
+            font-weight: 750;
+
+        }
+
+
+        .hero p {
+
+            max-width: 950px;
+
+            margin-top: 22px;
+
+            color: #e0e7ff;
+
+            font-size: 17px;
+
+            line-height: 1.9;
+
+            font-weight: 450;
+
+        }
+
+
+        .faculty-source {
+
+            display: inline-flex;
+
+            align-items: center;
+
+            gap: 7px;
+
+            margin-top: 24px;
+
+            padding:
+                9px 13px;
+
+            border-radius: 999px;
+
+            background:
+                rgba(255, 255, 255, 0.11);
+
+            font-size: 11px;
+
+        }
+
+
+
+        /* =====================================================
+           NOTE SECTIONS
+        ===================================================== */
+
+
+        .note-section {
+
+            scroll-margin-top: 100px;
+
+            margin-bottom: 34px;
+
+            padding: 34px;
+
+            border:
+                1px solid
+                var(--border);
+
+            border-radius: 24px;
+
+            background: white;
+
+        }
+
+
+        .section-type {
+
+            display: inline-flex;
+
+            margin-bottom: 14px;
+
+            padding:
+                7px 11px;
+
+            border-radius: 999px;
+
+            background: #eef2ff;
+
+            color: #4f46e5;
+
+            font-size: 10px;
+
+            font-weight: 950;
+
+            text-transform: uppercase;
+
+            letter-spacing: 0.8px;
+
+        }
+
+
+        .note-section h2 {
+
+            margin-bottom: 22px;
+
+            font-size: 31px;
+
+            line-height: 1.3;
+
+            font-weight: 950;
+
+            letter-spacing: -0.4px;
+
+        }
+
+
+        .section-body {
+
+            white-space: pre-line;
+
+            color: #273244;
+
+            font-size: 18px;
+
+            line-height: 2;
+
+            font-weight: 450;
+
+        }
+
+
+
+        /* =====================================================
+           MEDIA
+        ===================================================== */
+
+
+        .media-container {
+
+            margin:
+                26px 0 25px;
+
+            overflow: hidden;
+
+            border:
+                1px solid
+                var(--border);
+
+            border-radius: 21px;
+
+            background: #f8fafc;
+
+        }
+
+
+        .media-container img {
+
+            width: 100%;
+
+            display: block;
+
+        }
+
+
+        .media-caption {
+
+            padding:
+                16px 20px;
+
+            border-top:
+                1px solid
+                var(--border);
+
+            background: white;
+
+            color: #4b5563;
+
+            font-size: 14px;
+
+            line-height: 1.7;
+
+            font-weight: 650;
+
+        }
+
+
+
+        /* =====================================================
+           PHYSICS CONNECTION
+        ===================================================== */
+
+
+        .connection-box {
+
+            margin-top: 25px;
+
+            padding: 23px;
+
+            border:
+                1px solid
+                #c7d2fe;
+
+            border-radius: 18px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #eef2ff,
+                    #f5f3ff
+                );
+
+        }
+
+
+        .connection-box h3 {
+
+            margin-bottom: 12px;
+
+            color: #4338ca;
+
+            font-size: 19px;
+
+            font-weight: 950;
+
+        }
+
+
+        .connection-box p {
+
+            white-space: pre-line;
+
+            color: #374151;
+
+            font-size: 16px;
+
+            line-height: 1.9;
+
+            font-weight: 550;
+
+        }
+
+
+
+        /* =====================================================
+           CHECKPOINT
+        ===================================================== */
+
+
+        .checkpoint {
+
+            margin-top: 10px;
+
+            padding: 28px;
+
+            border:
+                1px solid
+                #fed7aa;
+
+            border-radius: 20px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #fffbeb,
+                    #fff7ed
+                );
+
+        }
+
+
+        .checkpoint-question {
+
+            margin-bottom: 21px;
+
+            color: #1f2937;
+
+            font-size: 21px;
+
+            font-weight: 950;
+
+            line-height: 1.6;
+
+        }
+
+
+        .options {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(2, 1fr);
+
+            gap: 11px;
+
+        }
+
+
+        .option {
+
+            min-height: 52px;
+
+            padding:
+                15px 17px;
+
+            border:
+                1px solid
+                #e5e7eb;
+
+            border-radius: 12px;
+
+            background: white;
+
+            color: #1f2937;
+
+            text-align: left;
+
+            font-size: 15px;
+
+            font-weight: 700;
+
+            transition: 0.18s;
+
+        }
+
+
+        .option:hover:not(:disabled) {
+
+            border-color: #818cf8;
+
+            background: #eef2ff;
+
+            transform:
+                translateY(-1px);
+
+        }
+
+
+        .option.correct {
+
+            border-color: #86efac;
+
+            background: #ecfdf5;
+
+            color: #166534;
+
+        }
+
+
+        .option.wrong {
+
+            border-color: #fecaca;
+
+            background: #fef2f2;
+
+            color: #991b1b;
+
+        }
+
+
+        .checkpoint-result {
+
+            display: none;
+
+            margin-top: 17px;
+
+            padding: 17px;
+
+            border-radius: 13px;
+
+            background: white;
+
+            color: #374151;
+
+            font-size: 15px;
+
+            line-height: 1.8;
+
+        }
+
+
+
+        /* =====================================================
+           END
+        ===================================================== */
+
+
+        .notes-end {
+
+            margin-top: 40px;
+
+            padding: 40px;
+
+            border-radius: 24px;
+
+            text-align: center;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #111827,
+                    #312e81
+                );
+
+            color: white;
+
+        }
+
+
+        .notes-end h2 {
+
+            font-size: 29px;
+
+            font-weight: 950;
+
+        }
+
+
+        .notes-end p {
+
+            max-width: 650px;
+
+            margin:
+                11px auto 22px;
+
+            color: #c7d2fe;
+
+            font-size: 15px;
+
+            line-height: 1.8;
+
+        }
+
+
+
+        /* =====================================================
+           LOADING
+        ===================================================== */
+
+
+        .loading {
+
+            padding: 80px;
+
+            text-align: center;
+
+            color: var(--muted);
+
+            font-size: 17px;
+
+        }
+
+
+        .error {
+
+            max-width: 700px;
+
+            margin: 80px auto;
+
+            padding: 32px;
+
+            border-radius: 18px;
+
+            background: #fef2f2;
+
+            color: #991b1b;
+
+            text-align: center;
+
+            font-size: 16px;
+
+        }
+
+
+
+        /* =====================================================
+           RESPONSIVE
+        ===================================================== */
+
+
+        @media (max-width: 1000px) {
+
+            .layout {
+
+                grid-template-columns:
+                    1fr;
+
+            }
+
+
+            .section-nav {
+
+                display: none;
+
+            }
+
+
+            .content {
+
+                padding:
+                    28px 22px
+                    90px;
+
+            }
+
+
+            .hero {
+
+                padding: 32px;
+
+            }
+
+
+            .hero h1 {
+
+                font-size: 36px;
+
+            }
+
+        }
+
+
+        @media (max-width: 650px) {
+
+            .topbar {
+
+                padding:
+                    10px 14px;
+
+            }
+
+
+            .brand-logo,
+            .brand-text {
+
+                display: none;
+
+            }
+
+
+            .print-button {
+
+                display: none;
+
+            }
+
+
+            .download-button {
+
+                max-width: 190px;
+
+                white-space: normal;
+
+            }
+
+
+            .hero h1 {
+
+                font-size: 31px;
+
+            }
+
+
+            .hero p {
+
+                font-size: 16px;
+
+            }
+
+
+            .note-section {
+
+                padding: 22px;
+
+            }
+
+
+            .note-section h2 {
+
+                font-size: 25px;
+
+            }
+
+
+            .section-body {
+
+                font-size: 17px;
+
+            }
+
+
+            .options {
+
+                grid-template-columns:
+                    1fr;
+
+            }
+
+        }
+
+
+
+        /* =====================================================
+           PRINT
+        ===================================================== */
+
+
+        @media print {
+
+            body {
+
+                background: white;
+
+            }
+
+
+            .topbar,
+            .section-nav {
+
+                display: none !important;
+
+            }
+
+
+            .layout {
+
+                display: block;
+
+            }
+
+
+            .content {
+
+                padding: 0;
+
+            }
+
+
+            .hero {
+
+                color: black;
+
+                background: white;
+
+                border:
+                    1px solid
+                    #ddd;
+
+            }
+
+
+            .hero h2,
+            .hero p {
+
+                color: #374151;
+
+            }
+
+
+            .note-section {
+
+                break-inside:
+                    avoid;
+
+                box-shadow: none;
+
+            }
+
+
+            .notes-end {
+
+                display: none;
+
+            }
+
+        }
+
+    </style>
+
+    <link rel="stylesheet" href="assets/css/resource-journey.css?v=1">
+    <link rel="stylesheet" href="assets/css/notes-personalization-v2.css?v=2">
+    <link rel="stylesheet" href="assets/css/universal-learning-journey.css?v=1">
+</head>
+
+
+<body>
+
+
+<!-- =========================================================
+     TOPBAR
+========================================================= -->
+
+
+<header class="topbar">
+
+
+    <div class="brand-row">
+
+
+        <button
+            class="back-button"
+            type="button"
+            onclick="goBack()"
+        >
+            ←
+        </button>
+
+
+        <div class="brand-logo">
+            MC
+        </div>
+
+
+        <div class="brand-text">
+
+            <h3>
+                My Campus Notes
+            </h3>
+
+            <p>
+                Visual • Story-Based • Faculty Content
+            </p>
+
+        </div>
+
+
+    </div>
+
+
+    <div class="top-actions">
+
+
+        <button
+            class="action-button print-button"
+            type="button"
+            onclick="window.print()"
+        >
+            🖨 Print / Save PDF
+        </button>
+
+
+        <button
+            id="downloadButton"
+            class="action-button download-button"
+            type="button"
+            disabled
+            onclick="downloadNotes()"
+        >
+            ⬇ Faculty PDF Not Uploaded Yet
+        </button>
+
+
+    </div>
+
+
+</header>
+
+
+
+<!-- =========================================================
+     PAGE
+========================================================= -->
+
+
+<div class="layout">
+
+
+    <!-- LEFT NAV -->
+
+
+    <aside
+        id="sectionNav"
+        class="section-nav"
+    >
+
+
+        <div class="nav-topic">
+
+            <span>
+                RICH NOTES
+            </span>
+
+
+            <h3 id="navTopicTitle">
+                Loading...
+            </h3>
+
+        </div>
+
+
+        <div id="navLinks">
+        </div>
+
+
+    </aside>
+
+
+
+    <!-- CONTENT -->
+
+
+    <main class="content">
+
+
+        <div
+            id="loading"
+            class="loading"
+        >
+            Loading your learning experience...
+        </div>
+
+
+        <div
+            id="errorBox"
+            class="error"
+            style="display:none;"
+        >
+        </div>
+
+
+        <div
+            id="notesContent"
+            style="display:none;"
+        >
+
+
+            <!-- HERO -->
+
+
+            <section class="hero">
+
+
+                <div class="hero-badge">
+                    📘 INTERACTIVE FACULTY NOTES
+                </div>
+
+
+                <h1 id="noteTitle">
+                Loading...
+                </h1>
+
+
+                <h2 id="noteSubtitle">
+                </h2>
+
+
+                <p id="noteIntroduction">
+                </p>
+
+
+                <div class="faculty-source">
+
+                    👨‍🏫 Content Source:
+
+                    <strong id="noteAuthor">
+                        Faculty
+                    </strong>
+
+                </div>
+
+
+            </section>
+
+
+
+            <!-- DYNAMIC SECTIONS -->
+
+
+            <div id="sectionsContainer">
+            </div>
+
+
+
+            <!-- COMPLETE -->
+
+
+            <section class="notes-end">
+
+
+                <h2>
+                    🎯 Notes Complete
+                </h2>
+
+
+                <p>
+
+                    You have reached the end of this notes experience.
+                    If any concept is still unclear, continue with
+                    Video, Visualization, Game or AI Tutor.
+
+                </p>
+
+
+                <button
+                    class="action-button download-button"
+                    type="button"
+                    onclick="goBack()"
+                >
+                    Continue Learning →
+                </button>
+
+
+            </section>
+
+
+        </div>
+
+
+    </main>
+
+
+</div>
+
+
+
+<script>
+
+
+    const API_BASE =
+        "http://127.0.0.1:8000";
+
+
+    let notesData =
+        null;
+
+
+
+    /* =========================================================
+       GET TOPIC ID
+    ========================================================= */
+
+
+    const params =
+        new URLSearchParams(
+            window.location.search
+        );
+
+
+    const topicId =
+        Number(
+            params.get(
+                "topic_id"
+            )
+        );
+
+
+    if (!topicId) {
+
+        showError(
+            "Topic ID is missing."
+        );
+
+    } else {
+
+        loadNotes();
+
+    }
+
+
+
+    /* =========================================================
+       LOAD NOTES
+    ========================================================= */
+
+
+    async function loadNotes() {
+
+
+        try {
+
+
+            const response =
+                await fetch(
+                    `${API_BASE}/notes/topic/${topicId}`
+                );
+
+
+            const data =
+                await response.json();
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    data.detail ||
+                    "Unable to load notes."
+                );
+
+            }
+
+
+            notesData =
+                data;
+
+
+            renderNotes();
+
+
+        } catch (error) {
+
+
+            showError(
+                error.message
+            );
+
+
+        }
+
+    }
+
+
+
+    /* =========================================================
+       RENDER NOTES
+    ========================================================= */
+
+
+    function renderNotes() {
+
+
+        document.getElementById(
+            "loading"
+        ).style.display =
+            "none";
+
+
+        document.getElementById(
+            "notesContent"
+        ).style.display =
+            "block";
+
+
+        document.getElementById(
+            "noteTitle"
+        ).textContent =
+            notesData.note.title;
+
+
+        document.getElementById(
+            "noteSubtitle"
+        ).textContent =
+            notesData.note.subtitle || "";
+
+
+        document.getElementById(
+            "noteIntroduction"
+        ).textContent =
+            notesData.note.introduction || "";
+
+
+        document.getElementById(
+            "noteAuthor"
+        ).textContent =
+            notesData.note.created_by.name;
+
+
+        document.getElementById(
+            "navTopicTitle"
+        ).textContent =
+            notesData.topic.title;
+
+
+        configureDownload();
+
+
+        const container =
+            document.getElementById(
+                "sectionsContainer"
+            );
+
+
+        const navigation =
+            document.getElementById(
+                "navLinks"
+            );
+
+
+        container.innerHTML =
+            "";
+
+
+        navigation.innerHTML =
+            "";
+
+
+        notesData.sections.forEach(
+            (
+                section,
+                index
+            ) => {
+
+
+                createNavigation(
+                    section,
+                    index
+                );
+
+
+                createSection(
+                    section
+                );
+
+
+            }
+        );
+
+
+        setupScrollTracking();
+
+    }
+
+
+
+    /* =========================================================
+       LEFT NAV
+    ========================================================= */
+
+
+    function createNavigation(
+        section,
+        index
+    ) {
+
+
+        const button =
+            document.createElement(
+                "button"
+            );
+
+
+        button.type =
+            "button";
+
+
+        button.className =
+            "section-link";
+
+
+        if (index === 0) {
+
+            button.classList.add(
+                "active"
+            );
+
+        }
+
+
+        button.dataset.target =
+            `section-${section.id}`;
+
+
+        button.innerHTML =
+            `
+
+            <div class="nav-number">
+                ${index + 1}
+            </div>
+
+            <div>
+                ${escapeHTML(
+                    section.heading ||
+                    "Section"
+                )}
+            </div>
+
+            `;
+
+
+        button.addEventListener(
+            "click",
+            () => {
+
+
+                const target =
+                    document.getElementById(
+                        `section-${section.id}`
+                    );
+
+
+                if (target) {
+
+                    target.scrollIntoView(
+                        {
+                            behavior:
+                                "smooth",
+
+                            block:
+                                "start"
+                        }
+                    );
+
+                }
+
+
+            }
+        );
+
+
+        document.getElementById(
+            "navLinks"
+        ).appendChild(
+            button
+        );
+
+    }
+
+
+
+    /* =========================================================
+       CREATE SECTION
+    ========================================================= */
+
+
+    function createSection(
+        section
+    ) {
+
+
+        const element =
+            document.createElement(
+                "section"
+            );
+
+
+        element.className =
+            "note-section";
+
+
+        element.id =
+            `section-${section.id}`;
+
+
+        let html =
+            `
+
+            <div class="section-type">
+
+                ${formatType(
+                    section.type
+                )}
+
+            </div>
+
+
+            <h2>
+
+                ${escapeHTML(
+                    section.heading || ""
+                )}
+
+            </h2>
+
+            `;
+
+
+
+        /* =====================================================
+           MEDIA / SVG / IMAGE
+        ===================================================== */
+
+
+        if (
+            section.media &&
+            section.media.url
+        ) {
+
+
+            const mediaURL =
+
+                section.media.url.startsWith(
+                    "http"
+                )
+
+                    ? section.media.url
+
+                    : `${API_BASE}${section.media.url}`;
+
+
+            html +=
+                `
+
+                <div class="media-container">
+
+
+                    <img
+                        src="${escapeHTML(mediaURL)}"
+                        alt="${escapeHTML(
+                            section.media.alt_text ||
+                            section.heading ||
+                            "Learning visual"
+                        )}"
+                    >
+
+
+                    ${
+                        section.media.caption
+
+                            ? `
+
+                            <div class="media-caption">
+
+                                💡
+                                ${escapeHTML(
+                                    section.media.caption
+                                )}
+
+                            </div>
+
+                            `
+
+                            : ""
+                    }
+
+
+                </div>
+
+                `;
+
+        }
+
+
+
+        /* =====================================================
+           EXPLANATION
+        ===================================================== */
+
+
+        if (
+            section.body
+        ) {
+
+
+            html +=
+                `
+
+                <div class="section-body">
+
+${escapeHTML(section.body)}
+
+                </div>
+
+                `;
+
+        }
+
+
+
+        /* =====================================================
+           VISUAL → PHYSICS CONNECTION
+        ===================================================== */
+
+
+        if (
+            section.media &&
+            section.media.url
+        ) {
+
+
+            html +=
+                buildConnectionBox(
+                    section
+                );
+
+        }
+
+
+
+        /* =====================================================
+           CHECKPOINT
+        ===================================================== */
+
+
+        if (
+            section.type ===
+            "checkpoint"
+            &&
+            section.interactive
+        ) {
+
+
+            html +=
+                buildCheckpoint(
+                    section
+                );
+
+        }
+
+
+        element.innerHTML =
+            html;
+
+
+        document.getElementById(
+            "sectionsContainer"
+        ).appendChild(
+            element
+        );
+
+    }
+
+
+
+    /* =========================================================
+       PHYSICS CONNECTION
+    ========================================================= */
+
+
+    function buildConnectionBox(
+        section
+    ) {
+
+
+        const heading =
+            (
+                section.heading ||
+                ""
+            )
+            .toLowerCase();
+
+
+        let explanation =
+            "";
+
+
+        if (
+            heading.includes(
+                "rocket"
+            )
+        ) {
+
+
+            explanation =
+`🔥 Fuel burns and produces hot expanding gases.
+
+The engine pushes those gases DOWN through the nozzle.
+
+According to Newton's Third Law, the exhaust gases push the rocket in the opposite direction.
+
+Gas ↓
+Reaction Force ↑
+
+That upward force is called THRUST.
+
+💡 Takeaway:
+A rocket moves upward because it accelerates exhaust gases downward.`;
+
+
+        } else if (
+            heading.includes(
+                "football"
+            )
+        ) {
+
+
+            explanation =
+`⚽ The player's foot gives the football its initial force and velocity.
+
+After the ball leaves the foot, it continues moving forward because of inertia.
+
+At the same time, gravity continuously pulls it downward.
+
+Forward Motion →
+Gravity ↓
+
+Together they produce the curved path called projectile motion.
+
+💡 Takeaway:
+The ball curves because it moves forward while gravity pulls it downward.`;
+
+
+        } else if (
+            heading.includes(
+                "morning"
+            )
+        ) {
+
+
+            explanation =
+`⏰ Phone Alarm → vibrations create sound waves.
+
+🚶 Walking → friction between your foot and the floor lets you move forward.
+
+🚗 Car → force changes motion and produces acceleration.
+
+☀️ Sunlight → electromagnetic radiation transfers energy through space.
+
+💡 Takeaway:
+Before reaching class, you have already experienced waves, friction, force, motion, light and energy.`;
+
+
+        } else {
+
+
+            explanation =
+`Observe what changes in the visual.
+
+Ask three questions:
+
+1. What object is moving or changing?
+2. What force or energy causes the change?
+3. Which Physics principle explains it?
+
+This connects the visual event to the underlying scientific concept.`;
+
+        }
+
+
+        return `
+            <div class="connection-box">
+
+                <h3>
+                    🔗 How is this connected to Physics?
+                </h3>
+
+                <p>${escapeHTML(explanation)}</p>
+
+            </div>
+        `;
+
+    }
+
+
+
+    /* =========================================================
+       CHECKPOINT BUILDER
+    ========================================================= */
+
+
+    function buildCheckpoint(
+        section
+    ) {
+
+
+        const data =
+            section.interactive;
+
+
+        let options =
+            "";
+
+
+        data.options.forEach(
+            option => {
+
+
+                options +=
+                    `
+
+                    <button
+                        type="button"
+                        class="option"
+                        onclick='checkAnswer(
+                            ${section.id},
+                            ${JSON.stringify(option)},
+                            this
+                        )'
+                    >
+
+                        ${escapeHTML(option)}
+
+                    </button>
+
+                    `;
+
+
+            }
+        );
+
+
+        return `
+            <div
+                class="checkpoint"
+                data-checkpoint="${section.id}"
+            >
+
+
+                <div class="checkpoint-question">
+
+                    🧠
+                    ${escapeHTML(data.question)}
+
+                </div>
+
+
+                <div class="options">
+
+                    ${options}
+
+                </div>
+
+
+                <div
+                    id="checkpoint-result-${section.id}"
+                    class="checkpoint-result"
+                >
+                </div>
+
+
+            </div>
+        `;
+
+    }
+
+
+
+    /* =========================================================
+       CHECK ANSWER
+    ========================================================= */
+
+
+    function checkAnswer(
+        sectionId,
+        selected,
+        button
+    ) {
+
+
+        const section =
+            notesData.sections.find(
+                item =>
+                    item.id === sectionId
+            );
+
+
+        if (
+            !section ||
+            !section.interactive
+        ) {
+
+            return;
+
+        }
+
+
+        const checkpoint =
+            document.querySelector(
+                `[data-checkpoint="${sectionId}"]`
+            );
+
+
+        const buttons =
+            checkpoint.querySelectorAll(
+                ".option"
+            );
+
+
+        buttons.forEach(
+            item => {
+
+                item.disabled =
+                    true;
+
+            }
+        );
+
+
+        const correct =
+            selected ===
+            section.interactive.answer;
+
+
+        button.classList.add(
+            correct
+                ? "correct"
+                : "wrong"
+        );
+
+
+        if (
+            !correct
+        ) {
+
+
+            buttons.forEach(
+                item => {
+
+
+                    if (
+                        item.textContent.trim()
+                        ===
+                        section.interactive.answer
+                    ) {
+
+
+                        item.classList.add(
+                            "correct"
+                        );
+
+
+                    }
+
+
+                }
+            );
+
+
+        }
+
+
+        const result =
+            document.getElementById(
+                `checkpoint-result-${sectionId}`
+            );
+
+
+        result.style.display =
+            "block";
+
+
+        if (
+            correct
+        ) {
+
+
+            result.innerHTML =
+                `
+
+                ✅
+                <strong>
+                    Correct!
+                </strong>
+
+                <br><br>
+
+                ${escapeHTML(
+                    section.interactive.explanation
+                )}
+
+                `;
+
+
+        } else {
+
+
+            result.innerHTML =
+                `
+
+                ❌
+                <strong>
+                    Not quite.
+                </strong>
+
+                <br><br>
+
+                Correct answer:
+
+                <strong>
+                    ${escapeHTML(
+                        section.interactive.answer
+                    )}
+                </strong>
+
+                <br><br>
+
+                ${escapeHTML(
+                    section.interactive.explanation
+                )}
+
+                `;
+
+
+        }
+
+    }
+
+
+
+    /* =========================================================
+       DOWNLOAD
+    ========================================================= */
+
+
+    function configureDownload() {
+
+
+        const button =
+            document.getElementById(
+                "downloadButton"
+            );
+
+
+        if (
+            notesData.note.pdf_url
+        ) {
+
+
+            button.disabled =
+                false;
+
+
+            button.textContent =
+                "⬇ Download Faculty Notes";
+
+
+        } else {
+
+
+            button.disabled =
+                true;
+
+
+            button.textContent =
+                "⬇ Faculty PDF Not Uploaded Yet";
+
+        }
+
+    }
+
+
+
+    function downloadNotes() {
+
+
+        if (
+            !notesData ||
+            !notesData.note.pdf_url
+        ) {
+
+            return;
+
+        }
+
+
+        const url =
+
+            notesData.note.pdf_url.startsWith(
+                "http"
+            )
+
+                ? notesData.note.pdf_url
+
+                : `${API_BASE}${notesData.note.pdf_url}`;
+
+
+        window.open(
+            url,
+            "_blank"
+        );
+
+    }
+
+
+
+    /* =========================================================
+       SCROLL TRACKING
+    ========================================================= */
+
+
+    function setupScrollTracking() {
+
+
+        const sections =
+            document.querySelectorAll(
+                ".note-section"
+            );
+
+
+        const observer =
+            new IntersectionObserver(
+                entries => {
+
+
+                    entries.forEach(
+                        entry => {
+
+
+                            if (
+                                entry.isIntersecting
+                            ) {
+
+
+                                document
+                                    .querySelectorAll(
+                                        ".section-link"
+                                    )
+                                    .forEach(
+                                        button => {
+
+                                            button.classList.remove(
+                                                "active"
+                                            );
+
+                                        }
+                                    );
+
+
+                                const activeButton =
+                                    document.querySelector(
+                                        `.section-link[data-target="${entry.target.id}"]`
+                                    );
+
+
+                                if (
+                                    activeButton
+                                ) {
+
+
+                                    activeButton.classList.add(
+                                        "active"
+                                    );
+
+
+                                }
+
+
+                            }
+
+
+                        }
+                    );
+
+
+                },
+                {
+
+                    rootMargin:
+                        "-18% 0px -67% 0px"
+
+                }
+            );
+
+
+        sections.forEach(
+            section => {
+
+                observer.observe(
+                    section
+                );
+
+            }
+        );
+
+    }
+
+
+
+    /* =========================================================
+       LABELS
+    ========================================================= */
+
+
+    function formatType(
+        type
+    ) {
+
+
+        const labels = {
+
+            story:
+                "📖 Story",
+
+            definition:
+                "💡 Core Concept",
+
+            real_world:
+                "🌍 Real-World Example",
+
+            application:
+                "🛠 Real-World Application",
+
+            animation:
+                "🎬 Animated Explanation",
+
+            checkpoint:
+                "🧠 Knowledge Check",
+
+            summary:
+                "✅ Key Summary"
+
+        };
+
+
+        return labels[type]
+            || type;
+
+    }
+
+
+
+    /* =========================================================
+       HELPERS
+    ========================================================= */
+
+
+    function escapeHTML(
+        value
+    ) {
+
+
+        return String(
+            value ?? ""
+        )
+
+            .replaceAll(
+                "&",
+                "&amp;"
+            )
+
+            .replaceAll(
+                "<",
+                "&lt;"
+            )
+
+            .replaceAll(
+                ">",
+                "&gt;"
+            )
+
+            .replaceAll(
+                '"',
+                "&quot;"
+            )
+
+            .replaceAll(
+                "'",
+                "&#039;"
+            );
+
+    }
+
+
+
+    function showError(
+        message
+    ) {
+
+
+        document.getElementById(
+            "loading"
+        ).style.display =
+            "none";
+
+
+        const box =
+            document.getElementById(
+                "errorBox"
+            );
+
+
+        box.style.display =
+            "block";
+
+
+        box.textContent =
+            message;
+
+    }
+
+
+
+    function goBack() {
+
+
+        window.location.href =
+            "student.html";
+
+    }
+
+
+</script>
+
+
+    <script src="assets/js/notes-personalization.js?v=1"></script>
+    <script src="assets/js/notes-personalization-v2.js?v=2"></script>
+    <script src="assets/js/universal-learning-journey.js?v=1"></script>
+</body>
+
+</html>

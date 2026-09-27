@@ -1,0 +1,2552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Interactive Learning | My Campus</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --bg: #f5f7fb;
+            --surface: #ffffff;
+            --text: #172033;
+            --muted: #64748b;
+            --border: #e2e8f0;
+
+            --primary: #4f46e5;
+            --primary-dark: #3730a3;
+            --primary-soft: #eef2ff;
+
+            --success: #16a34a;
+            --success-soft: #ecfdf5;
+
+            --warning: #ea580c;
+            --warning-soft: #fff7ed;
+
+            --blue-soft: #eff6ff;
+
+            --shadow:
+                0 18px 50px
+                rgba(15, 23, 42, 0.08);
+        }
+
+        body {
+            min-height: 100vh;
+
+            background:
+                radial-gradient(
+                    circle at top left,
+                    #eef2ff 0,
+                    transparent 35%
+                ),
+                var(--bg);
+
+            color: var(--text);
+
+            font-family:
+                Inter,
+                system-ui,
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                sans-serif;
+        }
+
+        button,
+        input {
+            font: inherit;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        /* =========================
+           HEADER
+        ========================== */
+
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 18px;
+
+            padding: 15px 28px;
+
+            background:
+                rgba(255,255,255,0.94);
+
+            backdrop-filter: blur(14px);
+
+            border-bottom:
+                1px solid var(--border);
+        }
+
+        .brand-wrap {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .back-btn {
+            width: 42px;
+            height: 42px;
+
+            border: 1px solid var(--border);
+            border-radius: 12px;
+
+            background: white;
+
+            font-size: 20px;
+        }
+
+        .brand h1 {
+            font-size: 18px;
+            font-weight: 850;
+        }
+
+        .brand p {
+            margin-top: 3px;
+
+            color: var(--muted);
+
+            font-size: 12px;
+        }
+
+        .topic-pill {
+            padding: 9px 13px;
+
+            border-radius: 999px;
+
+            background: var(--primary-soft);
+
+            color: var(--primary-dark);
+
+            font-size: 12px;
+            font-weight: 850;
+        }
+
+        /* =========================
+           PAGE
+        ========================== */
+
+        .page {
+            width:
+                min(
+                    1280px,
+                    calc(100% - 30px)
+                );
+
+            margin: 28px auto 70px;
+        }
+
+        /* =========================
+           HERO
+        ========================== */
+
+        .hero {
+            padding: 30px;
+
+            border-radius: 26px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #312e81,
+                    #4f46e5 55%,
+                    #7c3aed
+                );
+
+            color: white;
+
+            box-shadow: var(--shadow);
+        }
+
+        .hero-badge {
+            display: inline-block;
+
+            padding: 7px 11px;
+
+            border-radius: 999px;
+
+            background:
+                rgba(255,255,255,0.13);
+
+            border:
+                1px solid
+                rgba(255,255,255,0.2);
+
+            font-size: 11px;
+            font-weight: 850;
+            letter-spacing: 0.06em;
+        }
+
+        .hero h2 {
+            margin-top: 15px;
+
+            font-size:
+                clamp(
+                    30px,
+                    4vw,
+                    46px
+                );
+
+            line-height: 1.12;
+        }
+
+        .hero p {
+            max-width: 780px;
+
+            margin-top: 12px;
+
+            color:
+                rgba(255,255,255,0.8);
+
+            line-height: 1.65;
+        }
+
+        /* =========================
+           TABS
+        ========================== */
+
+        .tabs {
+            display: grid;
+
+            grid-template-columns:
+                repeat(3, 1fr);
+
+            gap: 12px;
+
+            margin-top: 22px;
+        }
+
+        .tab-btn {
+            padding: 15px;
+
+            border: 1px solid var(--border);
+            border-radius: 15px;
+
+            background: white;
+
+            color: var(--text);
+
+            font-weight: 800;
+        }
+
+        .tab-btn.active {
+            border-color: #a5b4fc;
+
+            background: var(--primary-soft);
+
+            color: var(--primary-dark);
+        }
+
+        /* =========================
+           LAB
+        ========================== */
+
+        .lab {
+            display: none;
+
+            grid-template-columns:
+                minmax(0, 1.45fr)
+                minmax(300px, 0.55fr);
+
+            gap: 20px;
+
+            margin-top: 20px;
+        }
+
+        .lab.active {
+            display: grid;
+        }
+
+        .sim-card,
+        .control-card {
+            background: white;
+
+            border: 1px solid var(--border);
+            border-radius: 22px;
+
+            box-shadow:
+                0 12px 34px
+                rgba(15,23,42,0.05);
+        }
+
+        .sim-card {
+            overflow: hidden;
+        }
+
+        .sim-header {
+            padding: 21px 22px;
+
+            border-bottom:
+                1px solid var(--border);
+        }
+
+        .sim-header h3 {
+            font-size: 21px;
+        }
+
+        .sim-header p {
+            margin-top: 5px;
+
+            color: var(--muted);
+
+            font-size: 13px;
+        }
+
+        .canvas {
+            position: relative;
+
+            height: 430px;
+
+            overflow: hidden;
+
+            background:
+                linear-gradient(
+                    180deg,
+                    #dbeafe 0%,
+                    #eff6ff 55%,
+                    #dcfce7 55%,
+                    #bbf7d0 100%
+                );
+        }
+
+        /* =========================
+           WALKING
+        ========================== */
+
+        .ground {
+            position: absolute;
+
+            left: 0;
+            right: 0;
+            bottom: 0;
+
+            height: 120px;
+
+            background:
+                linear-gradient(
+                    #64748b,
+                    #475569
+                );
+        }
+
+        .person {
+            position: absolute;
+
+            left: 70px;
+            bottom: 118px;
+
+            width: 72px;
+            height: 145px;
+
+            transition:
+                transform 0.5s ease;
+        }
+
+        .head {
+            width: 40px;
+            height: 40px;
+
+            margin: auto;
+
+            border-radius: 50%;
+
+            background: #f3c7a5;
+        }
+
+        .body {
+            width: 18px;
+            height: 58px;
+
+            margin: 4px auto 0;
+
+            border-radius: 10px;
+
+            background: #4f46e5;
+        }
+
+        .legs {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .leg {
+            width: 9px;
+            height: 45px;
+
+            border-radius: 8px;
+
+            background: #172033;
+        }
+
+        .force-arrow {
+            position: absolute;
+
+            height: 8px;
+
+            border-radius: 999px;
+
+            transform-origin: left center;
+
+            transition:
+                width 0.3s ease;
+        }
+
+        .force-arrow::after {
+            content: "";
+
+            position: absolute;
+
+            right: -2px;
+            top: -7px;
+
+            border-top: 11px solid transparent;
+            border-bottom: 11px solid transparent;
+            border-left: 18px solid currentColor;
+        }
+
+        .push-arrow {
+            left: 128px;
+            bottom: 160px;
+
+            background: #ef4444;
+            color: #ef4444;
+        }
+
+        .friction-arrow {
+            left: 128px;
+            bottom: 135px;
+
+            transform: rotate(180deg);
+
+            background: #16a34a;
+            color: #16a34a;
+        }
+
+        .arrow-label {
+            position: absolute;
+
+            font-size: 12px;
+            font-weight: 850;
+        }
+
+        #walkingForceLabel {
+            left: 160px;
+            bottom: 185px;
+
+            color: #b91c1c;
+        }
+
+        #walkingFrictionLabel {
+            left: 42px;
+            bottom: 125px;
+
+            color: #15803d;
+        }
+
+        /* =========================
+           FOOTBALL
+        ========================== */
+
+        .football-field {
+            background:
+                linear-gradient(
+                    180deg,
+                    #bfdbfe 0%,
+                    #dbeafe 52%,
+                    #22c55e 52%,
+                    #15803d 100%
+                );
+        }
+
+        .football {
+            position: absolute;
+
+            width: 54px;
+            height: 54px;
+
+            left: 70px;
+            bottom: 105px;
+
+            display: grid;
+            place-items: center;
+
+            border-radius: 50%;
+
+            background: white;
+
+            border: 4px solid #172033;
+
+            font-size: 30px;
+
+            transition:
+                transform 1s
+                cubic-bezier(.2,.8,.2,1);
+        }
+
+        .goal {
+            position: absolute;
+
+            right: 60px;
+            bottom: 100px;
+
+            width: 130px;
+            height: 130px;
+
+            border: 7px solid white;
+            border-bottom: 0;
+        }
+
+        .football-force {
+            left: 90px;
+            bottom: 180px;
+
+            background: #ef4444;
+            color: #ef4444;
+        }
+
+        #footballForceLabel {
+            left: 105px;
+            bottom: 205px;
+
+            color: #b91c1c;
+        }
+
+        /* =========================
+           ROCKET
+        ========================== */
+
+        .space {
+            background:
+                radial-gradient(
+                    circle at 15% 20%,
+                    #334155,
+                    #0f172a 55%,
+                    #020617
+                );
+        }
+
+        .star {
+            position: absolute;
+
+            width: 4px;
+            height: 4px;
+
+            border-radius: 50%;
+
+            background: white;
+        }
+
+        .rocket {
+            position: absolute;
+
+            left: 50%;
+            bottom: 80px;
+
+            transform:
+                translateX(-50%);
+
+            font-size: 100px;
+
+            transition:
+                transform 1.4s ease,
+                bottom 1.4s ease;
+        }
+
+        .rocket.launching {
+            bottom: 280px;
+
+            transform:
+                translateX(-50%)
+                scale(1.08);
+        }
+
+        .exhaust {
+            position: absolute;
+
+            left: 50%;
+            bottom: 65px;
+
+            width: 34px;
+            height: 80px;
+
+            transform:
+                translateX(-50%);
+
+            border-radius:
+                50% 50% 70% 70%;
+
+            background:
+                linear-gradient(
+                    #facc15,
+                    #f97316,
+                    transparent
+                );
+
+            opacity: 0;
+
+            transition: opacity 0.25s ease;
+        }
+
+        .rocket.launching + .exhaust {
+            opacity: 1;
+        }
+
+        .rocket-arrow-up {
+            left: 55%;
+            bottom: 225px;
+
+            transform: rotate(-90deg);
+
+            background: #22c55e;
+            color: #22c55e;
+        }
+
+        .rocket-arrow-down {
+            left: 44%;
+            bottom: 140px;
+
+            transform: rotate(90deg);
+
+            background: #f97316;
+            color: #f97316;
+        }
+
+        /* =========================
+           CONTROLS
+        ========================== */
+
+        .control-card {
+            padding: 22px;
+        }
+
+        .control-title {
+            font-size: 19px;
+            font-weight: 850;
+        }
+
+        .control-subtitle {
+            margin-top: 5px;
+
+            color: var(--muted);
+
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .control {
+            margin-top: 24px;
+        }
+
+        .control-top {
+            display: flex;
+            justify-content: space-between;
+
+            margin-bottom: 9px;
+        }
+
+        .control label {
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        .value {
+            color: var(--primary);
+
+            font-size: 13px;
+            font-weight: 900;
+        }
+
+        input[type="range"] {
+            width: 100%;
+        }
+
+        .action-btn {
+            width: 100%;
+
+            margin-top: 22px;
+
+            padding: 14px;
+
+            border: 0;
+            border-radius: 13px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #4f46e5,
+                    #7c3aed
+                );
+
+            color: white;
+
+            font-weight: 850;
+        }
+
+        .result-box {
+            margin-top: 22px;
+
+            padding: 17px;
+
+            border-radius: 16px;
+
+            background: var(--primary-soft);
+
+            border:
+                1px solid #c7d2fe;
+        }
+
+        .result-box strong {
+            display: block;
+
+            margin-bottom: 7px;
+
+            color: var(--primary-dark);
+        }
+
+        .result-box p {
+            color: #475569;
+
+            font-size: 13px;
+            line-height: 1.65;
+        }
+
+        .formula {
+            margin-top: 12px;
+
+            padding: 11px;
+
+            border-radius: 11px;
+
+            background: white;
+
+            color: var(--text);
+
+            font-weight: 800;
+
+            text-align: center;
+        }
+
+        /* =========================
+           EXPLANATION / EXAMPLES
+        ========================== */
+
+        .example-section {
+            display: none;
+
+            margin-top: 20px;
+
+            padding: 26px;
+
+            border: 1px solid var(--border);
+            border-radius: 22px;
+
+            background: white;
+
+            box-shadow:
+                0 10px 30px
+                rgba(15,23,42,0.04);
+        }
+
+        .example-section.active {
+            display: block;
+        }
+
+        .example-heading {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .example-icon {
+            width: 46px;
+            height: 46px;
+
+            display: grid;
+            place-items: center;
+
+            flex: 0 0 46px;
+
+            border-radius: 14px;
+
+            background: var(--primary-soft);
+
+            font-size: 23px;
+        }
+
+        .example-heading h3 {
+            font-size: 21px;
+        }
+
+        .example-heading p {
+            margin-top: 4px;
+
+            color: var(--muted);
+
+            font-size: 13px;
+        }
+
+        .example-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(2, 1fr);
+
+            gap: 15px;
+
+            margin-top: 22px;
+        }
+
+        .explain-card {
+            padding: 18px;
+
+            border-radius: 16px;
+
+            border: 1px solid var(--border);
+
+            background: #fbfcff;
+        }
+
+        .explain-card.full {
+            grid-column: 1 / -1;
+        }
+
+        .explain-label {
+            display: inline-block;
+
+            margin-bottom: 9px;
+
+            color: var(--primary);
+
+            font-size: 11px;
+            font-weight: 900;
+
+            letter-spacing: 0.05em;
+
+            text-transform: uppercase;
+        }
+
+        .explain-card h4 {
+            margin-bottom: 8px;
+
+            font-size: 16px;
+        }
+
+        .explain-card p,
+        .explain-card li {
+            color: #526174;
+
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        .explain-card ol {
+            padding-left: 19px;
+        }
+
+        .worked-calculation {
+            margin-top: 12px;
+
+            padding: 14px;
+
+            border-radius: 12px;
+
+            background: var(--primary-soft);
+
+            color: var(--primary-dark);
+
+            font-weight: 750;
+
+            line-height: 1.8;
+        }
+
+        .observation {
+            background: var(--blue-soft);
+        }
+
+        .why-card {
+            background: var(--warning-soft);
+        }
+
+        .real-world {
+            background: var(--success-soft);
+        }
+
+        .key-point {
+            margin-top: 18px;
+
+            padding: 16px 18px;
+
+            border-radius: 15px;
+
+            background:
+                linear-gradient(
+                    90deg,
+                    #312e81,
+                    #4f46e5
+                );
+
+            color: white;
+
+            line-height: 1.65;
+        }
+
+        .key-point strong {
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        /* =========================
+           FINAL CONCEPT
+        ========================== */
+
+        .concept-card {
+            margin-top: 20px;
+
+            padding: 22px;
+
+            border: 1px solid var(--border);
+            border-radius: 20px;
+
+            background: white;
+        }
+
+        .concept-card h3 {
+            font-size: 19px;
+        }
+
+        .concept-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(3, 1fr);
+
+            gap: 14px;
+
+            margin-top: 16px;
+        }
+
+        .concept-item {
+            padding: 15px;
+
+            border-radius: 14px;
+
+            background: #f8fafc;
+        }
+
+        .concept-item strong {
+            display: block;
+
+            margin-bottom: 5px;
+
+            font-size: 13px;
+        }
+
+        .concept-item span {
+            color: var(--muted);
+
+            font-size: 12px;
+            line-height: 1.55;
+        }
+
+        .complete-card {
+            margin-top: 20px;
+
+            padding: 20px;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+
+            border-radius: 20px;
+
+            background: var(--success-soft);
+
+            border: 1px solid #bbf7d0;
+        }
+
+        .complete-card strong {
+            color: #166534;
+        }
+
+        .complete-card p {
+            margin-top: 4px;
+
+            color: #4b7d5a;
+
+            font-size: 12px;
+        }
+
+        .complete-btn {
+            padding: 12px 17px;
+
+            border: 0;
+            border-radius: 12px;
+
+            background: var(--success);
+
+            color: white;
+
+            font-size: 12px;
+            font-weight: 850;
+        }
+
+        @media (max-width: 900px) {
+
+            .lab {
+                grid-template-columns: 1fr;
+            }
+
+            .tabs,
+            .concept-grid,
+            .example-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .explain-card.full {
+                grid-column: auto;
+            }
+        }
+
+        @media (max-width: 600px) {
+
+            .topbar {
+                padding: 12px 14px;
+            }
+
+            .topic-pill {
+                display: none;
+            }
+
+            .page {
+                width: calc(100% - 18px);
+                margin-top: 14px;
+            }
+
+            .hero {
+                padding: 22px;
+            }
+
+            .canvas {
+                height: 360px;
+            }
+
+            .complete-card {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .complete-btn {
+                width: 100%;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="assets/css/universal-learning-journey.css?v=1">
+</head>
+
+
+<body>
+
+<header class="topbar">
+
+    <div class="brand-wrap">
+
+        <button
+            class="back-btn"
+            onclick="goBack()"
+        >
+            ←
+        </button>
+
+        <div class="brand">
+
+            <h1>My Campus</h1>
+
+            <p>
+                Interactive Physics Lab
+            </p>
+
+        </div>
+
+    </div>
+
+    <div class="topic-pill">
+        Topic 1 • Interactive
+    </div>
+
+</header>
+
+
+<main class="page">
+
+    <section class="hero">
+
+        <span class="hero-badge">
+            INTERACTIVE LEARNING
+        </span>
+
+        <h2>
+            Physics Around You
+        </h2>
+
+        <p>
+            Change the values, run the experiments and observe
+            what happens. After every experiment, read the worked
+            example and explanation below to understand why the
+            result occurred.
+        </p>
+
+    </section>
+
+
+    <section class="tabs">
+
+        <button
+            id="walkingTab"
+            class="tab-btn active"
+            onclick="openLab('walking')"
+        >
+            🚶 Walking & Friction
+        </button>
+
+        <button
+            id="footballTab"
+            class="tab-btn"
+            onclick="openLab('football')"
+        >
+            ⚽ Football & Force
+        </button>
+
+        <button
+            id="rocketTab"
+            class="tab-btn"
+            onclick="openLab('rocket')"
+        >
+            🚀 Rocket Action–Reaction
+        </button>
+
+    </section>
+
+
+    <!-- WALKING -->
+
+    <section
+        id="walkingLab"
+        class="lab active"
+    >
+
+        <div class="sim-card">
+
+            <div class="sim-header">
+
+                <h3>
+                    Walking Needs Friction
+                </h3>
+
+                <p>
+                    Change push force and friction,
+                    then run the experiment.
+                </p>
+
+            </div>
+
+            <div class="canvas">
+
+                <div class="ground"></div>
+
+                <div
+                    id="walker"
+                    class="person"
+                >
+
+                    <div class="head"></div>
+
+                    <div class="body"></div>
+
+                    <div class="legs">
+                        <div class="leg"></div>
+                        <div class="leg"></div>
+                    </div>
+
+                </div>
+
+                <div
+                    id="walkingPushArrow"
+                    class="force-arrow push-arrow"
+                ></div>
+
+                <div
+                    id="walkingFrictionArrow"
+                    class="force-arrow friction-arrow"
+                ></div>
+
+                <div
+                    id="walkingForceLabel"
+                    class="arrow-label"
+                >
+                    Push
+                </div>
+
+                <div
+                    id="walkingFrictionLabel"
+                    class="arrow-label"
+                >
+                    Friction
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="control-card">
+
+            <div class="control-title">
+                Experiment Controls
+            </div>
+
+            <div class="control-subtitle">
+                Change how hard the person pushes and
+                how much grip the ground can provide.
+            </div>
+
+
+            <div class="control">
+
+                <div class="control-top">
+
+                    <label>
+                        Push Force
+                    </label>
+
+                    <span
+                        id="walkForceValue"
+                        class="value"
+                    >
+                        60 N
+                    </span>
+
+                </div>
+
+                <input
+                    id="walkForce"
+                    type="range"
+                    min="10"
+                    max="100"
+                    value="60"
+                    oninput="updateWalking()"
+                >
+
+            </div>
+
+
+            <div class="control">
+
+                <div class="control-top">
+
+                    <label>
+                        Available Friction
+                    </label>
+
+                    <span
+                        id="frictionValue"
+                        class="value"
+                    >
+                        50 N
+                    </span>
+
+                </div>
+
+                <input
+                    id="friction"
+                    type="range"
+                    min="0"
+                    max="100"
+                    value="50"
+                    oninput="updateWalking()"
+                >
+
+            </div>
+
+
+            <button
+                class="action-btn"
+                onclick="runWalking()"
+            >
+                ▶ Run Walking Experiment
+            </button>
+
+
+            <div class="result-box">
+
+                <strong>
+                    Live Observation
+                </strong>
+
+                <p id="walkingExplanation"></p>
+
+                <div
+                    id="walkingFormula"
+                    class="formula"
+                ></div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- WALKING EXAMPLE -->
+
+    <section
+        id="walkingExample"
+        class="example-section active"
+    >
+
+        <div class="example-heading">
+
+            <div class="example-icon">
+                🚶
+            </div>
+
+            <div>
+
+                <h3>
+                    Example & Explanation
+                </h3>
+
+                <p>
+                    Understand the Physics behind the walking experiment.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="example-grid">
+
+            <div class="explain-card">
+
+                <span class="explain-label">
+                    Worked Example
+                </span>
+
+                <h4>
+                    Walking on a normal road
+                </h4>
+
+                <p>
+                    Suppose a person pushes backward on the
+                    ground with a force of 60 N, while the
+                    ground can provide 50 N of frictional grip.
+                </p>
+
+                <div class="worked-calculation">
+                    Push force = 60 N<br>
+                    Available friction = 50 N<br>
+                    Difference ≈ 60 − 50<br>
+                    = 10 N
+                </div>
+
+            </div>
+
+
+            <div class="explain-card observation">
+
+                <span class="explain-label">
+                    What You Observe
+                </span>
+
+                <h4>
+                    The person moves forward
+                </h4>
+
+                <p>
+                    When the foot pushes backward against the
+                    ground, friction between the shoe and the
+                    ground provides the grip required for motion.
+                </p>
+
+            </div>
+
+
+            <div class="explain-card why-card">
+
+                <span class="explain-label">
+                    Why It Happens
+                </span>
+
+                <h4>
+                    Friction is useful here
+                </h4>
+
+                <p>
+                    Walking would be very difficult without friction.
+                    Your foot must interact with the ground to produce
+                    forward motion. If the surface becomes very slippery,
+                    the available friction becomes too small and the
+                    foot starts slipping.
+                </p>
+
+            </div>
+
+
+            <div class="explain-card real-world">
+
+                <span class="explain-label">
+                    Real-World Connection
+                </span>
+
+                <h4>
+                    Walking on ice
+                </h4>
+
+                <p>
+                    Ice provides much less friction than a rough road.
+                    That is why people take shorter, slower steps on ice.
+                    Sports shoes also use patterned soles to improve grip.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="key-point">
+
+            <strong>
+                Remember:
+            </strong>
+
+            Friction is not always an unwanted force.
+            In walking, braking and vehicle movement,
+            friction is essential for controlling motion.
+
+        </div>
+
+    </section>
+
+
+    <!-- FOOTBALL -->
+
+    <section
+        id="footballLab"
+        class="lab"
+    >
+
+        <div class="sim-card">
+
+            <div class="sim-header">
+
+                <h3>
+                    Force Changes Motion
+                </h3>
+
+                <p>
+                    Change kick force and ball mass,
+                    then observe the acceleration.
+                </p>
+
+            </div>
+
+
+            <div class="canvas football-field">
+
+                <div
+                    id="football"
+                    class="football"
+                >
+                    ⚽
+                </div>
+
+                <div class="goal"></div>
+
+                <div
+                    id="footballForceArrow"
+                    class="force-arrow football-force"
+                ></div>
+
+                <div
+                    id="footballForceLabel"
+                    class="arrow-label"
+                >
+                    Force
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="control-card">
+
+            <div class="control-title">
+                Kick Experiment
+            </div>
+
+            <div class="control-subtitle">
+                More force or lower mass produces
+                greater acceleration.
+            </div>
+
+
+            <div class="control">
+
+                <div class="control-top">
+
+                    <label>
+                        Kick Force
+                    </label>
+
+                    <span
+                        id="kickForceValue"
+                        class="value"
+                    >
+                        30 N
+                    </span>
+
+                </div>
+
+                <input
+                    id="kickForce"
+                    type="range"
+                    min="5"
+                    max="60"
+                    value="30"
+                    oninput="updateFootball()"
+                >
+
+            </div>
+
+
+            <div class="control">
+
+                <div class="control-top">
+
+                    <label>
+                        Ball Mass
+                    </label>
+
+                    <span
+                        id="ballMassValue"
+                        class="value"
+                    >
+                        0.5 kg
+                    </span>
+
+                </div>
+
+                <input
+                    id="ballMass"
+                    type="range"
+                    min="2"
+                    max="10"
+                    value="5"
+                    oninput="updateFootball()"
+                >
+
+            </div>
+
+
+            <button
+                class="action-btn"
+                onclick="kickBall()"
+            >
+                ⚽ Kick Ball
+            </button>
+
+
+            <div class="result-box">
+
+                <strong>
+                    Live Calculation
+                </strong>
+
+                <p id="footballExplanation"></p>
+
+                <div
+                    id="footballFormula"
+                    class="formula"
+                ></div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- FOOTBALL EXAMPLE -->
+
+    <section
+        id="footballExample"
+        class="example-section"
+    >
+
+        <div class="example-heading">
+
+            <div class="example-icon">
+                ⚽
+            </div>
+
+            <div>
+
+                <h3>
+                    Example & Explanation
+                </h3>
+
+                <p>
+                    See how force and mass control acceleration.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="example-grid">
+
+            <div class="explain-card">
+
+                <span class="explain-label">
+                    Worked Example
+                </span>
+
+                <h4>
+                    Kicking a football
+                </h4>
+
+                <p>
+                    Suppose the player applies a force of
+                    30 N to a 0.5 kg football.
+                </p>
+
+                <div class="worked-calculation">
+                    Force, F = 30 N<br>
+                    Mass, m = 0.5 kg<br><br>
+
+                    a = F / m<br>
+                    a = 30 / 0.5<br>
+                    a = 60 m/s²
+                </div>
+
+            </div>
+
+
+            <div class="explain-card observation">
+
+                <span class="explain-label">
+                    What You Observe
+                </span>
+
+                <h4>
+                    The ball accelerates rapidly
+                </h4>
+
+                <p>
+                    When kick force increases, the football moves
+                    more strongly. If the same force acts on a
+                    heavier object, acceleration becomes smaller.
+                </p>
+
+            </div>
+
+
+            <div class="explain-card why-card">
+
+                <span class="explain-label">
+                    Why It Happens
+                </span>
+
+                <h4>
+                    Newton's Second Law
+                </h4>
+
+                <p>
+                    Acceleration depends directly on force and
+                    inversely on mass. This means more force gives
+                    greater acceleration, while more mass makes an
+                    object harder to accelerate.
+                </p>
+
+            </div>
+
+
+            <div class="explain-card real-world">
+
+                <span class="explain-label">
+                    Real-World Connection
+                </span>
+
+                <h4>
+                    Football vs heavy medicine ball
+                </h4>
+
+                <p>
+                    If you kick a football and a much heavier ball
+                    with approximately the same force, the lighter
+                    football accelerates much more easily.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="key-point">
+
+            <strong>
+                Remember:
+            </strong>
+
+            For the same mass, more force means more acceleration.
+            For the same force, more mass means less acceleration.
+
+        </div>
+
+    </section>
+
+
+    <!-- ROCKET -->
+
+    <section
+        id="rocketLab"
+        class="lab"
+    >
+
+        <div class="sim-card">
+
+            <div class="sim-header">
+
+                <h3>
+                    Rocket Action & Reaction
+                </h3>
+
+                <p>
+                    Increase exhaust force and observe the
+                    force interaction.
+                </p>
+
+            </div>
+
+
+            <div class="canvas space">
+
+                <div class="star"
+                     style="left:12%;top:20%;">
+                </div>
+
+                <div class="star"
+                     style="left:28%;top:38%;">
+                </div>
+
+                <div class="star"
+                     style="left:72%;top:17%;">
+                </div>
+
+                <div class="star"
+                     style="left:84%;top:43%;">
+                </div>
+
+                <div class="star"
+                     style="left:56%;top:28%;">
+                </div>
+
+
+                <div
+                    id="rocket"
+                    class="rocket"
+                >
+                    🚀
+                </div>
+
+                <div class="exhaust"></div>
+
+
+                <div
+                    id="rocketUpArrow"
+                    class="force-arrow rocket-arrow-up"
+                ></div>
+
+                <div
+                    id="rocketDownArrow"
+                    class="force-arrow rocket-arrow-down"
+                ></div>
+
+            </div>
+
+        </div>
+
+
+        <div class="control-card">
+
+            <div class="control-title">
+                Rocket Thrust Experiment
+            </div>
+
+            <div class="control-subtitle">
+                Change exhaust force and observe the
+                corresponding reaction force.
+            </div>
+
+
+            <div class="control">
+
+                <div class="control-top">
+
+                    <label>
+                        Exhaust Force
+                    </label>
+
+                    <span
+                        id="thrustValue"
+                        class="value"
+                    >
+                        70 N
+                    </span>
+
+                </div>
+
+                <input
+                    id="thrust"
+                    type="range"
+                    min="10"
+                    max="100"
+                    value="70"
+                    oninput="updateRocket()"
+                >
+
+            </div>
+
+
+            <button
+                class="action-btn"
+                onclick="launchRocket()"
+            >
+                🚀 Launch Rocket
+            </button>
+
+
+            <div class="result-box">
+
+                <strong>
+                    Newton's Third Law
+                </strong>
+
+                <p id="rocketExplanation"></p>
+
+                <div
+                    id="rocketFormula"
+                    class="formula"
+                ></div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ROCKET EXAMPLE -->
+
+    <section
+        id="rocketExample"
+        class="example-section"
+    >
+
+        <div class="example-heading">
+
+            <div class="example-icon">
+                🚀
+            </div>
+
+            <div>
+
+                <h3>
+                    Example & Explanation
+                </h3>
+
+                <p>
+                    Understand why a rocket can move upward.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="example-grid">
+
+            <div class="explain-card">
+
+                <span class="explain-label">
+                    Worked Example
+                </span>
+
+                <h4>
+                    Rocket exhaust interaction
+                </h4>
+
+                <p>
+                    Suppose the rocket engine pushes exhaust gases
+                    downward with a force of 70 N.
+                </p>
+
+                <div class="worked-calculation">
+                    Force on gases = 70 N downward<br><br>
+
+                    Reaction force on rocket<br>
+                    = 70 N upward
+                </div>
+
+            </div>
+
+
+            <div class="explain-card observation">
+
+                <span class="explain-label">
+                    What You Observe
+                </span>
+
+                <h4>
+                    The rocket moves upward
+                </h4>
+
+                <p>
+                    Exhaust gases are expelled downward.
+                    At the same time, the gases exert an
+                    opposite force on the rocket.
+                </p>
+
+            </div>
+
+
+            <div class="explain-card why-card">
+
+                <span class="explain-label">
+                    Why It Happens
+                </span>
+
+                <h4>
+                    Newton's Third Law
+                </h4>
+
+                <p>
+                    Forces arise as interactions between two objects.
+                    The rocket pushes the gases, and the gases push
+                    the rocket with an equal-magnitude force in the
+                    opposite direction.
+                </p>
+
+            </div>
+
+
+            <div class="explain-card real-world">
+
+                <span class="explain-label">
+                    Real-World Connection
+                </span>
+
+                <h4>
+                    Rockets work even in space
+                </h4>
+
+                <p>
+                    A rocket does not need air to push against.
+                    It carries propellant and accelerates exhaust
+                    mass backward, producing the corresponding
+                    interaction force on the rocket.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="key-point">
+
+            <strong>
+                Remember:
+            </strong>
+
+            Action and reaction forces are equal in magnitude
+            and opposite in direction, but they act on
+            different objects.
+
+        </div>
+
+    </section>
+
+
+    <!-- SUMMARY -->
+
+    <section class="concept-card">
+
+        <h3>
+            What did these experiments teach?
+        </h3>
+
+        <div class="concept-grid">
+
+            <div class="concept-item">
+
+                <strong>
+                    🚶 Walking
+                </strong>
+
+                <span>
+                    Friction provides the grip needed
+                    to control motion.
+                </span>
+
+            </div>
+
+
+            <div class="concept-item">
+
+                <strong>
+                    ⚽ Football
+                </strong>
+
+                <span>
+                    Force and mass determine how strongly
+                    an object accelerates.
+                </span>
+
+            </div>
+
+
+            <div class="concept-item">
+
+                <strong>
+                    🚀 Rocket
+                </strong>
+
+                <span>
+                    Interacting objects exert equal and
+                    opposite forces on each other.
+                </span>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <section class="complete-card">
+
+        <div>
+
+            <strong>
+                ✅ Topic 1 Interactive Exploration
+            </strong>
+
+            <p>
+                Complete all three simulations and read
+                their examples before continuing.
+            </p>
+
+        </div>
+
+        <button
+            class="complete-btn"
+            onclick="markCompleted()"
+        >
+            Mark Interactive Completed
+        </button>
+
+    </section>
+
+</main>
+
+
+<script>
+
+    const params =
+        new URLSearchParams(
+            window.location.search
+        );
+
+
+    const topicId =
+        Number(
+            params.get("topic_id") || 1
+        );
+
+
+    /* =========================
+       LAB SWITCHING
+    ========================== */
+
+    function openLab(name) {
+
+        const names = [
+            "walking",
+            "football",
+            "rocket"
+        ];
+
+
+        names.forEach(item => {
+
+            document
+                .getElementById(
+                    `${item}Lab`
+                )
+                .classList
+                .remove("active");
+
+
+            document
+                .getElementById(
+                    `${item}Tab`
+                )
+                .classList
+                .remove("active");
+
+
+            document
+                .getElementById(
+                    `${item}Example`
+                )
+                .classList
+                .remove("active");
+
+        });
+
+
+        document
+            .getElementById(
+                `${name}Lab`
+            )
+            .classList
+            .add("active");
+
+
+        document
+            .getElementById(
+                `${name}Tab`
+            )
+            .classList
+            .add("active");
+
+
+        document
+            .getElementById(
+                `${name}Example`
+            )
+            .classList
+            .add("active");
+
+    }
+
+
+    /* =========================
+       WALKING
+    ========================== */
+
+    function updateWalking() {
+
+        const force =
+            Number(
+                document.getElementById(
+                    "walkForce"
+                ).value
+            );
+
+
+        const friction =
+            Number(
+                document.getElementById(
+                    "friction"
+                ).value
+            );
+
+
+        document.getElementById(
+            "walkForceValue"
+        ).textContent =
+            `${force} N`;
+
+
+        document.getElementById(
+            "frictionValue"
+        ).textContent =
+            `${friction} N`;
+
+
+        document.getElementById(
+            "walkingPushArrow"
+        ).style.width =
+            `${40 + force * 1.4}px`;
+
+
+        document.getElementById(
+            "walkingFrictionArrow"
+        ).style.width =
+            `${25 + friction * 1.15}px`;
+
+
+        const available =
+            Math.min(
+                force,
+                friction
+            );
+
+
+        const difference =
+            force - available;
+
+
+        let explanation;
+
+
+        if (friction < 20) {
+
+            explanation =
+                "The surface provides very little grip. The foot is likely to slip, making controlled walking difficult.";
+
+        } else if (difference <= 10) {
+
+            explanation =
+                "The surface provides good grip. Friction allows the foot to interact with the ground so the person can move forward.";
+
+        } else {
+
+            explanation =
+                "The applied push is much larger than the available frictional grip, so slipping can occur.";
+
+        }
+
+
+        document.getElementById(
+            "walkingExplanation"
+        ).textContent =
+            explanation;
+
+
+        document.getElementById(
+            "walkingFormula"
+        ).textContent =
+            `Push = ${force} N | Available friction = ${available} N`;
+
+    }
+
+
+    function runWalking() {
+
+        const force =
+            Number(
+                document.getElementById(
+                    "walkForce"
+                ).value
+            );
+
+
+        const friction =
+            Number(
+                document.getElementById(
+                    "friction"
+                ).value
+            );
+
+
+        const grip =
+            Math.min(
+                force,
+                friction
+            );
+
+
+        const distance =
+            70 + grip * 3;
+
+
+        const walker =
+            document.getElementById(
+                "walker"
+            );
+
+
+        walker.style.transform =
+            `translateX(${distance}px)`;
+
+
+        setTimeout(() => {
+
+            walker.style.transform =
+                "translateX(0px)";
+
+        }, 1400);
+
+    }
+
+
+    /* =========================
+       FOOTBALL
+    ========================== */
+
+    function updateFootball() {
+
+        const force =
+            Number(
+                document.getElementById(
+                    "kickForce"
+                ).value
+            );
+
+
+        const mass =
+            Number(
+                document.getElementById(
+                    "ballMass"
+                ).value
+            ) / 10;
+
+
+        const acceleration =
+            force / mass;
+
+
+        document.getElementById(
+            "kickForceValue"
+        ).textContent =
+            `${force} N`;
+
+
+        document.getElementById(
+            "ballMassValue"
+        ).textContent =
+            `${mass.toFixed(1)} kg`;
+
+
+        document.getElementById(
+            "footballForceArrow"
+        ).style.width =
+            `${45 + force * 2}px`;
+
+
+        let explanation;
+
+
+        if (acceleration > 80) {
+
+            explanation =
+                "The force is large compared with the ball's mass, producing high acceleration.";
+
+        } else if (acceleration > 40) {
+
+            explanation =
+                "The applied force produces moderate acceleration and clearly changes the ball's motion.";
+
+        } else {
+
+            explanation =
+                "The ball has relatively greater mass for the applied force, so acceleration is smaller.";
+
+        }
+
+
+        document.getElementById(
+            "footballExplanation"
+        ).textContent =
+            explanation;
+
+
+        document.getElementById(
+            "footballFormula"
+        ).textContent =
+            `a = F / m = ${force} / ${mass.toFixed(1)} = ${acceleration.toFixed(1)} m/s²`;
+
+    }
+
+
+    function kickBall() {
+
+        const force =
+            Number(
+                document.getElementById(
+                    "kickForce"
+                ).value
+            );
+
+
+        const mass =
+            Number(
+                document.getElementById(
+                    "ballMass"
+                ).value
+            ) / 10;
+
+
+        const acceleration =
+            force / mass;
+
+
+        const travel =
+            Math.min(
+                700,
+                180 + acceleration * 4
+            );
+
+
+        const lift =
+            Math.min(
+                180,
+                acceleration * 1.3
+            );
+
+
+        const ball =
+            document.getElementById(
+                "football"
+            );
+
+
+        ball.style.transform =
+            `translate(${travel}px, -${lift}px) rotate(${travel}deg)`;
+
+
+        setTimeout(() => {
+
+            ball.style.transform =
+                "translate(0,0) rotate(0deg)";
+
+        }, 1600);
+
+    }
+
+
+    /* =========================
+       ROCKET
+    ========================== */
+
+    function updateRocket() {
+
+        const force =
+            Number(
+                document.getElementById(
+                    "thrust"
+                ).value
+            );
+
+
+        document.getElementById(
+            "thrustValue"
+        ).textContent =
+            `${force} N`;
+
+
+        document.getElementById(
+            "rocketUpArrow"
+        ).style.width =
+            `${35 + force}px`;
+
+
+        document.getElementById(
+            "rocketDownArrow"
+        ).style.width =
+            `${35 + force}px`;
+
+
+        document.getElementById(
+            "rocketExplanation"
+        ).textContent =
+            `The rocket pushes exhaust gases downward with ${force} N. The gases exert an equal ${force} N force upward on the rocket.`;
+
+
+        document.getElementById(
+            "rocketFormula"
+        ).textContent =
+            `Action: ${force} N downward ↔ Reaction: ${force} N upward`;
+
+    }
+
+
+    function launchRocket() {
+
+        const rocket =
+            document.getElementById(
+                "rocket"
+            );
+
+
+        rocket.classList.add(
+            "launching"
+        );
+
+
+        setTimeout(() => {
+
+            rocket.classList.remove(
+                "launching"
+            );
+
+        }, 1800);
+
+    }
+
+
+    /* =========================
+       COMPLETION
+    ========================== */
+
+    function markCompleted() {
+
+        localStorage.setItem(
+            `myCampus_interactive_completed_${topicId}`,
+            "true"
+        );
+
+
+        alert(
+            "Topic 1 Interactive Exploration completed ✅"
+        );
+
+    }
+
+
+    function goBack() {
+
+        window.location.href =
+            "student.html";
+
+    }
+
+
+    /* =========================
+       START
+    ========================== */
+
+    updateWalking();
+    updateFootball();
+    updateRocket();
+
+</script>
+
+    <script src="assets/js/universal-learning-journey.js?v=1"></script>
+</body>
+</html>

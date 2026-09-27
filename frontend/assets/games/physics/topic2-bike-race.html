@@ -1,0 +1,4723 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+<title>My Campus - Physics Bike Race</title>
+
+<style>
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+html,body{
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    font-family:Segoe UI,Arial,sans-serif;
+    background:#07131d;
+}
+
+#game{
+    position:fixed;
+    inset:0;
+}
+
+canvas{
+    display:block;
+}
+
+.hud{
+    position:fixed;
+    inset:0;
+    z-index:10;
+    pointer-events:none;
+    color:#fff;
+}
+
+.glass{
+    background:
+        linear-gradient(
+            135deg,
+            rgba(5,20,32,.94),
+            rgba(7,29,44,.80)
+        );
+
+    border:1px solid rgba(255,255,255,.13);
+    border-radius:15px;
+
+    box-shadow:
+        0 14px 40px rgba(0,0,0,.28);
+
+    backdrop-filter:blur(13px);
+}
+
+/* -------------------------------------------------------
+   HEADER
+------------------------------------------------------- */
+
+.title{
+    position:absolute;
+    top:18px;
+    left:18px;
+
+    width:330px;
+
+    padding:14px 17px;
+}
+
+.title .eyebrow{
+    color:#67e2ff;
+    font-size:10px;
+    font-weight:900;
+    letter-spacing:1.7px;
+}
+
+.title h1{
+    margin-top:4px;
+
+    font-size:19px;
+}
+
+.title p{
+    margin-top:5px;
+
+    color:#adbeca;
+
+    font-size:11px;
+    line-height:1.4;
+}
+
+/* -------------------------------------------------------
+   PROGRESS
+------------------------------------------------------- */
+
+.progress{
+    position:absolute;
+
+    top:18px;
+    left:50%;
+
+    transform:translateX(-50%);
+
+    width:430px;
+
+    padding:11px 14px;
+}
+
+.progress-row{
+    display:flex;
+    justify-content:space-between;
+
+    color:#a4b5c1;
+
+    font-size:9px;
+    font-weight:900;
+}
+
+.progress-track{
+    margin-top:7px;
+
+    height:7px;
+
+    overflow:hidden;
+
+    border-radius:20px;
+
+    background:
+        rgba(255,255,255,.10);
+}
+
+#progressFill{
+    width:0%;
+    height:100%;
+
+    background:
+        linear-gradient(
+            90deg,
+            #49ddff,
+            #76ff99
+        );
+}
+
+/* -------------------------------------------------------
+   POSITION
+------------------------------------------------------- */
+
+.position{
+    position:absolute;
+
+    right:18px;
+    top:18px;
+
+    width:145px;
+
+    padding:12px;
+
+    text-align:center;
+}
+
+.position small{
+    color:#9cb0bf;
+
+    font-size:9px;
+    font-weight:900;
+}
+
+.position strong{
+    display:block;
+
+    margin-top:2px;
+
+    color:#67e3ff;
+
+    font-size:30px;
+}
+
+/* -------------------------------------------------------
+   CAMERA SELECTOR
+------------------------------------------------------- */
+
+.camera-options{
+    position:absolute;
+
+    right:18px;
+    top:115px;
+
+    display:flex;
+
+    gap:5px;
+
+    padding:7px;
+
+    pointer-events:auto;
+}
+
+.camera-options button{
+    border:0;
+
+    padding:7px 9px;
+
+    border-radius:7px;
+
+    background:
+        rgba(255,255,255,.08);
+
+    color:#fff;
+
+    font-size:9px;
+    font-weight:900;
+
+    cursor:pointer;
+}
+
+.camera-options button.active{
+    background:#60e1ff;
+    color:#03131c;
+}
+
+/* -------------------------------------------------------
+   LEADERBOARD
+------------------------------------------------------- */
+
+.leaderboard{
+    position:absolute;
+
+    top:145px;
+    left:18px;
+
+    width:285px;
+
+    padding:13px;
+}
+
+.panel-title{
+    color:#65e2ff;
+
+    font-size:10px;
+    font-weight:900;
+
+    letter-spacing:1.2px;
+}
+
+.racer-row{
+    display:grid;
+
+    grid-template-columns:
+        22px
+        1fr
+        auto;
+
+    gap:7px;
+
+    align-items:center;
+
+    padding:8px;
+
+    margin-top:5px;
+
+    border-radius:9px;
+
+    background:
+        rgba(255,255,255,.05);
+
+    font-size:10px;
+}
+
+.racer-row.you{
+    border:
+        1px solid
+        rgba(76,220,255,.42);
+
+    background:
+        rgba(56,204,255,.11);
+}
+
+.racer-row b{
+    font-size:11px;
+}
+
+.racer-distance{
+    display:block;
+
+    color:#91a7b6;
+
+    font-size:8px;
+}
+
+.racer-speed{
+    color:#70e6ff;
+
+    font-weight:900;
+}
+
+/* -------------------------------------------------------
+   CONTROLS
+------------------------------------------------------- */
+
+.controls{
+    position:absolute;
+
+    left:50%;
+    top:95px;
+
+    transform:translateX(-50%);
+
+    padding:7px 13px;
+
+    color:#e0e8ed;
+
+    font-size:10px;
+}
+
+/* -------------------------------------------------------
+   METRICS
+------------------------------------------------------- */
+
+.metrics{
+    position:absolute;
+
+    right:18px;
+    bottom:18px;
+
+    width:320px;
+
+    padding:15px;
+}
+
+.metrics > small{
+    color:#94a9b8;
+
+    font-size:9px;
+    font-weight:900;
+}
+
+.big-speed{
+    margin-top:4px;
+
+    font-size:42px;
+    font-weight:950;
+}
+
+.big-speed span{
+    color:#a8bac6;
+
+    font-size:14px;
+}
+
+.speed-track{
+    height:7px;
+
+    margin:10px 0;
+
+    overflow:hidden;
+
+    border-radius:20px;
+
+    background:
+        rgba(255,255,255,.09);
+}
+
+#speedFill{
+    height:100%;
+    width:0%;
+
+    background:
+        linear-gradient(
+            90deg,
+            #4bdcff,
+            #6cff91,
+            #ffe168
+        );
+}
+
+.metric-grid{
+    display:grid;
+
+    grid-template-columns:
+        1fr 1fr;
+
+    gap:7px;
+}
+
+.metric{
+    padding:8px;
+
+    border-radius:9px;
+
+    background:
+        rgba(255,255,255,.05);
+}
+
+.metric label{
+    display:block;
+
+    color:#92a7b6;
+
+    font-size:8px;
+    font-weight:900;
+}
+
+.metric strong{
+    display:block;
+
+    margin-top:2px;
+
+    font-size:14px;
+}
+
+/* -------------------------------------------------------
+   P1 TARGET
+------------------------------------------------------- */
+
+.target{
+    margin-top:9px;
+
+    padding:10px;
+
+    border:
+        1px solid
+        rgba(255,213,77,.25);
+
+    border-radius:10px;
+
+    background:
+        rgba(255,198,55,.09);
+}
+
+.target label{
+    color:#d0bb7d;
+
+    font-size:8px;
+    font-weight:900;
+}
+
+.target strong{
+    display:block;
+
+    margin-top:2px;
+
+    color:#ffe06a;
+
+    font-size:19px;
+}
+
+.target p{
+    margin-top:3px;
+
+    color:#bac9d2;
+
+    font-size:9px;
+    line-height:1.35;
+}
+
+/* -------------------------------------------------------
+   PHYSICS COACH
+------------------------------------------------------- */
+
+.coach{
+    position:absolute;
+
+    left:50%;
+    bottom:12px;
+
+    transform:translateX(-50%);
+
+    width:min(600px,40vw);
+
+    padding:11px 15px;
+
+    text-align:center;
+}
+
+#coachTitle{
+    color:#65e2ff;
+
+    font-size:10px;
+    font-weight:950;
+}
+
+#coachText{
+    margin-top:4px;
+
+    color:#e1ebf1;
+
+    font-size:11px;
+    line-height:1.4;
+}
+
+#coachFormula{
+    margin-top:4px;
+
+    color:#91a8b8;
+
+    font-size:10px;
+}
+
+/* -------------------------------------------------------
+   COUNTDOWN
+------------------------------------------------------- */
+
+.countdown{
+    position:fixed;
+
+    inset:0;
+
+    z-index:40;
+
+    display:flex;
+
+    align-items:center;
+    justify-content:center;
+
+    pointer-events:none;
+
+    color:white;
+
+    font-size:150px;
+    font-weight:950;
+
+    text-shadow:
+        0 12px 55px
+        rgba(0,0,0,.7);
+}
+
+/* -------------------------------------------------------
+   FLOATING RIDER LABEL
+------------------------------------------------------- */
+
+.rider-tag{
+    position:fixed;
+
+    z-index:20;
+
+    transform:
+        translate(-50%,-100%);
+
+    padding:4px 7px;
+
+    border:
+        1px solid
+        rgba(255,255,255,.17);
+
+    border-radius:7px;
+
+    background:
+        rgba(4,17,27,.88);
+
+    color:#fff;
+
+    font-size:9px;
+    font-weight:900;
+
+    pointer-events:none;
+
+    white-space:nowrap;
+}
+
+.rider-tag.you{
+    color:#64e5ff;
+
+    border-color:
+        rgba(91,228,255,.45);
+}
+
+/* -------------------------------------------------------
+   QUESTION
+------------------------------------------------------- */
+
+.challenge{
+    position:fixed;
+
+    top:120px;
+    left:50%;
+
+    transform:
+        translateX(-50%);
+
+    z-index:60;
+
+    width:min(700px,88vw);
+
+    display:none;
+
+    padding:17px;
+
+    color:#fff;
+
+    pointer-events:auto;
+}
+
+.challenge.show{
+    display:block;
+}
+
+.challenge-badge{
+    color:#ffe16b;
+
+    font-size:10px;
+    font-weight:950;
+
+    letter-spacing:1.2px;
+}
+
+.challenge h3{
+    margin-top:6px;
+
+    font-size:19px;
+}
+
+.challenge-hint{
+    margin-top:5px;
+
+    color:#b7c8d4;
+
+    font-size:11px;
+}
+
+.answers{
+    display:grid;
+
+    grid-template-columns:
+        repeat(3,1fr);
+
+    gap:8px;
+
+    margin-top:12px;
+}
+
+.answer{
+    padding:10px;
+
+    border:
+        1px solid
+        rgba(255,255,255,.14);
+
+    border-radius:9px;
+
+    background:
+        rgba(255,255,255,.07);
+
+    color:#fff;
+
+    font-weight:900;
+
+    cursor:pointer;
+}
+
+.answer:hover{
+    background:
+        rgba(68,215,255,.15);
+}
+
+.answer:disabled{
+    opacity:.6;
+}
+
+.feedback{
+    display:none;
+
+    max-height:230px;
+
+    overflow:auto;
+
+    margin-top:10px;
+
+    padding:11px;
+
+    border-radius:10px;
+
+    background:
+        rgba(66,214,255,.08);
+
+    border:
+        1px solid
+        rgba(82,218,255,.17);
+
+    font-size:11px;
+    line-height:1.55;
+}
+
+.feedback b{
+    color:#6ee5ff;
+}
+
+.continue-btn{
+    display:none;
+
+    margin:
+        10px auto 0;
+
+    padding:
+        10px 23px;
+
+    border:0;
+
+    border-radius:9px;
+
+    background:#61e1ff;
+
+    color:#03131c;
+
+    font-weight:900;
+
+    cursor:pointer;
+}
+
+/* -------------------------------------------------------
+   FINISH
+------------------------------------------------------- */
+
+.finish{
+    position:fixed;
+
+    inset:0;
+
+    z-index:80;
+
+    display:none;
+
+    align-items:center;
+    justify-content:center;
+
+    background:
+        rgba(1,7,13,.82);
+
+    backdrop-filter:blur(11px);
+
+    color:#fff;
+
+    pointer-events:auto;
+}
+
+.finish.show{
+    display:flex;
+}
+
+.finish-box{
+    width:min(780px,93vw);
+
+    max-height:93vh;
+
+    overflow:auto;
+
+    padding:28px;
+}
+
+.finish-box h2{
+    text-align:center;
+
+    font-size:34px;
+}
+
+.finish-sub{
+    margin-top:5px;
+
+    text-align:center;
+
+    color:#a9bbc8;
+
+    font-size:11px;
+}
+
+.final-grid{
+    display:grid;
+
+    grid-template-columns:
+        repeat(4,1fr);
+
+    gap:8px;
+
+    margin-top:16px;
+}
+
+.final-card{
+    padding:12px;
+
+    border-radius:10px;
+
+    text-align:center;
+
+    background:
+        rgba(255,255,255,.055);
+}
+
+.final-card strong{
+    display:block;
+
+    color:#68e3ff;
+
+    font-size:19px;
+}
+
+.final-card span{
+    color:#92a7b5;
+
+    font-size:8px;
+}
+
+.final-explanation{
+    margin-top:15px;
+
+    padding:16px;
+
+    border:
+        1px solid
+        rgba(89,220,255,.18);
+
+    border-radius:11px;
+
+    background:
+        rgba(68,212,255,.075);
+
+    font-size:11px;
+    line-height:1.65;
+}
+
+.final-explanation b{
+    color:#6ee5ff;
+}
+
+.restart{
+    display:block;
+
+    margin:
+        17px auto 0;
+
+    padding:
+        11px 25px;
+
+    border:0;
+
+    border-radius:9px;
+
+    background:#61e1ff;
+
+    color:#03131c;
+
+    font-weight:900;
+
+    cursor:pointer;
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="game"></div>
+
+<div class="hud">
+
+<div class="title glass">
+
+    <div class="eyebrow">
+        MY CAMPUS - PHYSICS GAME
+    </div>
+
+    <h1>
+        Bike Race - Motion, Distance, Speed and Velocity
+    </h1>
+
+    <p id="studentText"></p>
+
+</div>
+
+<div class="progress glass">
+
+    <div class="progress-row">
+
+        <span>START</span>
+
+        <span id="progressText">
+            0 / 1200 m
+        </span>
+
+        <span>FINISH</span>
+
+    </div>
+
+    <div class="progress-track">
+
+        <div id="progressFill"></div>
+
+    </div>
+
+</div>
+
+<div class="position glass">
+
+    <small>RACE POSITION</small>
+
+    <strong id="position">
+        4 / 4
+    </strong>
+
+</div>
+
+<div class="camera-options glass">
+
+    <button
+        id="cameraChase"
+        class="active">
+        CHASE
+    </button>
+
+    <button id="cameraSide">
+        SIDE
+    </button>
+
+    <button id="cameraTop">
+        TOP
+    </button>
+
+</div>
+
+<div class="controls glass">
+    W / UP Accelerate |
+    S / DOWN Brake |
+    A D / LEFT RIGHT Steer
+</div>
+
+<div class="leaderboard glass">
+
+    <div class="panel-title">
+        LIVE RACERS
+    </div>
+
+    <div id="leaderboard"></div>
+
+</div>
+
+<div class="metrics glass">
+
+    <small>
+        YOUR CURRENT SPEED
+    </small>
+
+    <div class="big-speed">
+
+        <span id="currentSpeed">
+            0
+        </span>
+
+        <span>km/h</span>
+
+    </div>
+
+    <div class="speed-track">
+        <div id="speedFill"></div>
+    </div>
+
+    <div class="metric-grid">
+
+        <div class="metric">
+
+            <label>TIME</label>
+
+            <strong>
+                <span id="time">
+                    0.0
+                </span>
+                s
+            </strong>
+
+        </div>
+
+        <div class="metric">
+
+            <label>DISTANCE</label>
+
+            <strong>
+                <span id="distance">
+                    0
+                </span>
+                m
+            </strong>
+
+        </div>
+
+        <div class="metric">
+
+            <label>AVERAGE SPEED</label>
+
+            <strong>
+                <span id="averageSpeed">
+                    0
+                </span>
+                km/h
+            </strong>
+
+        </div>
+
+        <div class="metric">
+
+            <label>REMAINING</label>
+
+            <strong>
+                <span id="remaining">
+                    1200
+                </span>
+                m
+            </strong>
+
+        </div>
+
+    </div>
+
+    <div class="target">
+
+        <label>
+            SPEED NEEDED FROM NOW FOR P1
+        </label>
+
+        <strong id="requiredSpeed">
+            --
+        </strong>
+
+        <p id="requiredInfo">
+            Race starts soon.
+        </p>
+
+    </div>
+
+</div>
+
+<div class="coach glass">
+
+    <div id="coachTitle">
+        REAL-TIME PHYSICS COACH
+    </div>
+
+    <div id="coachText">
+        Your Physics lesson happens during the race.
+    </div>
+
+    <div id="coachFormula">
+        Speed = Distance / Time
+    </div>
+
+</div>
+
+</div>
+
+<div
+    id="countdown"
+    class="countdown">
+    3
+</div>
+
+<div
+    id="challenge"
+    class="challenge glass">
+
+    <div class="challenge-badge">
+        PHYSICS BOOST CHALLENGE
+    </div>
+
+    <h3 id="question"></h3>
+
+    <div
+        id="challengeHint"
+        class="challenge-hint">
+    </div>
+
+    <div
+        id="answers"
+        class="answers">
+    </div>
+
+    <div
+        id="feedback"
+        class="feedback">
+    </div>
+
+    <button
+        id="continueBtn"
+        class="continue-btn">
+
+        Continue Race
+
+    </button>
+
+</div>
+
+<div
+    id="finish"
+    class="finish">
+
+    <div class="finish-box glass">
+
+        <h2 id="finishTitle"></h2>
+
+        <div class="finish-sub">
+            Your race result becomes the Physics explanation.
+        </div>
+
+        <div class="final-grid">
+
+            <div class="final-card">
+
+                <strong id="finalPosition">
+                    -
+                </strong>
+
+                <span>POSITION</span>
+
+            </div>
+
+            <div class="final-card">
+
+                <strong id="finalTime">
+                    -
+                </strong>
+
+                <span>TIME</span>
+
+            </div>
+
+            <div class="final-card">
+
+                <strong>
+                    1200 m
+                </strong>
+
+                <span>DISTANCE</span>
+
+            </div>
+
+            <div class="final-card">
+
+                <strong id="finalAverage">
+                    -
+                </strong>
+
+                <span>AVERAGE SPEED</span>
+
+            </div>
+
+        </div>
+
+        <div
+            id="finalExplanation"
+            class="final-explanation">
+        </div>
+
+        <button
+            class="restart"
+            onclick="location.reload()">
+
+            Race Again - New Questions
+
+        </button>
+
+    </div>
+
+</div>
+
+<script src="../../vendor/three-0.160.1.min.js"></script>
+
+<script>
+
+(() => {
+
+"use strict";
+
+/* ==========================================================
+   CONFIGURATION
+========================================================== */
+
+const TRACK_LENGTH = 1200;
+
+const ROAD_WIDTH = 18;
+
+const PLAYER_MAX_KMH = 84;
+
+const PLAYER_MAX_SPEED =
+    PLAYER_MAX_KMH / 3.6;
+
+const BOOST_MAX_KMH = 96;
+
+const BOOST_MAX_SPEED =
+    BOOST_MAX_KMH / 3.6;
+
+const ACCELERATION = 6.3;
+
+const BRAKE_FORCE = 12;
+
+const NATURAL_DRAG = 1.25;
+
+const studentName =
+    localStorage.getItem(
+        "student_name"
+    ) ||
+    sessionStorage.getItem(
+        "student_name"
+    ) ||
+    "Student";
+
+document
+.getElementById(
+    "studentText"
+)
+.textContent =
+    studentName +
+    " - catch the riders ahead and finish first using Physics.";
+
+/* ==========================================================
+   SCENE
+========================================================== */
+
+const scene =
+    new THREE.Scene();
+
+scene.background =
+    new THREE.Color(
+        0x83c8e9
+    );
+
+scene.fog =
+    new THREE.Fog(
+        0x83c8e9,
+        150,
+        530
+    );
+
+const camera =
+    new THREE.PerspectiveCamera(
+        58,
+        innerWidth /
+        innerHeight,
+        .1,
+        700
+    );
+
+const renderer =
+    new THREE.WebGLRenderer({
+        antialias:true,
+        powerPreference:
+            "high-performance"
+    });
+
+renderer.setSize(
+    innerWidth,
+    innerHeight
+);
+
+renderer.setPixelRatio(
+    Math.min(
+        devicePixelRatio,
+        2
+    )
+);
+
+renderer.shadowMap.enabled =
+    true;
+
+renderer.outputColorSpace =
+    THREE.SRGBColorSpace;
+
+renderer.toneMapping =
+    THREE.ACESFilmicToneMapping;
+
+renderer.toneMappingExposure =
+    1.08;
+
+document
+.getElementById(
+    "game"
+)
+.appendChild(
+    renderer.domElement
+);
+
+/* ==========================================================
+   LIGHTS
+========================================================== */
+
+scene.add(
+    new THREE.HemisphereLight(
+        0xd9f3ff,
+        0x4a7044,
+        2.5
+    )
+);
+
+const sun =
+    new THREE.DirectionalLight(
+        0xffedd0,
+        4
+    );
+
+sun.position.set(
+    -70,
+    110,
+    -50
+);
+
+sun.castShadow = true;
+
+sun.shadow.mapSize.set(
+    2048,
+    2048
+);
+
+scene.add(sun);
+
+/* ==========================================================
+   MATERIALS
+========================================================== */
+
+const MAT = {
+
+    road:
+        new THREE.MeshStandardMaterial({
+            color:0x292f34,
+            roughness:.93
+        }),
+
+    grass:
+        new THREE.MeshStandardMaterial({
+            color:0x559846,
+            roughness:1
+        }),
+
+    concrete:
+        new THREE.MeshStandardMaterial({
+            color:0xafb7ba,
+            roughness:.9
+        }),
+
+    white:
+        new THREE.MeshStandardMaterial({
+            color:0xf7f7f1,
+            roughness:.7
+        }),
+
+    dark:
+        new THREE.MeshStandardMaterial({
+            color:0x151a20,
+            roughness:.55,
+            metalness:.3
+        }),
+
+    tree:
+        new THREE.MeshStandardMaterial({
+            color:0x267038,
+            roughness:.9
+        }),
+
+    trunk:
+        new THREE.MeshStandardMaterial({
+            color:0x654027,
+            roughness:1
+        }),
+
+    window:
+        new THREE.MeshStandardMaterial({
+            color:0x3c91b4,
+            roughness:.2
+        })
+};
+
+function createBox(
+    width,
+    height,
+    depth,
+    material,
+    position,
+    parent=scene
+){
+
+    const mesh =
+        new THREE.Mesh(
+            new THREE.BoxGeometry(
+                width,
+                height,
+                depth
+            ),
+            material
+        );
+
+    mesh.position.copy(
+        position
+    );
+
+    mesh.castShadow = true;
+
+    mesh.receiveShadow = true;
+
+    parent.add(mesh);
+
+    return mesh;
+}
+
+/* ==========================================================
+   TRACK
+
+   IMPORTANT:
+   START = z = 0
+   FINISH = z = +1200
+
+   Positive Z = FORWARD.
+
+   Simple.
+========================================================== */
+
+function trackX(s){
+
+    return (
+        7.5 *
+        Math.sin(s/110)
+        +
+        3.5 *
+        Math.sin(s/52)
+    );
+}
+
+function trackCenter(s){
+
+    return new THREE.Vector3(
+        trackX(s),
+        0,
+        s
+    );
+}
+
+function trackBasis(s){
+
+    const d = 1;
+
+    const previous =
+        trackCenter(
+            s-d
+        );
+
+    const next =
+        trackCenter(
+            s+d
+        );
+
+    const forward =
+        next
+        .clone()
+        .sub(previous)
+        .normalize();
+
+    const right =
+        new THREE.Vector3(
+            forward.z,
+            0,
+            -forward.x
+        )
+        .normalize();
+
+    return {
+        center:
+            trackCenter(s),
+
+        forward,
+
+        right
+    };
+}
+
+function trackPosition(
+    s,
+    lane=0,
+    y=0
+){
+
+    const basis =
+        trackBasis(s);
+
+    return basis
+        .center
+        .clone()
+        .addScaledVector(
+            basis.right,
+            lane
+        )
+        .add(
+            new THREE.Vector3(
+                0,
+                y,
+                0
+            )
+        );
+}
+
+const MODEL_FORWARD =
+    new THREE.Vector3(
+        0,
+        0,
+        1
+    );
+
+function faceTrack(
+    object,
+    progress
+){
+
+    const forward =
+        trackBasis(
+            progress
+        )
+        .forward;
+
+    object.quaternion
+        .setFromUnitVectors(
+            MODEL_FORWARD,
+            forward
+        );
+}
+
+/* ==========================================================
+   GROUND
+========================================================== */
+
+const ground =
+    new THREE.Mesh(
+        new THREE.PlaneGeometry(
+            220,
+            TRACK_LENGTH+400
+        ),
+        MAT.grass
+    );
+
+ground.rotation.x =
+    -Math.PI/2;
+
+ground.position.set(
+    0,
+    -.1,
+    TRACK_LENGTH/2
+);
+
+ground.receiveShadow =
+    true;
+
+scene.add(ground);
+
+/* ==========================================================
+   ROAD
+========================================================== */
+
+const SEGMENT = 6;
+
+for(
+    let s=-30;
+    s<TRACK_LENGTH+20;
+    s+=SEGMENT
+){
+
+    const middle =
+        s+
+        SEGMENT/2;
+
+    const road =
+        createBox(
+            ROAD_WIDTH,
+            .08,
+            SEGMENT+.7,
+            MAT.road,
+            trackPosition(
+                middle,
+                0,
+                .03
+            )
+        );
+
+    faceTrack(
+        road,
+        middle
+    );
+
+    [-10.2,10.2]
+    .forEach(offset=>{
+
+        const sidewalk =
+            createBox(
+                2.5,
+                .22,
+                SEGMENT+.7,
+                MAT.concrete,
+                trackPosition(
+                    middle,
+                    offset,
+                    .08
+                )
+            );
+
+        faceTrack(
+            sidewalk,
+            middle
+        );
+    });
+
+    [-8.3,8.3]
+    .forEach(offset=>{
+
+        const edge =
+            createBox(
+                .14,
+                .025,
+                SEGMENT+.5,
+                MAT.white,
+                trackPosition(
+                    middle,
+                    offset,
+                    .105
+                )
+            );
+
+        faceTrack(
+            edge,
+            middle
+        );
+    });
+
+    if(
+        Math.floor(
+            Math.abs(s)/
+            SEGMENT
+        ) % 2 === 0
+    ){
+
+        [-4.3,0,4.3]
+        .forEach(offset=>{
+
+            const marker =
+                createBox(
+                    .13,
+                    .025,
+                    3.3,
+                    MAT.white,
+                    trackPosition(
+                        middle,
+                        offset,
+                        .108
+                    )
+                );
+
+            faceTrack(
+                marker,
+                middle
+            );
+        });
+    }
+}
+
+/* ==========================================================
+   TREES
+========================================================== */
+
+function createTree(
+    progress,
+    offset
+){
+
+    const root =
+        new THREE.Group();
+
+    const trunk =
+        new THREE.Mesh(
+            new THREE.CylinderGeometry(
+                .24,
+                .33,
+                3.1,
+                8
+            ),
+            MAT.trunk
+        );
+
+    trunk.position.y =
+        1.55;
+
+    trunk.castShadow =
+        true;
+
+    root.add(trunk);
+
+    [
+        [0,3.6,0,1],
+        [-.68,3.4,0,.75],
+        [.68,3.45,0,.82],
+        [0,4.2,0,.72]
+    ]
+    .forEach(data=>{
+
+        const leaves =
+            new THREE.Mesh(
+                new THREE.IcosahedronGeometry(
+                    data[3],
+                    1
+                ),
+                MAT.tree
+            );
+
+        leaves.position.set(
+            data[0],
+            data[1],
+            data[2]
+        );
+
+        leaves.castShadow =
+            true;
+
+        root.add(leaves);
+    });
+
+    root.position.copy(
+        trackPosition(
+            progress,
+            offset,
+            0
+        )
+    );
+
+    scene.add(root);
+}
+
+for(
+    let s=25;
+    s<TRACK_LENGTH;
+    s+=30
+){
+
+    createTree(
+        s,
+        -14-Math.random()*6
+    );
+
+    createTree(
+        s+12,
+        14+Math.random()*6
+    );
+}
+
+/* ==========================================================
+   BUILDINGS
+========================================================== */
+
+const buildingColors = [
+    0xd8d3c5,
+    0xafbdc2,
+    0xe0cdb4,
+    0xb9c5ce,
+    0xd4bca5
+];
+
+function createBuilding(
+    progress,
+    offset
+){
+
+    const root =
+        new THREE.Group();
+
+    const width =
+        10+
+        Math.random()*5;
+
+    const height =
+        7+
+        Math.random()*9;
+
+    const depth =
+        10+
+        Math.random()*5;
+
+    const bodyMaterial =
+        new THREE.MeshStandardMaterial({
+            color:
+                buildingColors[
+                    Math.floor(
+                        Math.random()*
+                        buildingColors.length
+                    )
+                ],
+
+            roughness:.82
+        });
+
+    createBox(
+        width,
+        height,
+        depth,
+        bodyMaterial,
+        new THREE.Vector3(
+            0,
+            height/2,
+            0
+        ),
+        root
+    );
+
+    createBox(
+        width+.3,
+        .3,
+        depth+.3,
+        MAT.dark,
+        new THREE.Vector3(
+            0,
+            height+.15,
+            0
+        ),
+        root
+    );
+
+    for(
+        let floor=0;
+        floor<
+        Math.floor(height/2);
+        floor++
+    ){
+
+        [-1.4,0,1.4]
+        .forEach(x=>{
+
+            createBox(
+                .8,
+                .6,
+                .04,
+                MAT.window,
+                new THREE.Vector3(
+                    x,
+                    1.35+
+                    floor*1.7,
+
+                    offset<0
+                    ? depth/2+.03
+                    : -depth/2-.03
+                ),
+                root
+            );
+        });
+    }
+
+    root.position.copy(
+        trackPosition(
+            progress,
+            offset,
+            0
+        )
+    );
+
+    faceTrack(
+        root,
+        progress
+    );
+
+    scene.add(root);
+}
+
+for(
+    let s=45;
+    s<TRACK_LENGTH;
+    s+=70
+){
+
+    createBuilding(
+        s,
+        -31-
+        Math.random()*7
+    );
+
+    createBuilding(
+        s+30,
+        31+
+        Math.random()*7
+    );
+}
+
+/* ==========================================================
+   START + FINISH
+========================================================== */
+
+function createRaceLine(
+    progress
+){
+
+    for(
+        let i=0;
+        i<14;
+        i++
+    ){
+
+        const lane =
+            -ROAD_WIDTH/2+
+            ROAD_WIDTH/28+
+            i*(
+                ROAD_WIDTH/14
+            );
+
+        const tile =
+            createBox(
+                ROAD_WIDTH/14,
+                .03,
+                1.4,
+
+                i%2===0
+                ? MAT.white
+                : MAT.dark,
+
+                trackPosition(
+                    progress,
+                    lane,
+                    .11
+                )
+            );
+
+        faceTrack(
+            tile,
+            progress
+        );
+    }
+}
+
+createRaceLine(0);
+
+createRaceLine(
+    TRACK_LENGTH
+);
+
+/* FINISH GATE */
+
+[-10,10]
+.forEach(offset=>{
+
+    const p =
+        trackPosition(
+            TRACK_LENGTH,
+            offset,
+            0
+        );
+
+    createBox(
+        .4,
+        6,
+        .4,
+        MAT.dark,
+        new THREE.Vector3(
+            p.x,
+            3,
+            p.z
+        )
+    );
+});
+
+const finishBanner =
+    createBox(
+        20,
+        .55,
+        .45,
+
+        new THREE.MeshStandardMaterial({
+            color:0xffb72f
+        }),
+
+        trackPosition(
+            TRACK_LENGTH,
+            0,
+            5.7
+        )
+    );
+
+faceTrack(
+    finishBanner,
+    TRACK_LENGTH
+);
+
+/* ==========================================================
+   BIKE MODEL
+
+   FRONT = LOCAL +Z.
+
+   rear wheel = z -0.82
+   front wheel = z +0.82
+========================================================== */
+
+function cylinderBetween(
+    a,
+    b,
+    radius,
+    material,
+    parent
+){
+
+    const direction =
+        b.clone()
+        .sub(a);
+
+    const length =
+        direction.length();
+
+    const mesh =
+        new THREE.Mesh(
+            new THREE.CylinderGeometry(
+                radius,
+                radius,
+                length,
+                10
+            ),
+            material
+        );
+
+    mesh.position
+        .copy(a)
+        .add(b)
+        .multiplyScalar(.5);
+
+    mesh.quaternion
+        .setFromUnitVectors(
+            new THREE.Vector3(
+                0,
+                1,
+                0
+            ),
+            direction
+            .clone()
+            .normalize()
+        );
+
+    mesh.castShadow =
+        true;
+
+    parent.add(mesh);
+
+    return mesh;
+}
+
+function createBike(
+    color,
+    isPlayer=false
+){
+
+    const root =
+        new THREE.Group();
+
+    root.scale.setScalar(
+        isPlayer
+        ? 1.45
+        : 1.17
+    );
+
+    const frame =
+        new THREE.MeshStandardMaterial({
+            color,
+            roughness:.35,
+            metalness:.45
+        });
+
+    const skin =
+        new THREE.MeshStandardMaterial({
+            color:0xc48862,
+            roughness:.82
+        });
+
+    const clothes =
+        new THREE.MeshStandardMaterial({
+            color,
+            roughness:.7
+        });
+
+    const pants =
+        new THREE.MeshStandardMaterial({
+            color:0x17232e,
+            roughness:.82
+        });
+
+    const rubber =
+        new THREE.MeshStandardMaterial({
+            color:0x0b0e11,
+            roughness:1
+        });
+
+    function wheel(z){
+
+        const group =
+            new THREE.Group();
+
+        group.position.set(
+            0,
+            .58,
+            z
+        );
+
+        const tyre =
+            new THREE.Mesh(
+                new THREE.TorusGeometry(
+                    .54,
+                    .085,
+                    12,
+                    28
+                ),
+                rubber
+            );
+
+        tyre.rotation.y =
+            Math.PI/2;
+
+        tyre.castShadow =
+            true;
+
+        group.add(tyre);
+
+        root.add(group);
+
+        return group;
+    }
+
+    const rearWheel =
+        wheel(-.82);
+
+    const frontWheel =
+        wheel(.82);
+
+    const rear =
+        new THREE.Vector3(
+            0,.58,-.82
+        );
+
+    const front =
+        new THREE.Vector3(
+            0,.58,.82
+        );
+
+    const center =
+        new THREE.Vector3(
+            0,1.02,-.04
+        );
+
+    const seat =
+        new THREE.Vector3(
+            0,1.43,-.38
+        );
+
+    const handle =
+        new THREE.Vector3(
+            0,1.48,.65
+        );
+
+    cylinderBetween(
+        rear,
+        center,
+        .055,
+        frame,
+        root
+    );
+
+    cylinderBetween(
+        front,
+        center,
+        .055,
+        frame,
+        root
+    );
+
+    cylinderBetween(
+        center,
+        seat,
+        .055,
+        frame,
+        root
+    );
+
+    cylinderBetween(
+        seat,
+        handle,
+        .055,
+        frame,
+        root
+    );
+
+    cylinderBetween(
+        rear,
+        seat,
+        .055,
+        frame,
+        root
+    );
+
+    createBox(
+        .42,
+        .1,
+        .2,
+        MAT.dark,
+        new THREE.Vector3(
+            0,
+            1.47,
+            -.42
+        ),
+        root
+    );
+
+    createBox(
+        .64,
+        .05,
+        .06,
+        MAT.dark,
+        new THREE.Vector3(
+            0,
+            1.51,
+            .65
+        ),
+        root
+    );
+
+    /* -------------------------
+       RIDER
+    ------------------------- */
+
+    const torso =
+        new THREE.Mesh(
+            new THREE.CapsuleGeometry(
+                .31,
+                .72,
+                7,
+                14
+            ),
+            clothes
+        );
+
+    torso.position.set(
+        0,
+        2.08,
+        -.05
+    );
+
+    torso.rotation.x =
+        .22;
+
+    torso.castShadow =
+        true;
+
+    root.add(torso);
+
+    const head =
+        new THREE.Mesh(
+            new THREE.SphereGeometry(
+                .29,
+                20,
+                16
+            ),
+            skin
+        );
+
+    head.position.set(
+        0,
+        2.82,
+        .04
+    );
+
+    head.castShadow =
+        true;
+
+    root.add(head);
+
+    const helmet =
+        new THREE.Mesh(
+            new THREE.SphereGeometry(
+                .31,
+                20,
+                14
+            ),
+            MAT.dark
+        );
+
+    helmet.scale.y=.65;
+
+    helmet.position.set(
+        0,
+        2.93,
+        .02
+    );
+
+    root.add(helmet);
+
+    /*
+       Arms extend toward +Z.
+       Therefore +Z is visibly bike front.
+    */
+
+    cylinderBetween(
+        new THREE.Vector3(
+            -.2,
+            2.3,
+            .03
+        ),
+        new THREE.Vector3(
+            -.31,
+            1.55,
+            .62
+        ),
+        .075,
+        skin,
+        root
+    );
+
+    cylinderBetween(
+        new THREE.Vector3(
+            .2,
+            2.3,
+            .03
+        ),
+        new THREE.Vector3(
+            .31,
+            1.55,
+            .62
+        ),
+        .075,
+        skin,
+        root
+    );
+
+    cylinderBetween(
+        new THREE.Vector3(
+            -.17,
+            1.82,
+            -.14
+        ),
+        new THREE.Vector3(
+            -.22,
+            .92,
+            .1
+        ),
+        .09,
+        pants,
+        root
+    );
+
+    cylinderBetween(
+        new THREE.Vector3(
+            .17,
+            1.82,
+            -.14
+        ),
+        new THREE.Vector3(
+            .22,
+            .92,
+            -.08
+        ),
+        .09,
+        pants,
+        root
+    );
+
+    root.userData={
+        rearWheel,
+        frontWheel
+    };
+
+    return root;
+}
+
+/* ==========================================================
+   RACERS
+========================================================== */
+
+const racers=[];
+
+function addRacer(
+    name,
+    lane,
+    color,
+    speedKmh,
+    progress,
+    isPlayer=false
+){
+
+    const bike =
+        createBike(
+            color,
+            isPlayer
+        );
+
+    scene.add(bike);
+
+    const racer={
+
+        name,
+
+        lane,
+
+        bike,
+
+        isPlayer,
+
+        progress,
+
+        speed:
+            isPlayer
+            ? 0
+            : speedKmh/3.6,
+
+        baseSpeed:
+            speedKmh/3.6,
+
+        phase:
+            Math.random()*10,
+
+        finished:false,
+
+        finishTime:null
+    };
+
+    racers.push(racer);
+
+    return racer;
+}
+
+const player =
+    addRacer(
+        studentName,
+        -3,
+        0x169fe8,
+        0,
+        0,
+        true
+    );
+
+addRacer(
+    "Riya",
+    -1,
+    0xed5158,
+    59,
+    9
+);
+
+addRacer(
+    "Kiran",
+    1,
+    0x43d778,
+    63,
+    13
+);
+
+addRacer(
+    "Aman",
+    3,
+    0xf1b72f,
+    66,
+    17
+);
+
+/* ==========================================================
+   INPUT
+========================================================== */
+
+const keys={};
+
+addEventListener(
+    "keydown",
+    e=>{
+
+        keys[
+            e.key.toLowerCase()
+        ]=true;
+    }
+);
+
+addEventListener(
+    "keyup",
+    e=>{
+
+        keys[
+            e.key.toLowerCase()
+        ]=false;
+    }
+);
+
+function pressed(...names){
+
+    return names.some(
+        name=>keys[name]
+    );
+}
+
+/* ==========================================================
+   GAME STATE
+========================================================== */
+
+let raceStarted=false;
+
+let raceFinished=false;
+
+let challengeActive=false;
+
+let elapsed=0;
+
+let lastTime=
+    performance.now();
+
+let countdownStart=
+    performance.now();
+
+let boostUntil=0;
+
+const finishOrder=[];
+
+/* ==========================================================
+   CAMERA MODES
+========================================================== */
+
+let cameraMode =
+    "CHASE";
+
+const chaseButton =
+    document.getElementById(
+        "cameraChase"
+    );
+
+const sideButton =
+    document.getElementById(
+        "cameraSide"
+    );
+
+const topButton =
+    document.getElementById(
+        "cameraTop"
+    );
+
+function selectCamera(
+    mode
+){
+
+    cameraMode=mode;
+
+    [
+        chaseButton,
+        sideButton,
+        topButton
+    ]
+    .forEach(
+        button=>
+        button.classList
+        .remove(
+            "active"
+        )
+    );
+
+    if(mode==="CHASE"){
+        chaseButton
+        .classList
+        .add(
+            "active"
+        );
+    }
+
+    if(mode==="SIDE"){
+        sideButton
+        .classList
+        .add(
+            "active"
+        );
+    }
+
+    if(mode==="TOP"){
+        topButton
+        .classList
+        .add(
+            "active"
+        );
+    }
+}
+
+chaseButton.onclick=
+    ()=>selectCamera(
+        "CHASE"
+    );
+
+sideButton.onclick=
+    ()=>selectCamera(
+        "SIDE"
+    );
+
+topButton.onclick=
+    ()=>selectCamera(
+        "TOP"
+    );
+
+addEventListener(
+    "keydown",
+    e=>{
+
+        if(e.key==="1"){
+            selectCamera(
+                "CHASE"
+            );
+        }
+
+        if(e.key==="2"){
+            selectCamera(
+                "SIDE"
+            );
+        }
+
+        if(e.key==="3"){
+            selectCamera(
+                "TOP"
+            );
+        }
+    }
+);
+
+/* ==========================================================
+   QUESTION HELPERS
+========================================================== */
+
+function randomItem(array){
+
+    return array[
+        Math.floor(
+            Math.random()*
+            array.length
+        )
+    ];
+}
+
+function shuffle(array){
+
+    const copy=
+        [...array];
+
+    for(
+        let i=copy.length-1;
+        i>0;
+        i--
+    ){
+
+        const j=
+            Math.floor(
+                Math.random()*
+                (i+1)
+            );
+
+        [
+            copy[i],
+            copy[j]
+        ]=[
+            copy[j],
+            copy[i]
+        ];
+    }
+
+    return copy;
+}
+
+function makeOptions(
+    correct,
+    wrong1,
+    wrong2
+){
+
+    const options=
+        shuffle([
+            correct,
+            wrong1,
+            wrong2
+        ]);
+
+    return{
+        options,
+
+        correct:
+            options.indexOf(
+                correct
+            )
+    };
+}
+
+/* ==========================================================
+   RANDOM SPEED QUESTION
+========================================================== */
+
+function createSpeedQuestion(){
+
+    const speed=
+        randomItem([
+            14,15,16,18,20,22
+        ]);
+
+    const time=
+        randomItem([
+            12,15,18,20
+        ]);
+
+    const distance=
+        speed*time;
+
+    const correct=
+        speed+" m/s";
+
+    const options=
+        makeOptions(
+            correct,
+            (speed-3)+" m/s",
+            (speed+3)+" m/s"
+        );
+
+    return{
+
+        id:
+            "speed_"+
+            distance+"_"+
+            time,
+
+        question:
+            `You covered ${distance} m in ${time} s. What was your average speed?`,
+
+        hint:
+            "Average Speed = Distance / Time",
+
+        options:
+            options.options,
+
+        correct:
+            options.correct,
+
+        explanation:
+        `
+        <b>STEP 1 - Formula</b><br>
+        Average Speed = Distance / Time<br><br>
+
+        <b>STEP 2 - Substitute</b><br>
+        ${distance} / ${time}<br><br>
+
+        <b>STEP 3 - Answer</b><br>
+        = <b>${speed} m/s</b><br><br>
+
+        <b>STEP 4 - Convert to km/h</b><br>
+        ${speed} x 3.6 =
+        <b>${(speed*3.6).toFixed(1)} km/h</b><br><br>
+
+        <b>RACE CONNECTION</b><br>
+        This tells how quickly you covered that section.
+        For the same distance, a higher average speed
+        produces a lower travelling time.
+
+        That is why increasing your average speed helps
+        you catch the riders ahead.
+        `
+    };
+}
+
+/* ==========================================================
+   RANDOM REQUIRED SPEED QUESTION
+========================================================== */
+
+function createRequiredQuestion(){
+
+    const speed=
+        randomItem([
+            15,18,20,22
+        ]);
+
+    const time=
+        randomItem([
+            10,12,15
+        ]);
+
+    const distance=
+        speed*time;
+
+    const correct=
+        (speed*3.6)
+        .toFixed(1)+
+        " km/h";
+
+    const options=
+        makeOptions(
+            correct,
+
+            (
+                (speed-2)*3.6
+            ).toFixed(1)+
+            " km/h",
+
+            (
+                (speed+2)*3.6
+            ).toFixed(1)+
+            " km/h"
+        );
+
+    return{
+
+        id:
+            "required_"+
+            distance+"_"+
+            time,
+
+        question:
+            `${distance} m remains. To finish in ${time} s, what speed is required?`,
+
+        hint:
+            "Required Speed = Remaining Distance / Remaining Time",
+
+        options:
+            options.options,
+
+        correct:
+            options.correct,
+
+        explanation:
+        `
+        <b>Formula</b><br>
+        Required Speed =
+        Remaining Distance /
+        Remaining Time<br><br>
+
+        <b>Substitute</b><br>
+        ${distance} / ${time}
+        =
+        <b>${speed} m/s</b><br><br>
+
+        <b>Convert</b><br>
+        ${speed} x 3.6 =
+        <b>${(speed*3.6).toFixed(1)} km/h</b><br><br>
+
+        <b>RACE CONNECTION</b><br>
+        The yellow P1 target uses this same idea.
+
+        The game compares your remaining distance
+        with the time before the leader is predicted
+        to reach the finish.
+        `
+    };
+}
+
+/* ==========================================================
+   RANDOM VELOCITY QUESTION
+========================================================== */
+
+function createVelocityQuestion(){
+
+    const speed=
+        randomItem([
+            55,60,65,70
+        ]);
+
+    const direction=
+        randomItem([
+            "left",
+            "right"
+        ]);
+
+    return{
+
+        id:
+            "velocity_"+
+            speed+"_"+
+            direction,
+
+        question:
+            `Your speed stays at ${speed} km/h while the road curves ${direction}. Does your velocity change?`,
+
+        hint:
+            "Velocity includes speed AND direction.",
+
+        options:[
+            "No, because speed did not change",
+            "Yes, because direction changed",
+            "Only if the bicycle stops"
+        ],
+
+        correct:1,
+
+        explanation:
+        `
+        <b>Speed</b>
+        tells how fast you are moving.<br><br>
+
+        <b>Velocity</b>
+        includes both speed and direction.<br><br>
+
+        Your speedometer can remain at
+        <b>${speed} km/h</b>.
+
+        But when the track bends,
+        your direction changes.<br><br>
+
+        Therefore your
+        <b>velocity changes</b>.<br><br>
+
+        <b>RACE CONNECTION</b><br>
+        The curved road exists specifically to demonstrate
+        the difference between speed and velocity.
+
+        Speed may remain similar while velocity changes
+        because the direction changes.
+        `
+    };
+}
+
+/* ==========================================================
+   RANDOM DISTANCE QUESTION
+========================================================== */
+
+function createDistanceQuestion(){
+
+    const speed=
+        randomItem([
+            12,15,18,20
+        ]);
+
+    const time=
+        randomItem([
+            10,12,15,20
+        ]);
+
+    const distance=
+        speed*time;
+
+    const correct=
+        distance+" m";
+
+    const options=
+        makeOptions(
+            correct,
+            (
+                distance-
+                speed*2
+            )+" m",
+            (
+                distance+
+                speed*2
+            )+" m"
+        );
+
+    return{
+
+        id:
+            "distance_"+
+            speed+"_"+
+            time,
+
+        question:
+            `You travel at ${speed} m/s for ${time} s. What distance do you cover?`,
+
+        hint:
+            "Distance = Speed x Time",
+
+        options:
+            options.options,
+
+        correct:
+            options.correct,
+
+        explanation:
+        `
+        <b>Formula</b><br>
+        Distance =
+        Speed x Time<br><br>
+
+        <b>Substitute</b><br>
+        ${speed} x ${time}<br><br>
+
+        <b>Answer</b><br>
+        =
+        <b>${distance} m</b><br><br>
+
+        <b>RACE CONNECTION</b><br>
+        During the same time interval,
+        a faster bicycle covers more distance.
+
+        That is physically how your bicycle
+        closes the gap and overtakes another rider.
+        `
+    };
+}
+
+/* ==========================================================
+   RANDOM CONVERSION QUESTION
+========================================================== */
+
+function createConversionQuestion(){
+
+    const ms=
+        randomItem([
+            15,16,17.5,18,20
+        ]);
+
+    const kmh=
+        ms*3.6;
+
+    const correct=
+        kmh.toFixed(1)+
+        " km/h";
+
+    const options=
+        makeOptions(
+            correct,
+
+            (
+                kmh-7.2
+            ).toFixed(1)+
+            " km/h",
+
+            (
+                kmh+7.2
+            ).toFixed(1)+
+            " km/h"
+        );
+
+    return{
+
+        id:
+            "convert_"+
+            ms,
+
+        question:
+            `Your Physics result is ${ms} m/s. What should your bike HUD show?`,
+
+        hint:
+            "km/h = m/s x 3.6",
+
+        options:
+            options.options,
+
+        correct:
+            options.correct,
+
+        explanation:
+        `
+        <b>Conversion</b><br>
+        km/h =
+        m/s x 3.6<br><br>
+
+        ${ms} x 3.6 =
+        <b>${kmh.toFixed(1)} km/h</b><br><br>
+
+        <b>RACE CONNECTION</b><br>
+        Physics equations normally use metres
+        and seconds.
+
+        The racing dashboard shows km/h.
+
+        Both values describe the same bicycle speed,
+        only using different units.
+        `
+    };
+}
+
+/* ==========================================================
+   CHOOSE 3 FRESH QUESTIONS
+========================================================== */
+
+const questionGenerators=[
+    createSpeedQuestion,
+    createRequiredQuestion,
+    createVelocityQuestion,
+    createDistanceQuestion,
+    createConversionQuestion
+];
+
+let previousQuestionIds=[];
+
+try{
+
+    previousQuestionIds=
+        JSON.parse(
+            localStorage.getItem(
+                "bikeRacePreviousQuestions"
+            ) ||
+            "[]"
+        );
+
+}catch(e){
+
+    previousQuestionIds=[];
+}
+
+const selectedQuestions=[];
+
+for(
+    const generator of
+    shuffle(
+        questionGenerators
+    )
+){
+
+    let selected=null;
+
+    for(
+        let attempt=0;
+        attempt<12;
+        attempt++
+    ){
+
+        const candidate=
+            generator();
+
+        if(
+            !previousQuestionIds
+            .includes(
+                candidate.id
+            )
+        ){
+
+            selected=candidate;
+
+            break;
+        }
+    }
+
+    if(!selected){
+
+        selected=
+            generator();
+    }
+
+    selectedQuestions
+        .push(
+            selected
+        );
+
+    if(
+        selectedQuestions.length===3
+    ){
+
+        break;
+    }
+}
+
+localStorage.setItem(
+    "bikeRacePreviousQuestions",
+
+    JSON.stringify(
+        selectedQuestions
+        .map(
+            question=>
+            question.id
+        )
+    )
+);
+
+const questionPositions=[
+    300,
+    650,
+    930
+];
+
+const challenges=
+    selectedQuestions
+    .map(
+        (question,index)=>({
+
+            ...question,
+
+            at:
+                questionPositions[
+                    index
+                ],
+
+            asked:false
+        })
+    );
+
+/* ==========================================================
+   QUESTION UI
+========================================================== */
+
+const challengeBox=
+    document.getElementById(
+        "challenge"
+    );
+
+function openChallenge(
+    challenge
+){
+
+    challengeActive=true;
+
+    challenge.asked=true;
+
+    document
+    .getElementById(
+        "question"
+    )
+    .textContent=
+        challenge.question;
+
+    document
+    .getElementById(
+        "challengeHint"
+    )
+    .textContent=
+        challenge.hint;
+
+    const answers=
+        document.getElementById(
+            "answers"
+        );
+
+    const feedback=
+        document.getElementById(
+            "feedback"
+        );
+
+    const continueButton=
+        document.getElementById(
+            "continueBtn"
+        );
+
+    answers.innerHTML="";
+
+    feedback.style.display=
+        "none";
+
+    continueButton.style.display=
+        "none";
+
+    challenge.options
+    .forEach(
+        (option,index)=>{
+
+            const button=
+                document.createElement(
+                    "button"
+                );
+
+            button.className=
+                "answer";
+
+            button.textContent=
+                option;
+
+            button.onclick=
+                ()=>{
+
+                    answers
+                    .querySelectorAll(
+                        "button"
+                    )
+                    .forEach(
+                        item=>
+                        item.disabled=true
+                    );
+
+                    feedback.style.display=
+                        "block";
+
+                    if(
+                        index===
+                        challenge.correct
+                    ){
+
+                        feedback.innerHTML=
+                        `
+                        <b>CORRECT</b><br><br>
+
+                        ${challenge.explanation}
+
+                        <br><br>
+
+                        <b>GAME EFFECT</b><br>
+                        Correct Physics activates
+                        a 5-second speed boost.
+                        `;
+
+                        player.speed=
+                            Math.min(
+                                player.speed+3,
+                                BOOST_MAX_SPEED
+                            );
+
+                        boostUntil=
+                            performance.now()+
+                            5000;
+                    }
+                    else{
+
+                        feedback.innerHTML=
+                        `
+                        <b>NOT CORRECT - SEE THE COMPLETE METHOD</b><br><br>
+
+                        ${challenge.explanation}
+                        `;
+                    }
+
+                    continueButton.style.display=
+                        "block";
+                };
+
+            answers.appendChild(
+                button
+            );
+        }
+    );
+
+    continueButton.onclick=
+        ()=>{
+
+            challengeBox
+            .classList
+            .remove(
+                "show"
+            );
+
+            challengeActive=false;
+
+            lastTime=
+                performance.now();
+        };
+
+    challengeBox
+    .classList
+    .add(
+        "show"
+    );
+}
+
+/* ==========================================================
+   COUNTDOWN
+========================================================== */
+
+function updateCountdown(now){
+
+    const seconds=
+        (
+            now-
+            countdownStart
+        )/1000;
+
+    const element=
+        document.getElementById(
+            "countdown"
+        );
+
+    if(seconds<1){
+
+        element.textContent="3";
+    }
+    else if(seconds<2){
+
+        element.textContent="2";
+    }
+    else if(seconds<3){
+
+        element.textContent="1";
+    }
+    else if(seconds<3.7){
+
+        element.textContent="GO";
+    }
+    else{
+
+        element.style.display=
+            "none";
+
+        raceStarted=true;
+    }
+}
+
+/* ==========================================================
+   PLAYER MOVEMENT
+========================================================== */
+
+function updatePlayer(
+    dt,
+    now
+){
+
+    const maximumSpeed=
+        now<boostUntil
+
+        ? BOOST_MAX_SPEED
+
+        : PLAYER_MAX_SPEED;
+
+    if(
+        pressed(
+            "w",
+            "arrowup"
+        )
+    ){
+
+        player.speed+=
+            ACCELERATION*dt;
+    }
+    else{
+
+        player.speed-=
+            NATURAL_DRAG*dt;
+    }
+
+    if(
+        pressed(
+            "s",
+            "arrowdown"
+        )
+    ){
+
+        player.speed-=
+            BRAKE_FORCE*dt;
+    }
+
+    player.speed=
+        THREE.MathUtils.clamp(
+            player.speed,
+            0,
+            maximumSpeed
+        );
+
+    const steering=
+        4.2*
+        (
+            .3+
+            player.speed/
+            PLAYER_MAX_SPEED
+        );
+
+    if(
+        pressed(
+            "a",
+            "arrowleft"
+        )
+    ){
+
+        player.lane-=
+            steering*dt;
+    }
+
+    if(
+        pressed(
+            "d",
+            "arrowright"
+        )
+    ){
+
+        player.lane+=
+            steering*dt;
+    }
+
+    player.lane=
+        THREE.MathUtils.clamp(
+            player.lane,
+            -7.2,
+            7.2
+        );
+
+    player.progress+=
+        player.speed*dt;
+}
+
+/* ==========================================================
+   AI
+========================================================== */
+
+function updateAI(
+    dt,
+    now
+){
+
+    racers
+    .filter(
+        racer=>
+        !racer.isPlayer
+    )
+    .forEach(
+        racer=>{
+
+            if(racer.finished){
+
+                return;
+            }
+
+            racer.speed=
+                racer.baseSpeed+
+                Math.sin(
+                    now*.001+
+                    racer.phase
+                )*.25;
+
+            racer.progress+=
+                racer.speed*dt;
+
+            if(
+                racer.progress>=
+                TRACK_LENGTH
+            ){
+
+                racer.progress=
+                    TRACK_LENGTH;
+
+                racer.finished=true;
+
+                racer.finishTime=
+                    elapsed;
+
+                if(
+                    !finishOrder
+                    .includes(
+                        racer
+                    )
+                ){
+
+                    finishOrder
+                    .push(
+                        racer
+                    );
+                }
+            }
+        }
+    );
+}
+
+/* ==========================================================
+   VISUAL RACER POSITION
+========================================================== */
+
+function placeRacers(){
+
+    racers
+    .forEach(
+        racer=>{
+
+            const progress=
+                THREE.MathUtils.clamp(
+                    racer.progress,
+                    0,
+                    TRACK_LENGTH
+                );
+
+            racer.bike
+            .position
+            .copy(
+                trackPosition(
+                    progress,
+                    racer.lane,
+                    0
+                )
+            );
+
+            /*
+               No 180-degree rotation.
+               Bike's local +Z points toward
+               increasing race progress.
+            */
+
+            faceTrack(
+                racer.bike,
+                progress
+            );
+        }
+    );
+}
+
+/* ==========================================================
+   RANK
+========================================================== */
+
+function sortedRacers(){
+
+    return [...racers]
+    .sort(
+        (a,b)=>{
+
+            const aFinish=
+                finishOrder
+                .indexOf(a);
+
+            const bFinish=
+                finishOrder
+                .indexOf(b);
+
+            if(
+                aFinish>=0 &&
+                bFinish>=0
+            ){
+
+                return(
+                    aFinish-
+                    bFinish
+                );
+            }
+
+            if(aFinish>=0){
+                return -1;
+            }
+
+            if(bFinish>=0){
+                return 1;
+            }
+
+            return(
+                b.progress-
+                a.progress
+            );
+        }
+    );
+}
+
+function playerPosition(){
+
+    return(
+        sortedRacers()
+        .indexOf(
+            player
+        )+1
+    );
+}
+
+/* ==========================================================
+   P1 REQUIRED SPEED
+========================================================== */
+
+function calculateP1Requirement(){
+
+    let projectedLeaderFinish=
+        Infinity;
+
+    racers
+    .filter(
+        racer=>
+        !racer.isPlayer
+    )
+    .forEach(
+        racer=>{
+
+            let projected;
+
+            if(
+                racer.finished &&
+                racer.finishTime!==null
+            ){
+
+                projected=
+                    racer.finishTime;
+            }
+            else{
+
+                const remaining=
+                    Math.max(
+                        0,
+                        TRACK_LENGTH-
+                        racer.progress
+                    );
+
+                projected=
+                    elapsed+
+                    remaining/
+                    Math.max(
+                        racer.speed,
+                        .1
+                    );
+            }
+
+            projectedLeaderFinish=
+                Math.min(
+                    projectedLeaderFinish,
+                    projected
+                );
+        }
+    );
+
+    const availableTime=
+        projectedLeaderFinish-
+        elapsed-
+        .5;
+
+    const remainingDistance=
+        Math.max(
+            0,
+            TRACK_LENGTH-
+            player.progress
+        );
+
+    if(
+        availableTime<=0
+    ){
+
+        return{
+            possible:false
+        };
+    }
+
+    const requiredKmh=
+        (
+            remainingDistance/
+            availableTime
+        )*3.6;
+
+    return{
+
+        possible:
+            requiredKmh<=
+            BOOST_MAX_KMH,
+
+        requiredKmh,
+
+        availableTime,
+
+        remainingDistance
+    };
+}
+
+/* ==========================================================
+   LEADERBOARD
+========================================================== */
+
+function updateLeaderboard(){
+
+    const root=
+        document.getElementById(
+            "leaderboard"
+        );
+
+    root.innerHTML="";
+
+    sortedRacers()
+    .forEach(
+        (racer,index)=>{
+
+            const row=
+                document.createElement(
+                    "div"
+                );
+
+            row.className=
+                "racer-row"+
+                (
+                    racer.isPlayer
+                    ? " you"
+                    : ""
+                );
+
+            row.innerHTML=
+            `
+            <span>
+                ${index+1}
+            </span>
+
+            <span>
+
+                <b>
+                    ${
+                        racer.isPlayer
+                        ? "YOU"
+                        : racer.name
+                    }
+                </b>
+
+                <span class="racer-distance">
+                    ${
+                        Math.max(
+                            0,
+                            racer.progress
+                        )
+                        .toFixed(0)
+                    } m
+                </span>
+
+            </span>
+
+            <span class="racer-speed">
+
+                ${
+                    (
+                        racer.speed*
+                        3.6
+                    ).toFixed(0)
+                }
+                km/h
+
+            </span>
+            `;
+
+            root.appendChild(
+                row
+            );
+        }
+    );
+}
+
+/* ==========================================================
+   REAL-TIME PHYSICS EXPLANATION
+========================================================== */
+
+function updateCoach(
+    averageKmh,
+    requirement
+){
+
+    const title=
+        document.getElementById(
+            "coachTitle"
+        );
+
+    const text=
+        document.getElementById(
+            "coachText"
+        );
+
+    const formula=
+        document.getElementById(
+            "coachFormula"
+        );
+
+    const distance=
+        player.progress;
+
+    if(distance<250){
+
+        title.textContent=
+            "ZONE 1 - MOTION AND DISTANCE";
+
+        text.textContent=
+            "Your bicycle is in motion because its position is changing. The distance counter measures how much of the 1200 m track you have covered.";
+
+        formula.textContent=
+            "Motion = change in position";
+    }
+    else if(distance<500){
+
+        title.textContent=
+            "ZONE 2 - SPEED";
+
+        text.textContent=
+            "Current speed tells how quickly your bike is covering distance at this instant. More speed means more metres covered each second.";
+
+        formula.textContent=
+            "Speed = Distance / Time";
+    }
+    else if(distance<800){
+
+        title.textContent=
+            "ZONE 3 - AVERAGE SPEED";
+
+        text.textContent=
+            "Your race average is "+
+            averageKmh.toFixed(1)+
+            " km/h. Average speed uses the full distance travelled and full elapsed time.";
+
+        formula.textContent=
+            "Average Speed = Total Distance / Total Time";
+    }
+    else if(distance<1050){
+
+        title.textContent=
+            "ZONE 4 - VELOCITY";
+
+        text.textContent=
+            "The road is curving. Your direction is changing, so your velocity changes even if your speedometer value stays almost constant.";
+
+        formula.textContent=
+            "Velocity = Speed + Direction";
+    }
+    else{
+
+        title.textContent=
+            "FINAL SPRINT";
+
+        if(
+            requirement &&
+            requirement.possible
+        ){
+
+            text.textContent=
+                "You have "+
+                requirement
+                .remainingDistance
+                .toFixed(0)+
+                " m remaining. About "+
+                requirement
+                .requiredKmh
+                .toFixed(1)+
+                " km/h is required from this point to challenge the projected leader.";
+        }
+        else{
+
+            text.textContent=
+                "Your total average speed now determines your finishing result.";
+        }
+
+        formula.textContent=
+            "Required Speed = Remaining Distance / Available Time";
+    }
+}
+
+/* ==========================================================
+   HUD
+========================================================== */
+
+function updateHUD(){
+
+    const distance=
+        Math.max(
+            0,
+            Math.min(
+                TRACK_LENGTH,
+                player.progress
+            )
+        );
+
+    const remaining=
+        TRACK_LENGTH-
+        distance;
+
+    const currentKmh=
+        player.speed*
+        3.6;
+
+    const averageKmh=
+        elapsed>0
+
+        ? (
+            distance/
+            elapsed
+          )*3.6
+
+        : 0;
+
+    document
+    .getElementById(
+        "currentSpeed"
+    )
+    .textContent=
+        currentKmh
+        .toFixed(0);
+
+    document
+    .getElementById(
+        "speedFill"
+    )
+    .style.width=
+        Math.min(
+            100,
+            currentKmh/
+            BOOST_MAX_KMH*
+            100
+        )+"%";
+
+    document
+    .getElementById(
+        "time"
+    )
+    .textContent=
+        elapsed
+        .toFixed(1);
+
+    document
+    .getElementById(
+        "distance"
+    )
+    .textContent=
+        distance
+        .toFixed(0);
+
+    document
+    .getElementById(
+        "averageSpeed"
+    )
+    .textContent=
+        averageKmh
+        .toFixed(1);
+
+    document
+    .getElementById(
+        "remaining"
+    )
+    .textContent=
+        remaining
+        .toFixed(0);
+
+    document
+    .getElementById(
+        "position"
+    )
+    .textContent=
+        playerPosition()+
+        " / 4";
+
+    document
+    .getElementById(
+        "progressText"
+    )
+    .textContent=
+        distance
+        .toFixed(0)+
+        " / "+
+        TRACK_LENGTH+
+        " m";
+
+    document
+    .getElementById(
+        "progressFill"
+    )
+    .style.width=
+        (
+            distance/
+            TRACK_LENGTH*
+            100
+        )+"%";
+
+    const requirement=
+        calculateP1Requirement();
+
+    if(
+        requirement &&
+        requirement.possible
+    ){
+
+        document
+        .getElementById(
+            "requiredSpeed"
+        )
+        .textContent=
+            requirement
+            .requiredKmh
+            .toFixed(1)+
+            " km/h";
+
+        document
+        .getElementById(
+            "requiredInfo"
+        )
+        .textContent=
+
+            currentKmh>=
+            requirement.requiredKmh
+
+            ? "Good. Your current speed is above the calculated P1 requirement."
+
+            : "Increase by about "+
+              (
+                  requirement.requiredKmh-
+                  currentKmh
+              ).toFixed(1)+
+              " km/h.";
+    }
+    else{
+
+        document
+        .getElementById(
+            "requiredSpeed"
+        )
+        .textContent=
+            "P1 difficult";
+
+        document
+        .getElementById(
+            "requiredInfo"
+        )
+        .textContent=
+            "Your earlier average pace was too low to recover before the projected leader finish.";
+    }
+
+    updateLeaderboard();
+
+    updateCoach(
+        averageKmh,
+        requirement
+    );
+}
+
+/* ==========================================================
+   CAMERA
+
+   THIS IS THE IMPORTANT FIX.
+
+   CHASE:
+   CAMERA IS 8 METRES BEHIND PLAYER.
+
+   CAMERA LOOKS ALMOST AT PLAYER BODY,
+   ONLY 1.8 METRES AHEAD.
+
+   Therefore YOUR RIDER MUST BE VISIBLE.
+========================================================== */
+
+const desiredCamera=
+    new THREE.Vector3();
+
+const desiredTarget=
+    new THREE.Vector3();
+
+function updateCamera(dt){
+
+    const progress=
+        THREE.MathUtils.clamp(
+            player.progress,
+            0,
+            TRACK_LENGTH
+        );
+
+    const basis=
+        trackBasis(
+            progress
+        );
+
+    const playerWorld=
+        trackPosition(
+            progress,
+            player.lane,
+            0
+        );
+
+    /* ------------------------------------------------------
+       CHASE VIEW
+
+       Normal racing view:
+
+       CAMERA -> YOUR BIKE -> ROAD -> AI -> FINISH
+    ------------------------------------------------------ */
+
+    if(cameraMode==="CHASE"){
+
+        desiredCamera
+        .copy(
+            playerWorld
+        )
+        .addScaledVector(
+            basis.forward,
+            -8.2
+        );
+
+        desiredCamera.y=
+            3.45;
+
+        /*
+           IMPORTANT:
+
+           We look almost at the rider,
+           NOT far down the road.
+
+           This keeps the complete player bike
+           visible at lower-middle of screen.
+        */
+
+        desiredTarget
+        .copy(
+            playerWorld
+        )
+        .addScaledVector(
+            basis.forward,
+            1.8
+        );
+
+        desiredTarget.y=
+            1.45;
+    }
+
+    /* ------------------------------------------------------
+       SIDE VIEW
+    ------------------------------------------------------ */
+
+    else if(cameraMode==="SIDE"){
+
+        desiredCamera
+        .copy(
+            playerWorld
+        )
+        .addScaledVector(
+            basis.right,
+            10
+        )
+        .addScaledVector(
+            basis.forward,
+            -1.5
+        );
+
+        desiredCamera.y=
+            3.5;
+
+        desiredTarget
+        .copy(
+            playerWorld
+        );
+
+        desiredTarget.y=
+            1.5;
+    }
+
+    /* ------------------------------------------------------
+       TOP VIEW
+    ------------------------------------------------------ */
+
+    else{
+
+        desiredCamera
+        .copy(
+            playerWorld
+        )
+        .addScaledVector(
+            basis.forward,
+            -3
+        );
+
+        desiredCamera.y=
+            18;
+
+        desiredTarget
+        .copy(
+            playerWorld
+        )
+        .addScaledVector(
+            basis.forward,
+            4
+        );
+
+        desiredTarget.y=
+            0;
+    }
+
+    camera.position.lerp(
+        desiredCamera,
+        1-
+        Math.pow(
+            .00005,
+            dt
+        )
+    );
+
+    /*
+   FIX:
+   THREE.Camera looks through its local -Z axis.
+   So the camera itself must lookAt the target.
+*/
+camera.lookAt(
+    desiredTarget
+);
+}
+
+/* ==========================================================
+   FLOATING LABELS
+========================================================== */
+
+const tags=
+    new Map();
+
+racers.forEach(
+    racer=>{
+
+        const element=
+            document.createElement(
+                "div"
+            );
+
+        element.className=
+            "rider-tag"+
+            (
+                racer.isPlayer
+                ? " you"
+                : ""
+            );
+
+        document.body.appendChild(
+            element
+        );
+
+        tags.set(
+            racer,
+            element
+        );
+    }
+);
+
+function updateTags(){
+
+    racers.forEach(
+        racer=>{
+
+            const tag=
+                tags.get(
+                    racer
+                );
+
+            const world=
+                racer
+                .bike
+                .position
+                .clone()
+                .add(
+                    new THREE.Vector3(
+                        0,
+                        racer.isPlayer
+                        ? 4.6
+                        : 3.8,
+                        0
+                    )
+                );
+
+            world.project(
+                camera
+            );
+
+            if(
+                world.z<-1 ||
+                world.z>1 ||
+                Math.abs(world.x)>1.1 ||
+                Math.abs(world.y)>1.1
+            ){
+
+                tag.style.display=
+                    "none";
+
+                return;
+            }
+
+            tag.style.display=
+                "block";
+
+            tag.style.left=
+                (
+                    (
+                        world.x*.5+
+                        .5
+                    )*
+                    innerWidth
+                )+
+                "px";
+
+            tag.style.top=
+                (
+                    (
+                        -world.y*.5+
+                        .5
+                    )*
+                    innerHeight
+                )+
+                "px";
+
+            tag.textContent=
+
+                racer.isPlayer
+
+                ? "YOU - "+
+                  (
+                      racer.speed*
+                      3.6
+                  ).toFixed(0)+
+                  " km/h"
+
+                : racer.name+
+                  " - "+
+                  (
+                      racer.speed*
+                      3.6
+                  ).toFixed(0)+
+                  " km/h";
+        }
+    );
+}
+
+/* ==========================================================
+   QUESTION TRIGGER
+========================================================== */
+
+function checkChallenges(){
+
+    if(challengeActive){
+
+        return;
+    }
+
+    for(
+        const challenge of
+        challenges
+    ){
+
+        if(
+            !challenge.asked &&
+            player.progress>=
+            challenge.at
+        ){
+
+            openChallenge(
+                challenge
+            );
+
+            break;
+        }
+    }
+}
+
+/* ==========================================================
+   FINISH
+========================================================== */
+
+function finishRace(){
+
+    if(raceFinished){
+
+        return;
+    }
+
+    raceFinished=true;
+
+    player.finished=true;
+
+    player.finishTime=
+        elapsed;
+
+    if(
+        !finishOrder
+        .includes(
+            player
+        )
+    ){
+
+        finishOrder
+        .push(
+            player
+        );
+    }
+
+    const finalPosition=
+        finishOrder
+        .indexOf(
+            player
+        )+1;
+
+    const averageMs=
+        TRACK_LENGTH/
+        elapsed;
+
+    const averageKmh=
+        averageMs*
+        3.6;
+
+    document
+    .getElementById(
+        "finish"
+    )
+    .classList
+    .add(
+        "show"
+    );
+
+    document
+    .getElementById(
+        "finishTitle"
+    )
+    .textContent=
+
+        finalPosition===1
+
+        ? "You Finished 1st!"
+
+        : "Race Complete - Position "+
+          finalPosition;
+
+    document
+    .getElementById(
+        "finalPosition"
+    )
+    .textContent=
+        finalPosition+
+        " / 4";
+
+    document
+    .getElementById(
+        "finalTime"
+    )
+    .textContent=
+        elapsed
+        .toFixed(1)+
+        " s";
+
+    document
+    .getElementById(
+        "finalAverage"
+    )
+    .textContent=
+        averageKmh
+        .toFixed(1)+
+        " km/h";
+
+    document
+    .getElementById(
+        "finalExplanation"
+    )
+    .innerHTML=
+    `
+    <b>HOW DID THIS GAME TEACH THE TOPIC?</b><br><br>
+
+    <b>1. MOTION</b><br>
+    Your bicycle changed position continuously from START to FINISH.
+    That changing position is motion.<br><br>
+
+    <b>2. DISTANCE</b><br>
+    You travelled a total race distance of
+    <b>${TRACK_LENGTH} m</b>.
+
+    The game continuously measured distance travelled
+    and distance remaining.<br><br>
+
+    <b>3. SPEED - USING YOUR ACTUAL RACE RESULT</b><br>
+
+    Average Speed =
+    Total Distance / Total Time<br><br>
+
+    =
+    ${TRACK_LENGTH} m /
+    ${elapsed.toFixed(1)} s<br><br>
+
+    =
+    <b>${averageMs.toFixed(2)} m/s</b><br><br>
+
+    Convert to km/h:<br>
+
+    ${averageMs.toFixed(2)} x 3.6 =
+    <b>${averageKmh.toFixed(1)} km/h</b>.<br><br>
+
+    Your CURRENT SPEED changed whenever you accelerated,
+    released the accelerator or braked.
+
+    But your AVERAGE SPEED represents your entire race.<br><br>
+
+    <b>4. WHY THE P1 SPEED TARGET WAS SHOWN</b><br>
+
+    The game estimated when the fastest AI rider would
+    reach the finish.
+
+    Then it calculated:<br><br>
+
+    <b>
+    Required Speed =
+    Your Remaining Distance /
+    Time Available Before Leader Finishes
+    </b><br><br>
+
+    If your current speed was below this value,
+    you needed to accelerate.
+
+    If your current speed was above it,
+    you were travelling fast enough to challenge P1.<br><br>
+
+    <b>5. VELOCITY</b><br>
+
+    Speed tells how fast you move.<br>
+
+    Velocity includes
+    <b>speed AND direction</b>.<br><br>
+
+    The road contains curves for this reason.
+
+    When your bicycle turns,
+    its direction changes.
+
+    Therefore velocity changes
+    even when your speed in km/h remains nearly constant.<br><br>
+
+    <b>FINAL CONNECTION</b><br>
+
+    Motion = change in position.<br>
+
+    Distance = path travelled.<br>
+
+    Speed = distance travelled per unit time.<br>
+
+    Velocity = speed together with direction.<br><br>
+
+    So Physics directly decided whether you could
+    catch the other riders and finish first.
+    `;
+}
+
+/* ==========================================================
+   INITIAL CAMERA
+
+   This guarantees first frame:
+
+           ROAD + AI
+               ↑
+             PLAYER
+               ↑
+             CAMERA
+========================================================== */
+
+placeRacers();
+
+{
+
+    const basis=
+        trackBasis(0);
+
+    const playerWorld=
+        trackPosition(
+            0,
+            player.lane,
+            0
+        );
+
+    camera.position
+    .copy(
+        playerWorld
+    )
+    .addScaledVector(
+        basis.forward,
+        -8.2
+    );
+
+    camera.position.y=
+        3.45;
+
+    const target=
+        playerWorld
+        .clone()
+        .addScaledVector(
+            basis.forward,
+            1.8
+        );
+
+    target.y=
+        1.45;
+
+    camera.lookAt(
+        target
+    );
+}
+
+/* ==========================================================
+   MAIN LOOP
+========================================================== */
+
+function animate(now){
+
+    requestAnimationFrame(
+        animate
+    );
+
+    const dt=
+        Math.min(
+            (
+                now-
+                lastTime
+            )/1000,
+            .035
+        );
+
+    lastTime=now;
+
+    if(!raceStarted){
+
+        updateCountdown(
+            now
+        );
+    }
+    else if(
+        !raceFinished &&
+        !challengeActive
+    ){
+
+        elapsed+=dt;
+
+        updatePlayer(
+            dt,
+            now
+        );
+
+        updateAI(
+            dt,
+            now
+        );
+
+        checkChallenges();
+
+        if(
+            player.progress>=
+            TRACK_LENGTH
+        ){
+
+            player.progress=
+                TRACK_LENGTH;
+
+            finishRace();
+        }
+
+        updateHUD();
+    }
+
+    placeRacers();
+
+    updateCamera(dt);
+
+    updateTags();
+
+    renderer.render(
+        scene,
+        camera
+    );
+}
+
+/* INITIAL HUD */
+
+updateHUD();
+
+requestAnimationFrame(
+    animate
+);
+
+/* ==========================================================
+   RESIZE
+========================================================== */
+
+addEventListener(
+    "resize",
+    ()=>{
+
+        camera.aspect=
+            innerWidth/
+            innerHeight;
+
+        camera
+        .updateProjectionMatrix();
+
+        renderer.setSize(
+            innerWidth,
+            innerHeight
+        );
+    }
+);
+
+})();
+
+</script>
+
+</body>
+</html>

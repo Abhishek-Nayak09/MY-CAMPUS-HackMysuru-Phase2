@@ -1,0 +1,5264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+<title>My Campus - Magnetic Field Lab</title>
+
+<style>
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0
+}
+
+html,body{
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    background:#06121c;
+    font-family:Segoe UI,Arial,sans-serif
+}
+
+#game{
+    position:fixed;
+    inset:0
+}
+
+canvas{
+    display:block
+}
+
+.hud{
+    position:fixed;
+    inset:0;
+    z-index:10;
+    color:#fff;
+    pointer-events:none
+}
+
+.glass{
+    background:linear-gradient(
+        135deg,
+        rgba(5,20,32,.95),
+        rgba(7,29,44,.83)
+    );
+
+    border:1px solid rgba(255,255,255,.13);
+    border-radius:15px;
+
+    box-shadow:0 14px 40px rgba(0,0,0,.28);
+    backdrop-filter:blur(13px)
+}
+
+/* ======================================================
+   HEADER
+====================================================== */
+
+.title{
+    position:absolute;
+    top:18px;
+    left:18px;
+
+    width:355px;
+    padding:14px 17px
+}
+
+.eyebrow{
+    color:#65e4ff;
+    font-size:10px;
+    font-weight:900;
+    letter-spacing:1.5px
+}
+
+.title h1{
+    margin-top:4px;
+    font-size:20px
+}
+
+.title p{
+    margin-top:5px;
+
+    color:#adc0cc;
+    font-size:11px;
+    line-height:1.4
+}
+
+/* ======================================================
+   STAGE
+====================================================== */
+
+.stage{
+    position:absolute;
+    top:18px;
+    left:50%;
+
+    transform:translateX(-50%);
+
+    width:430px;
+    padding:12px;
+
+    text-align:center
+}
+
+.stage small{
+    color:#98adbc;
+    font-size:9px;
+    font-weight:900
+}
+
+.stage strong{
+    display:block;
+
+    margin-top:3px;
+
+    color:#69e4ff;
+    font-size:18px
+}
+
+.stage p{
+    margin-top:3px;
+
+    color:#b8c8d2;
+    font-size:9px
+}
+
+/* ======================================================
+   TIMER / SCORE
+====================================================== */
+
+.status-panel{
+    position:absolute;
+    top:18px;
+    right:18px;
+
+    width:220px;
+
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+
+    padding:10px
+}
+
+.status-box{
+    padding:6px;
+
+    border-radius:9px;
+
+    background:rgba(255,255,255,.05);
+
+    text-align:center
+}
+
+.status-box small{
+    display:block;
+
+    color:#98adbc;
+    font-size:8px;
+    font-weight:900
+}
+
+.status-box strong{
+    display:block;
+
+    margin-top:2px;
+
+    font-size:22px
+}
+
+#score{
+    color:#ffe16a
+}
+
+#timerValue{
+    color:#69e4ff
+}
+
+#timerValue.warning{
+    color:#ffc95c
+}
+
+#timerValue.danger{
+    color:#ff6262;
+    animation:pulse .55s infinite alternate
+}
+
+@keyframes pulse{
+    from{
+        transform:scale(1)
+    }
+
+    to{
+        transform:scale(1.13)
+    }
+}
+
+/* ======================================================
+   CONTROLS
+====================================================== */
+
+.controls{
+    position:absolute;
+    top:150px;
+    left:18px;
+
+    width:315px;
+    padding:14px;
+
+    pointer-events:auto
+}
+
+.panel-title{
+    color:#69e5ff;
+
+    font-size:10px;
+    font-weight:950;
+    letter-spacing:1px
+}
+
+.control-group{
+    margin-top:11px
+}
+
+.control-label{
+    color:#a9bac6;
+
+    font-size:9px;
+    font-weight:900
+}
+
+.option-row{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+
+    gap:6px;
+
+    margin-top:5px
+}
+
+.option-row.two{
+    grid-template-columns:repeat(2,1fr)
+}
+
+.option-row button{
+    min-height:38px;
+
+    padding:7px 4px;
+
+    border:1px solid rgba(255,255,255,.14);
+    border-radius:8px;
+
+    background:rgba(255,255,255,.06);
+    color:#fff;
+
+    font-size:9px;
+    font-weight:900;
+
+    cursor:pointer
+}
+
+.option-row button.active{
+    background:#63e1ff;
+    color:#03131c
+}
+
+#poleGroup,
+#fieldGroup,
+#currentGroup,
+#turnGroup,
+#directionGroup{
+    display:none
+}
+
+.test-button{
+    width:100%;
+
+    margin-top:13px;
+    padding:11px;
+
+    border:0;
+    border-radius:9px;
+
+    background:#63e1ff;
+    color:#03131c;
+
+    font-weight:950;
+
+    cursor:pointer
+}
+
+.test-button:disabled{
+    opacity:.45;
+    cursor:not-allowed
+}
+
+.control-help{
+    margin-top:8px;
+
+    color:#94a9b7;
+
+    font-size:9px;
+    line-height:1.45
+}
+
+/* ======================================================
+   VALUES
+====================================================== */
+
+.values{
+    position:absolute;
+    right:18px;
+    bottom:18px;
+
+    width:350px;
+    padding:15px
+}
+
+.value-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+
+    gap:7px
+}
+
+.value{
+    padding:9px;
+
+    border-radius:9px;
+
+    background:rgba(255,255,255,.05)
+}
+
+.value label{
+    display:block;
+
+    color:#92a7b5;
+
+    font-size:8px;
+    font-weight:900
+}
+
+.value strong{
+    display:block;
+
+    margin-top:2px;
+
+    font-size:14px
+}
+
+.value strong.highlight{
+    color:#69e4ff
+}
+
+.field-title{
+    display:flex;
+    justify-content:space-between;
+
+    margin-top:10px;
+
+    color:#9cafbc;
+
+    font-size:8px;
+    font-weight:900
+}
+
+.field-bar{
+    height:7px;
+
+    margin-top:4px;
+
+    overflow:hidden;
+
+    border-radius:20px;
+
+    background:rgba(255,255,255,.08)
+}
+
+#fieldFill{
+    width:0%;
+    height:100%;
+
+    background:linear-gradient(
+        90deg,
+        #54dcff,
+        #79ff9d,
+        #ffe267
+    )
+}
+
+.equation{
+    margin-top:10px;
+    padding:10px;
+
+    border:1px solid rgba(83,220,255,.17);
+    border-radius:10px;
+
+    background:rgba(71,216,255,.07);
+
+    font-size:10px;
+    line-height:1.5
+}
+
+.equation b{
+    color:#69e4ff
+}
+
+/* ======================================================
+   COACH
+====================================================== */
+
+.coach{
+    position:absolute;
+
+    left:50%;
+    bottom:15px;
+
+    transform:translateX(-50%);
+
+    width:min(680px,41vw);
+
+    padding:12px 16px;
+
+    text-align:center
+}
+
+#coachTitle{
+    color:#66e3ff;
+
+    font-size:10px;
+    font-weight:950;
+    letter-spacing:1px
+}
+
+#coachText{
+    margin-top:4px;
+
+    color:#e2ecf2;
+
+    font-size:11px;
+    line-height:1.45
+}
+
+#coachFormula{
+    margin-top:4px;
+
+    color:#93a9b7;
+    font-size:10px
+}
+
+/* ======================================================
+   START
+====================================================== */
+
+.start-screen{
+    position:fixed;
+    inset:0;
+
+    z-index:40;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    background:rgba(2,8,14,.76);
+
+    backdrop-filter:blur(8px);
+
+    color:#fff;
+
+    pointer-events:auto
+}
+
+.start-box{
+    width:min(680px,92vw);
+
+    padding:27px;
+
+    text-align:center
+}
+
+.start-box h2{
+    font-size:31px
+}
+
+.start-box p{
+    margin-top:10px;
+
+    color:#b7c8d3;
+
+    font-size:12px;
+    line-height:1.6
+}
+
+.rules{
+    margin-top:13px;
+    padding:11px;
+
+    border-radius:10px;
+
+    background:rgba(255,255,255,.05);
+
+    color:#d7e6ed;
+
+    font-size:11px;
+    line-height:1.6
+}
+
+.rules b{
+    color:#69e4ff
+}
+
+.start-box button{
+    margin-top:18px;
+    padding:12px 26px;
+
+    border:0;
+    border-radius:10px;
+
+    background:#61e1ff;
+    color:#03131c;
+
+    font-weight:950;
+    cursor:pointer
+}
+
+/* ======================================================
+   RESULT
+====================================================== */
+
+.result{
+    position:fixed;
+
+    top:78px;
+    left:50%;
+
+    transform:translateX(-50%);
+
+    z-index:70;
+
+    width:min(760px,92vw);
+    max-height:calc(100vh - 98px);
+
+    display:none;
+    flex-direction:column;
+
+    padding:18px;
+
+    overflow:hidden;
+
+    color:#fff;
+
+    pointer-events:auto
+}
+
+.result.show{
+    display:flex
+}
+
+.result-scroll{
+    min-height:0;
+
+    overflow-y:auto;
+
+    padding-right:6px
+}
+
+.result-badge{
+    color:#ffe16b;
+
+    font-size:10px;
+    font-weight:950;
+    letter-spacing:1.1px
+}
+
+.result h3{
+    margin-top:5px;
+    font-size:20px
+}
+
+.result-text{
+    margin-top:8px;
+    padding:11px;
+
+    border-radius:9px;
+
+    background:rgba(255,255,255,.05);
+
+    color:#dce8ef;
+
+    font-size:11px;
+    line-height:1.55
+}
+
+.question-label{
+    margin-top:12px;
+
+    color:#69e4ff;
+
+    font-size:10px;
+    font-weight:950
+}
+
+#question{
+    margin-top:5px;
+    font-size:16px
+}
+
+#questionHint{
+    margin-top:4px;
+
+    color:#a2b5c2;
+
+    font-size:10px
+}
+
+.answers{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+
+    gap:8px;
+
+    margin-top:10px
+}
+
+.answer{
+    padding:10px;
+
+    border:1px solid rgba(255,255,255,.14);
+    border-radius:9px;
+
+    background:rgba(255,255,255,.07);
+
+    color:#fff;
+
+    font-weight:900;
+    cursor:pointer
+}
+
+.answer.correct{
+    background:rgba(63,207,116,.24);
+    border-color:#6aed98
+}
+
+.answer.wrong{
+    background:rgba(255,72,72,.24);
+    border-color:#ff7676
+}
+
+.answer:disabled{
+    opacity:.75
+}
+
+#feedback{
+    display:none;
+
+    max-height:135px;
+    overflow-y:auto;
+
+    margin-top:10px;
+    padding:11px;
+
+    border:1px solid rgba(80,218,255,.17);
+    border-radius:10px;
+
+    background:rgba(69,214,255,.08);
+
+    font-size:11px;
+    line-height:1.55
+}
+
+#feedback b{
+    color:#6de4ff
+}
+
+.result-footer{
+    flex:0 0 auto;
+
+    padding-top:11px
+}
+
+.next-button{
+    display:none;
+
+    width:min(310px,90%);
+
+    margin:0 auto;
+    padding:12px;
+
+    border:0;
+    border-radius:9px;
+
+    background:#61e1ff;
+    color:#03131c;
+
+    font-weight:950;
+
+    cursor:pointer
+}
+
+/* ======================================================
+   FAILURE
+====================================================== */
+
+.failure{
+    position:fixed;
+    inset:0;
+
+    z-index:100;
+
+    display:none;
+    align-items:center;
+    justify-content:center;
+
+    background:rgba(13,3,7,.93);
+
+    backdrop-filter:blur(11px);
+
+    color:#fff;
+
+    pointer-events:auto
+}
+
+.failure.show{
+    display:flex
+}
+
+.failure-box{
+    width:min(620px,92vw);
+
+    padding:30px;
+
+    text-align:center;
+
+    border:1px solid rgba(255,90,90,.35);
+    border-radius:16px;
+
+    background:linear-gradient(
+        135deg,
+        rgba(40,8,14,.96),
+        rgba(18,12,20,.95)
+    )
+}
+
+.failure-icon{
+    font-size:52px
+}
+
+.failure-box h2{
+    margin-top:8px;
+
+    color:#ff6868;
+
+    font-size:32px
+}
+
+.failure-box p{
+    margin-top:10px;
+
+    color:#d8c5ca;
+
+    font-size:12px;
+    line-height:1.6
+}
+
+.failure-stage{
+    margin-top:13px;
+    padding:11px;
+
+    border-radius:9px;
+
+    background:rgba(255,255,255,.05);
+
+    font-size:11px;
+    line-height:1.5
+}
+
+.failure-box button{
+    margin-top:18px;
+    padding:12px 25px;
+
+    border:0;
+    border-radius:9px;
+
+    background:#ff6262;
+    color:#fff;
+
+    font-weight:950;
+    cursor:pointer
+}
+
+/* ======================================================
+   FINISH
+====================================================== */
+
+.finish{
+    position:fixed;
+    inset:0;
+
+    z-index:90;
+
+    display:none;
+
+    align-items:center;
+    justify-content:center;
+
+    background:rgba(1,7,13,.86);
+
+    backdrop-filter:blur(11px);
+
+    color:#fff;
+
+    pointer-events:auto
+}
+
+.finish.show{
+    display:flex
+}
+
+.finish-box{
+    width:min(840px,94vw);
+
+    max-height:93vh;
+    overflow:auto;
+
+    padding:27px
+}
+
+.finish-box h2{
+    text-align:center;
+
+    font-size:32px
+}
+
+.finish-sub{
+    margin-top:5px;
+
+    text-align:center;
+
+    color:#aabcc8;
+
+    font-size:11px
+}
+
+.final-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+
+    gap:8px;
+
+    margin-top:15px
+}
+
+.final-card{
+    padding:12px;
+
+    border-radius:10px;
+
+    background:rgba(255,255,255,.055);
+
+    text-align:center
+}
+
+.final-card strong{
+    display:block;
+
+    color:#69e4ff;
+
+    font-size:18px
+}
+
+.final-card span{
+    color:#92a7b5;
+    font-size:8px
+}
+
+.final-explanation{
+    margin-top:15px;
+    padding:16px;
+
+    border:1px solid rgba(89,220,255,.18);
+    border-radius:11px;
+
+    background:rgba(68,212,255,.075);
+
+    font-size:11px;
+    line-height:1.65
+}
+
+.final-explanation b{
+    color:#6ee5ff
+}
+
+.restart{
+    display:block;
+
+    margin:16px auto 0;
+    padding:11px 25px;
+
+    border:0;
+    border-radius:9px;
+
+    background:#61e1ff;
+    color:#03131c;
+
+    font-weight:900;
+    cursor:pointer
+}
+</style>
+</head>
+
+<body>
+
+<div id="game"></div>
+
+<div class="hud">
+
+<div class="title glass">
+
+    <div class="eyebrow">
+        MY CAMPUS - PHYSICS GAME
+    </div>
+
+    <h1>
+        Magnetic Field Lab
+    </h1>
+
+    <p id="studentText"></p>
+
+</div>
+
+<div class="stage glass">
+
+    <small>
+        CURRENT MAGNETIC MISSION
+    </small>
+
+    <strong id="stageName">
+        Magnetic Poles
+    </strong>
+
+    <p id="stageObjective">
+        Create the required magnetic interaction.
+    </p>
+
+</div>
+
+<div class="status-panel glass">
+
+    <div class="status-box">
+
+        <small>
+            SCORE
+        </small>
+
+        <strong id="score">
+            0
+        </strong>
+
+    </div>
+
+    <div class="status-box">
+
+        <small>
+            TIME LEFT
+        </small>
+
+        <strong id="timerValue">
+            30
+        </strong>
+
+    </div>
+
+</div>
+
+<div class="controls glass">
+
+    <div class="panel-title">
+        MAGNETIC CONTROL PANEL
+    </div>
+
+    <div
+        id="poleGroup"
+        class="control-group">
+
+        <div class="control-label">
+            RIGHT MAGNET FACING POLE
+        </div>
+
+        <div
+            id="poleButtons"
+            class="option-row two">
+
+            <button
+                data-pole="N"
+                class="active">
+                N POLE
+            </button>
+
+            <button data-pole="S">
+                S POLE
+            </button>
+
+        </div>
+
+    </div>
+
+    <div
+        id="fieldGroup"
+        class="control-group">
+
+        <div class="control-label">
+            FIELD DIRECTION OUTSIDE MAGNET
+        </div>
+
+        <div
+            id="fieldButtons"
+            class="option-row two">
+
+            <button
+                data-field="N_TO_S"
+                class="active">
+                N -> S
+            </button>
+
+            <button data-field="S_TO_N">
+                S -> N
+            </button>
+
+        </div>
+
+    </div>
+
+    <div
+        id="currentGroup"
+        class="control-group">
+
+        <div class="control-label">
+            COIL CURRENT
+        </div>
+
+        <div
+            id="currentButtons"
+            class="option-row">
+
+            <button data-current="1">
+                1 A
+            </button>
+
+            <button
+                data-current="2"
+                class="active">
+                2 A
+            </button>
+
+            <button data-current="3">
+                3 A
+            </button>
+
+        </div>
+
+    </div>
+
+    <div
+        id="turnGroup"
+        class="control-group">
+
+        <div class="control-label">
+            COIL TURNS
+        </div>
+
+        <div
+            id="turnButtons"
+            class="option-row">
+
+            <button data-turns="50">
+                50
+            </button>
+
+            <button
+                data-turns="100"
+                class="active">
+                100
+            </button>
+
+            <button data-turns="150">
+                150
+            </button>
+
+        </div>
+
+    </div>
+
+    <div
+        id="directionGroup"
+        class="control-group">
+
+        <div class="control-label">
+            CURRENT DIRECTION
+        </div>
+
+        <div
+            id="directionButtons"
+            class="option-row two">
+
+            <button
+                data-direction="forward"
+                class="active">
+                FORWARD
+            </button>
+
+            <button data-direction="reverse">
+                REVERSE
+            </button>
+
+        </div>
+
+    </div>
+
+    <button
+        id="testButton"
+        class="test-button">
+        TEST MAGNETIC SYSTEM
+    </button>
+
+    <div class="control-help">
+        Solve the magnetic experiment before the timer reaches zero.
+    </div>
+
+</div>
+
+<div class="values glass">
+
+    <div class="value-grid">
+
+        <div class="value">
+
+            <label>
+                CURRENT
+            </label>
+
+            <strong class="highlight">
+
+                <span id="currentValue">
+                    2
+                </span>
+
+                A
+
+            </strong>
+
+        </div>
+
+        <div class="value">
+
+            <label>
+                COIL TURNS
+            </label>
+
+            <strong>
+
+                <span id="turnValue">
+                    100
+                </span>
+
+            </strong>
+
+        </div>
+
+        <div class="value">
+
+            <label>
+                FIELD STRENGTH
+            </label>
+
+            <strong class="highlight">
+
+                <span id="fieldStrengthValue">
+                    200
+                </span>
+
+                units
+
+            </strong>
+
+        </div>
+
+        <div class="value">
+
+            <label>
+                TOP CORE POLE
+            </label>
+
+            <strong id="corePoleValue">
+                N
+            </strong>
+
+        </div>
+
+        <div class="value">
+
+            <label>
+                MAGNET RELATION
+            </label>
+
+            <strong id="relationValue">
+                REPULSION
+            </strong>
+
+        </div>
+
+        <div class="value">
+
+            <label>
+                TARGET FIELD
+            </label>
+
+            <strong>
+
+                <span id="targetFieldValue">
+                    --
+                </span>
+
+            </strong>
+
+        </div>
+
+    </div>
+
+    <div class="field-title">
+
+        <span>
+            ELECTROMAGNET STRENGTH
+        </span>
+
+        <span id="fieldPercent">
+            44%
+        </span>
+
+    </div>
+
+    <div class="field-bar">
+        <div id="fieldFill"></div>
+    </div>
+
+    <div
+        id="equation"
+        class="equation">
+
+        <b>Electromagnet model</b><br>
+
+        B proportional to N x I
+
+    </div>
+
+</div>
+
+<div class="coach glass">
+
+    <div id="coachTitle">
+        MAGNETIC POLES
+    </div>
+
+    <div id="coachText">
+        Like poles repel. Unlike poles attract.
+    </div>
+
+    <div id="coachFormula">
+        N-N / S-S repel | N-S attract
+    </div>
+
+</div>
+
+</div>
+
+<!-- START -->
+
+<div
+    id="startScreen"
+    class="start-screen">
+
+    <div class="start-box glass">
+
+        <h2>
+            Electromagnet Rescue Mission
+        </h2>
+
+        <p>
+            The campus electromagnetic security system has failed.
+            Restore it using magnetic poles, field direction,
+            current, coil turns and electromagnet polarity.
+        </p>
+
+        <div class="rules">
+
+            <b>MISSION RULES</b><br>
+
+            Each experiment:
+            <b>30 seconds</b><br>
+
+            Final magnetic locks:
+            <b>20 seconds each</b><br>
+
+            Correct experiment:
+            <b>+100 points</b><br>
+
+            Correct physics answer:
+            <b>+50 points</b><br>
+
+            Wrong physics answer:
+            <b>-50 points</b><br>
+
+            Timer reaches zero:
+            <b>SYSTEM FAILURE</b>
+
+        </div>
+
+        <button id="startButton">
+            Start Magnetic Mission
+        </button>
+
+    </div>
+
+</div>
+
+<!-- RESULT -->
+
+<div
+    id="resultBox"
+    class="result glass">
+
+    <div class="result-scroll">
+
+        <div class="result-badge">
+            MAGNETIC TEST RESULT
+        </div>
+
+        <h3 id="resultTitle"></h3>
+
+        <div
+            id="resultText"
+            class="result-text">
+        </div>
+
+        <div class="question-label">
+            PHYSICS CHECK
+        </div>
+
+        <div id="question"></div>
+
+        <div id="questionHint"></div>
+
+        <div
+            id="answers"
+            class="answers">
+        </div>
+
+        <div id="feedback"></div>
+
+    </div>
+
+    <div class="result-footer">
+
+        <button
+            id="nextButton"
+            class="next-button">
+            NEXT EXPERIMENT
+        </button>
+
+    </div>
+
+</div>
+
+<!-- FAILURE -->
+
+<div
+    id="failure"
+    class="failure">
+
+    <div class="failure-box">
+
+        <div class="failure-icon">
+            ⚠
+        </div>
+
+        <h2>
+            MAGNETIC SYSTEM FAILED
+        </h2>
+
+        <p>
+            The electromagnetic system was not stabilized
+            before the mission timer reached zero.
+        </p>
+
+        <div
+            id="failureStage"
+            class="failure-stage">
+        </div>
+
+        <button onclick="location.reload()">
+            RESTART MISSION
+        </button>
+
+    </div>
+
+</div>
+
+<!-- FINISH -->
+
+<div
+    id="finish"
+    class="finish">
+
+    <div class="finish-box glass">
+
+        <h2>
+            Electromagnet System Restored!
+        </h2>
+
+        <div class="finish-sub">
+            Your experiments now explain Magnetism and Electromagnetism.
+        </div>
+
+        <div class="final-grid">
+
+            <div class="final-card">
+
+                <strong id="finalCurrent">
+                    -
+                </strong>
+
+                <span>
+                    FINAL CURRENT
+                </span>
+
+            </div>
+
+            <div class="final-card">
+
+                <strong id="finalTurns">
+                    -
+                </strong>
+
+                <span>
+                    COIL TURNS
+                </span>
+
+            </div>
+
+            <div class="final-card">
+
+                <strong id="finalField">
+                    -
+                </strong>
+
+                <span>
+                    FIELD STRENGTH
+                </span>
+
+            </div>
+
+            <div class="final-card">
+
+                <strong id="finalScore">
+                    -
+                </strong>
+
+                <span>
+                    FINAL SCORE
+                </span>
+
+            </div>
+
+        </div>
+
+        <div
+            id="finalExplanation"
+            class="final-explanation">
+        </div>
+
+        <button
+            class="restart"
+            onclick="location.reload()">
+            Run New Magnetic Mission
+        </button>
+
+    </div>
+
+</div>
+
+<script src="../../vendor/three-0.160.1.min.js"></script>
+
+<script>
+
+(() => {
+
+"use strict";
+
+/* ======================================================
+   CONFIG
+====================================================== */
+
+const STAGE_TIME = 30;
+const FINAL_TIME = 20;
+
+const CURRENT_VALUES = [
+    1,2,3
+];
+
+const TURN_VALUES = [
+    50,100,150
+];
+
+const studentName =
+    localStorage.getItem(
+        "student_name"
+    ) ||
+    sessionStorage.getItem(
+        "student_name"
+    ) ||
+    "Student";
+
+document
+.getElementById(
+    "studentText"
+)
+.textContent =
+    studentName +
+    " - restore the electromagnetic campus security system before time runs out.";
+
+/* ======================================================
+   THREE
+====================================================== */
+
+const scene =
+    new THREE.Scene();
+
+scene.background =
+    new THREE.Color(
+        0x82c8e9
+    );
+
+scene.fog =
+    new THREE.Fog(
+        0x82c8e9,
+        90,
+        240
+    );
+
+const camera =
+    new THREE.PerspectiveCamera(
+        58,
+        innerWidth/innerHeight,
+        .1,
+        350
+    );
+
+const renderer =
+    new THREE.WebGLRenderer({
+        antialias:true,
+        powerPreference:"high-performance"
+    });
+
+renderer.setSize(
+    innerWidth,
+    innerHeight
+);
+
+renderer.setPixelRatio(
+    Math.min(
+        devicePixelRatio,
+        2
+    )
+);
+
+renderer.shadowMap.enabled =
+    true;
+
+renderer.outputColorSpace =
+    THREE.SRGBColorSpace;
+
+renderer.toneMapping =
+    THREE.ACESFilmicToneMapping;
+
+renderer.toneMappingExposure =
+    1.08;
+
+document
+.getElementById(
+    "game"
+)
+.appendChild(
+    renderer.domElement
+);
+
+/* ======================================================
+   LIGHTING
+====================================================== */
+
+scene.add(
+    new THREE.HemisphereLight(
+        0xdaf4ff,
+        0x486c43,
+        2.6
+    )
+);
+
+const sun =
+    new THREE.DirectionalLight(
+        0xffefd0,
+        4
+    );
+
+sun.position.set(
+    -30,
+    70,
+    -35
+);
+
+sun.castShadow =
+    true;
+
+sun.shadow.mapSize.set(
+    2048,
+    2048
+);
+
+scene.add(
+    sun
+);
+
+/* ======================================================
+   MATERIALS
+====================================================== */
+
+const MAT = {
+
+    floor:
+    new THREE.MeshStandardMaterial({
+        color:0x353f46,
+        roughness:.9
+    }),
+
+    platform:
+    new THREE.MeshStandardMaterial({
+        color:0xaeb8bd,
+        roughness:.8
+    }),
+
+    dark:
+    new THREE.MeshStandardMaterial({
+        color:0x151a20,
+        roughness:.55,
+        metalness:.35
+    }),
+
+    north:
+    new THREE.MeshStandardMaterial({
+        color:0xdf4f54,
+        roughness:.55
+    }),
+
+    south:
+    new THREE.MeshStandardMaterial({
+        color:0x246fd0,
+        roughness:.55
+    }),
+
+    copper:
+    new THREE.MeshStandardMaterial({
+        color:0xc97532,
+        roughness:.38,
+        metalness:.6
+    }),
+
+    iron:
+    new THREE.MeshStandardMaterial({
+        color:0x69747d,
+        roughness:.4,
+        metalness:.75
+    }),
+
+    yellow:
+    new THREE.MeshStandardMaterial({
+        color:0xf2bd3d,
+        roughness:.55
+    }),
+
+    green:
+    new THREE.MeshStandardMaterial({
+        color:0x42bf78,
+        roughness:.55
+    })
+};
+
+function box(
+    width,
+    height,
+    depth,
+    material,
+    x,
+    y,
+    z,
+    parent=scene
+){
+
+    const mesh =
+        new THREE.Mesh(
+            new THREE.BoxGeometry(
+                width,
+                height,
+                depth
+            ),
+            material
+        );
+
+    mesh.position.set(
+        x,y,z
+    );
+
+    mesh.castShadow =
+        true;
+
+    mesh.receiveShadow =
+        true;
+
+    parent.add(
+        mesh
+    );
+
+    return mesh;
+}
+
+/* ======================================================
+   FLOOR
+====================================================== */
+
+box(
+    55,
+    .25,
+    82,
+    MAT.floor,
+    0,
+    -.15,
+    23
+);
+
+box(
+    24,
+    .5,
+    23,
+    MAT.platform,
+    0,
+    .1,
+    10
+);
+
+box(
+    24,
+    .5,
+    31,
+    MAT.platform,
+    0,
+    .1,
+    42
+);
+
+/* ======================================================
+   BAR MAGNET LAB
+====================================================== */
+
+const magnetLab =
+    new THREE.Group();
+
+scene.add(
+    magnetLab
+);
+
+magnetLab.position.set(
+    0,
+    0,
+    10
+);
+
+/* LEFT FIXED MAGNET
+   facing side = N
+*/
+
+const leftMagnet =
+    new THREE.Group();
+
+magnetLab.add(
+    leftMagnet
+);
+
+leftMagnet.position.x =
+    -5;
+
+box(
+    2.8,
+    2.5,
+    3,
+    MAT.south,
+    -1.4,
+    1.6,
+    0,
+    leftMagnet
+);
+
+box(
+    2.8,
+    2.5,
+    3,
+    MAT.north,
+    1.4,
+    1.6,
+    0,
+    leftMagnet
+);
+
+/* RIGHT MOVABLE MAGNET */
+
+const rightMagnet =
+    new THREE.Group();
+
+magnetLab.add(
+    rightMagnet
+);
+
+rightMagnet.position.x =
+    5;
+
+const rightLeftHalf =
+    box(
+        2.8,
+        2.5,
+        3,
+        MAT.north,
+        -1.4,
+        1.6,
+        0,
+        rightMagnet
+);
+
+const rightRightHalf =
+    box(
+        2.8,
+        2.5,
+        3,
+        MAT.south,
+        1.4,
+        1.6,
+        0,
+        rightMagnet
+);
+
+/* ======================================================
+   SINGLE MAGNET FOR FIELD VISUAL
+====================================================== */
+
+const fieldMagnet =
+    new THREE.Group();
+
+scene.add(
+    fieldMagnet
+);
+
+fieldMagnet.position.set(
+    0,
+    0,
+    10
+);
+
+box(
+    3,
+    2.4,
+    3,
+    MAT.north,
+    -1.5,
+    1.6,
+    0,
+    fieldMagnet
+);
+
+box(
+    3,
+    2.4,
+    3,
+    MAT.south,
+    1.5,
+    1.6,
+    0,
+    fieldMagnet
+);
+
+/* ======================================================
+   BAR MAGNET FIELD LINES
+====================================================== */
+
+const barFieldLines = [];
+const barFieldDots = [];
+
+function createBarFieldLine(
+    amplitude,
+    sign
+){
+
+    const points = [];
+
+    for(
+        let i=0;
+        i<=50;
+        i++
+    ){
+
+        const t =
+            i/50;
+
+        const x =
+            -3+
+            6*t;
+
+        const y =
+            1.6+
+            sign*
+            amplitude*
+            Math.sin(
+                Math.PI*t
+            );
+
+        points.push(
+            new THREE.Vector3(
+                x,
+                y,
+                10
+            )
+        );
+    }
+
+    const curve =
+        new THREE.CatmullRomCurve3(
+            points
+        );
+
+    const geometry =
+        new THREE.BufferGeometry()
+        .setFromPoints(
+            curve.getPoints(
+                80
+            )
+        );
+
+    const material =
+        new THREE.LineBasicMaterial({
+            color:0x62e1ff,
+            transparent:true,
+            opacity:.65
+        });
+
+    const line =
+        new THREE.Line(
+            geometry,
+            material
+        );
+
+    scene.add(
+        line
+    );
+
+    const dot =
+        new THREE.Mesh(
+            new THREE.SphereGeometry(
+                .16,
+                10,
+                8
+            ),
+            new THREE.MeshBasicMaterial({
+                color:0xffe267
+            })
+        );
+
+    scene.add(
+        dot
+    );
+
+    barFieldLines.push({
+        line,
+        curve
+    });
+
+    barFieldDots.push({
+        mesh:dot,
+        curve,
+        offset:
+            barFieldDots.length/
+            8
+    });
+}
+
+[
+    1.4,
+    2.3,
+    3.3,
+    4.4
+]
+.forEach(
+    amplitude=>{
+
+        createBarFieldLine(
+            amplitude,
+            1
+        );
+
+        createBarFieldLine(
+            amplitude,
+            -1
+        );
+    }
+);
+
+/* ======================================================
+   IRON FILINGS
+====================================================== */
+
+const filings = [];
+
+for(
+    let x=-6;
+    x<=6;
+    x+=2
+){
+
+    for(
+        let y=-3;
+        y<=5;
+        y+=2
+    ){
+
+        if(
+            Math.abs(x)<3.2 &&
+            Math.abs(
+                y-1.6
+            )<1.8
+        ){
+            continue;
+        }
+
+        const filing =
+            box(
+                1.0,
+                .07,
+                .12,
+                MAT.dark,
+                x,
+                y+1.6,
+                10.15
+            );
+
+        filings.push(
+            filing
+        );
+    }
+}
+
+/* ======================================================
+   ELECTROMAGNET
+====================================================== */
+
+const electroLab =
+    new THREE.Group();
+
+scene.add(
+    electroLab
+);
+
+electroLab.position.set(
+    0,
+    0,
+    39
+);
+
+/* BASE */
+
+box(
+    12,
+    .6,
+    10,
+    MAT.dark,
+    0,
+    .3,
+    0,
+    electroLab
+);
+
+/* IRON CORE */
+
+const core =
+    box(
+        2.1,
+        8,
+        2.1,
+        MAT.iron,
+        0,
+        4.6,
+        0,
+        electroLab
+);
+
+/* TOP / BOTTOM POLE VISUALS */
+
+const topPole =
+    box(
+        2.35,
+        .8,
+        2.35,
+        MAT.north,
+        0,
+        8.8,
+        0,
+        electroLab
+);
+
+const bottomPole =
+    box(
+        2.35,
+        .8,
+        2.35,
+        MAT.south,
+        0,
+        .75,
+        0,
+        electroLab
+);
+
+/* ======================================================
+   COIL HELIX
+====================================================== */
+
+const coilPoints = [];
+
+const HELIX_STEPS =
+    260;
+
+for(
+    let i=0;
+    i<=HELIX_STEPS;
+    i++
+){
+
+    const t =
+        i/
+        HELIX_STEPS;
+
+    const angle =
+        t*
+        Math.PI*
+        2*
+        11;
+
+    const radius =
+        1.8;
+
+    const y =
+        1.2+
+        t*6.8;
+
+    coilPoints.push(
+        new THREE.Vector3(
+            Math.cos(angle)*
+            radius,
+            y,
+            Math.sin(angle)*
+            radius
+        )
+    );
+}
+
+const coilCurve =
+    new THREE.CatmullRomCurve3(
+        coilPoints
+    );
+
+const coilGeometry =
+    new THREE.TubeGeometry(
+        coilCurve,
+        320,
+        .12,
+        8,
+        false
+    );
+
+const coilMesh =
+    new THREE.Mesh(
+        coilGeometry,
+        MAT.copper
+    );
+
+coilMesh.castShadow =
+    true;
+
+electroLab.add(
+    coilMesh
+);
+
+/* CURRENT PARTICLES */
+
+const currentParticles = [];
+
+for(
+    let i=0;
+    i<25;
+    i++
+){
+
+    const particle =
+        new THREE.Mesh(
+            new THREE.SphereGeometry(
+                .14,
+                8,
+                6
+            ),
+
+            new THREE.MeshBasicMaterial({
+                color:0x65ecff
+            })
+        );
+
+    electroLab.add(
+        particle
+    );
+
+    currentParticles.push({
+        mesh:particle,
+        t:i/25
+    });
+}
+
+/* ======================================================
+   ELECTROMAGNET FIELD LINES
+====================================================== */
+
+const electroFieldLines = [];
+const electroFieldDots = [];
+
+function createElectroFieldLine(
+    amplitude,
+    side
+){
+
+    const points = [];
+
+    for(
+        let i=0;
+        i<=60;
+        i++
+    ){
+
+        const t =
+            i/60;
+
+        const y =
+            8.7-
+            7.8*t;
+
+        const x =
+            side*
+            amplitude*
+            Math.sin(
+                Math.PI*t
+            );
+
+        points.push(
+            new THREE.Vector3(
+                x,
+                y,
+                0
+            )
+        );
+    }
+
+    const curve =
+        new THREE.CatmullRomCurve3(
+            points
+        );
+
+    const geometry =
+        new THREE.BufferGeometry()
+        .setFromPoints(
+            curve.getPoints(
+                90
+            )
+        );
+
+    const material =
+        new THREE.LineBasicMaterial({
+            color:0x68e4ff,
+            transparent:true,
+            opacity:.55
+        });
+
+    const line =
+        new THREE.Line(
+            geometry,
+            material
+        );
+
+    electroLab.add(
+        line
+    );
+
+    const dot =
+        new THREE.Mesh(
+            new THREE.SphereGeometry(
+                .15,
+                9,
+                7
+            ),
+
+            new THREE.MeshBasicMaterial({
+                color:0xffdd58
+            })
+        );
+
+    electroLab.add(
+        dot
+    );
+
+    electroFieldLines.push({
+        line,
+        curve
+    });
+
+    electroFieldDots.push({
+        mesh:dot,
+        curve,
+        offset:
+            electroFieldDots.length/
+            8
+    });
+}
+
+[
+    2.7,
+    3.8,
+    5,
+    6.2
+]
+.forEach(
+    amplitude=>{
+
+        createElectroFieldLine(
+            amplitude,
+            1
+        );
+
+        createElectroFieldLine(
+            amplitude,
+            -1
+        );
+    }
+);
+
+/* ======================================================
+   LIFT OBJECT
+====================================================== */
+
+const liftObject =
+    box(
+        5,
+        .8,
+        4,
+        MAT.iron,
+        0,
+        11,
+        39
+    );
+
+let liftHeight =
+    11;
+
+let targetLiftHeight =
+    11;
+
+/* ======================================================
+   STATE
+====================================================== */
+
+let started = false;
+let failed = false;
+let finished = false;
+
+let stage = 1;
+
+let score = 0;
+
+let animationTime = 0;
+
+let timerRemaining =
+    STAGE_TIME;
+
+let timerRunning =
+    false;
+
+let stageComplete =
+    false;
+
+let selectedFacingPole =
+    "N";
+
+let selectedFieldDirection =
+    "N_TO_S";
+
+let selectedCurrent =
+    2;
+
+let selectedTurns =
+    100;
+
+let currentDirection =
+    "forward";
+
+let targetRelation =
+    "ATTRACTION";
+
+let targetFieldStrength =
+    200;
+
+let targetPole =
+    "N";
+
+let targetLiftStrength =
+    300;
+
+let finalTargets = [];
+
+let finalIndex =
+    0;
+
+/* ======================================================
+   CONTROLS
+====================================================== */
+
+const poleButtons =
+    [
+        ...document.querySelectorAll(
+            "#poleButtons button"
+        )
+    ];
+
+const fieldButtons =
+    [
+        ...document.querySelectorAll(
+            "#fieldButtons button"
+        )
+    ];
+
+const currentButtons =
+    [
+        ...document.querySelectorAll(
+            "#currentButtons button"
+        )
+    ];
+
+const turnButtons =
+    [
+        ...document.querySelectorAll(
+            "#turnButtons button"
+        )
+    ];
+
+const directionButtons =
+    [
+        ...document.querySelectorAll(
+            "#directionButtons button"
+        )
+    ];
+
+function activate(
+    buttons,
+    key,
+    value
+){
+
+    buttons.forEach(
+        button=>{
+
+            button.classList.toggle(
+                "active",
+                String(
+                    button.dataset[key]
+                )===
+                String(value)
+            );
+        }
+    );
+}
+
+poleButtons.forEach(
+    button=>{
+
+        button.onclick =
+        ()=>{
+
+            selectedFacingPole =
+                button.dataset.pole;
+
+            activate(
+                poleButtons,
+                "pole",
+                selectedFacingPole
+            );
+
+            updateMagnetVisual();
+
+            updateHUD();
+        };
+    }
+);
+
+fieldButtons.forEach(
+    button=>{
+
+        button.onclick =
+        ()=>{
+
+            selectedFieldDirection =
+                button.dataset.field;
+
+            activate(
+                fieldButtons,
+                "field",
+                selectedFieldDirection
+            );
+
+            updateHUD();
+        };
+    }
+);
+
+currentButtons.forEach(
+    button=>{
+
+        button.onclick =
+        ()=>{
+
+            selectedCurrent =
+                Number(
+                    button.dataset.current
+                );
+
+            activate(
+                currentButtons,
+                "current",
+                selectedCurrent
+            );
+
+            updateHUD();
+        };
+    }
+);
+
+turnButtons.forEach(
+    button=>{
+
+        button.onclick =
+        ()=>{
+
+            selectedTurns =
+                Number(
+                    button.dataset.turns
+                );
+
+            activate(
+                turnButtons,
+                "turns",
+                selectedTurns
+            );
+
+            updateHUD();
+        };
+    }
+);
+
+directionButtons.forEach(
+    button=>{
+
+        button.onclick =
+        ()=>{
+
+            currentDirection =
+                button.dataset.direction;
+
+            activate(
+                directionButtons,
+                "direction",
+                currentDirection
+            );
+
+            updatePoleVisual();
+
+            updateHUD();
+        };
+    }
+);
+
+/* ======================================================
+   START
+====================================================== */
+
+document
+.getElementById(
+    "startButton"
+)
+.onclick =
+()=>{
+
+    started =
+        true;
+
+    document
+    .getElementById(
+        "startScreen"
+    )
+    .style.display =
+        "none";
+
+    prepareStage();
+};
+
+/* ======================================================
+   TEST
+====================================================== */
+
+document
+.getElementById(
+    "testButton"
+)
+.onclick =
+()=>{
+
+    if(
+        !started ||
+        failed ||
+        finished ||
+        stageComplete
+    ){
+
+        return;
+    }
+
+    evaluateStage();
+};
+
+/* ======================================================
+   TIMER
+====================================================== */
+
+function startTimer(
+    seconds
+){
+
+    timerRemaining =
+        seconds;
+
+    timerRunning =
+        true;
+
+    updateTimer();
+}
+
+function pauseTimer(){
+
+    timerRunning =
+        false;
+}
+
+function updateTimerPhysics(
+    dt
+){
+
+    if(
+        !started ||
+        failed ||
+        finished ||
+        !timerRunning
+    ){
+
+        return;
+    }
+
+    timerRemaining -=
+        dt;
+
+    if(
+        timerRemaining<=0
+    ){
+
+        timerRemaining =
+            0;
+
+        updateTimer();
+
+        failMission();
+
+        return;
+    }
+
+    updateTimer();
+}
+
+function updateTimer(){
+
+    const element =
+        document.getElementById(
+            "timerValue"
+        );
+
+    element.textContent =
+        Math.ceil(
+            Math.max(
+                0,
+                timerRemaining
+            )
+        );
+
+    element.classList.remove(
+        "warning",
+        "danger"
+    );
+
+    if(
+        timerRemaining<=5
+    ){
+
+        element.classList.add(
+            "danger"
+        );
+    }
+
+    else if(
+        timerRemaining<=10
+    ){
+
+        element.classList.add(
+            "warning"
+        );
+    }
+}
+
+/* ======================================================
+   FAILURE
+====================================================== */
+
+function failMission(){
+
+    if(
+        failed ||
+        finished
+    ){
+
+        return;
+    }
+
+    failed =
+        true;
+
+    pauseTimer();
+
+    document
+    .getElementById(
+        "testButton"
+    )
+    .disabled =
+        true;
+
+    document
+    .getElementById(
+        "failureStage"
+    )
+    .innerHTML =
+    `
+    Failed during:<br>
+
+    <b>
+    ${
+        document
+        .getElementById(
+            "stageName"
+        )
+        .textContent
+    }
+    </b><br><br>
+
+    Final score:
+    <b>${score}</b>
+    `;
+
+    document
+    .getElementById(
+        "failure"
+    )
+    .classList.add(
+        "show"
+    );
+}
+
+/* ======================================================
+   RANDOM
+====================================================== */
+
+function randomItem(
+    array
+){
+
+    return array[
+        Math.floor(
+            Math.random()*
+            array.length
+        )
+    ];
+}
+
+/* ======================================================
+   FIELD MODEL
+====================================================== */
+
+function fieldStrength(){
+
+    /*
+       Simplified educational model:
+
+       B proportional to N x I
+
+       Here displayed strength =
+       coil turns x current
+    */
+
+    return selectedTurns*
+           selectedCurrent;
+}
+
+function topCorePole(){
+
+    return currentDirection===
+        "forward"
+        ?
+        "N"
+        :
+        "S";
+}
+
+function magnetRelation(){
+
+    /*
+       Fixed left magnet faces N.
+
+       Right facing:
+       N -> like poles -> repel
+       S -> unlike poles -> attract
+    */
+
+    return selectedFacingPole===
+        "N"
+        ?
+        "REPULSION"
+        :
+        "ATTRACTION";
+}
+
+/* ======================================================
+   STAGE SETUP
+====================================================== */
+
+function showGroup(
+    id,
+    visible
+){
+
+    document
+    .getElementById(
+        id
+    )
+    .style.display =
+        visible
+        ?
+        "block"
+        :
+        "none";
+}
+
+function prepareStage(){
+
+    stageComplete =
+        false;
+
+    document
+    .getElementById(
+        "testButton"
+    )
+    .disabled =
+        false;
+
+    showGroup(
+        "poleGroup",
+        stage===1
+    );
+
+    showGroup(
+        "fieldGroup",
+        stage===2
+    );
+
+    showGroup(
+        "currentGroup",
+        stage>=3
+    );
+
+    showGroup(
+        "turnGroup",
+        stage>=4
+    );
+
+    showGroup(
+        "directionGroup",
+        stage>=5
+    );
+
+    magnetLab.visible =
+        stage===1;
+
+    fieldMagnet.visible =
+        stage===2;
+
+    barFieldLines.forEach(
+        item=>
+        item.line.visible=
+            stage===2
+    );
+
+    barFieldDots.forEach(
+        item=>
+        item.mesh.visible=
+            stage===2
+    );
+
+    filings.forEach(
+        item=>
+        item.visible=
+            stage===2
+    );
+
+    electroLab.visible =
+        stage>=3;
+
+    liftObject.visible =
+        stage>=6;
+
+    targetLiftHeight =
+        11;
+
+    liftHeight =
+        11;
+
+    liftObject.position.y =
+        liftHeight;
+
+    if(
+        stage===1
+    ){
+
+        targetRelation =
+            randomItem([
+                "ATTRACTION",
+                "REPULSION"
+            ]);
+
+        document
+        .getElementById(
+            "stageName"
+        )
+        .textContent =
+            "Stage 1 - Magnetic Poles";
+
+        document
+        .getElementById(
+            "stageObjective"
+        )
+        .textContent =
+            `Create ${targetRelation.toLowerCase()} between the two magnets.`;
+
+        document
+        .getElementById(
+            "coachTitle"
+        )
+        .textContent =
+            "MAGNETIC POLES";
+
+        document
+        .getElementById(
+            "coachText"
+        )
+        .textContent =
+            "The fixed magnet faces North. Choose the facing pole of the second magnet.";
+
+        document
+        .getElementById(
+            "coachFormula"
+        )
+        .textContent =
+            "Like poles repel | Unlike poles attract";
+    }
+
+    else if(
+        stage===2
+    ){
+
+        document
+        .getElementById(
+            "stageName"
+        )
+        .textContent =
+            "Stage 2 - Magnetic Field";
+
+        document
+        .getElementById(
+            "stageObjective"
+        )
+        .textContent =
+            "Select the correct direction of magnetic field lines outside a bar magnet.";
+
+        document
+        .getElementById(
+            "coachTitle"
+        )
+        .textContent =
+            "MAGNETIC FIELD";
+
+        document
+        .getElementById(
+            "coachText"
+        )
+        .textContent =
+            "Watch the animated field lines and iron filings around the bar magnet.";
+
+        document
+        .getElementById(
+            "coachFormula"
+        )
+        .textContent =
+            "Outside a magnet: North -> South";
+    }
+
+    else if(
+        stage===3
+    ){
+
+        selectedTurns =
+            100;
+
+        targetFieldStrength =
+            randomItem([
+                100,
+                200,
+                300
+            ]);
+
+        document
+        .getElementById(
+            "stageName"
+        )
+        .textContent =
+            "Stage 3 - Electromagnet Current";
+
+        document
+        .getElementById(
+            "stageObjective"
+        )
+        .textContent =
+            `With 100 turns, create field strength ${targetFieldStrength} units.`;
+
+        document
+        .getElementById(
+            "coachTitle"
+        )
+        .textContent =
+            "CURRENT AND FIELD STRENGTH";
+
+        document
+        .getElementById(
+            "coachText"
+        )
+        .textContent =
+            "Increase current and watch the electromagnet field become stronger.";
+
+        document
+        .getElementById(
+            "coachFormula"
+        )
+        .textContent =
+            "B proportional to N x I";
+    }
+
+    else if(
+        stage===4
+    ){
+
+        selectedCurrent =
+            2;
+
+        targetFieldStrength =
+            randomItem([
+                100,
+                200,
+                300
+            ]);
+
+        document
+        .getElementById(
+            "stageName"
+        )
+        .textContent =
+            "Stage 4 - Coil Turns";
+
+        document
+        .getElementById(
+            "stageObjective"
+        )
+        .textContent =
+            `With current fixed at 2 A, create ${targetFieldStrength} field units.`;
+
+        document
+        .getElementById(
+            "coachTitle"
+        )
+        .textContent =
+            "COIL TURNS";
+
+        document
+        .getElementById(
+            "coachText"
+        )
+        .textContent =
+            "More turns around the core strengthen the electromagnet.";
+
+        document
+        .getElementById(
+            "coachFormula"
+        )
+        .textContent =
+            "Field strength increases with N and I";
+    }
+
+    else if(
+        stage===5
+    ){
+
+        targetPole =
+            randomItem([
+                "N",
+                "S"
+            ]);
+
+        document
+        .getElementById(
+            "stageName"
+        )
+        .textContent =
+            "Stage 5 - Reverse Current";
+
+        document
+        .getElementById(
+            "stageObjective"
+        )
+        .textContent =
+            `Make the TOP of the electromagnet a ${targetPole} pole.`;
+
+        document
+        .getElementById(
+            "coachTitle"
+        )
+        .textContent =
+            "CURRENT DIRECTION";
+
+        document
+        .getElementById(
+            "coachText"
+        )
+        .textContent =
+            "Reverse the current and watch the electromagnet's North and South poles swap.";
+
+        document
+        .getElementById(
+            "coachFormula"
+        )
+        .textContent =
+            "Reverse current -> reverse magnetic polarity";
+    }
+
+    else if(
+        stage===6
+    ){
+
+        targetLiftStrength =
+            randomItem([
+                100,
+                150,
+                200,
+                300,
+                450
+            ]);
+
+        document
+        .getElementById(
+            "stageName"
+        )
+        .textContent =
+            "Stage 6 - Magnetic Lift";
+
+        document
+        .getElementById(
+            "stageObjective"
+        )
+        .textContent =
+            `Generate exactly ${targetLiftStrength} field units to lift the steel gate lock.`;
+
+        document
+        .getElementById(
+            "coachTitle"
+        )
+        .textContent =
+            "ELECTROMAGNETIC FORCE";
+
+        document
+        .getElementById(
+            "coachText"
+        )
+        .textContent =
+            "Choose current and coil turns to create the required magnetic strength.";
+
+        document
+        .getElementById(
+            "coachFormula"
+        )
+        .textContent =
+            "Game model: Field Strength = N x I";
+    }
+
+    else{
+
+        const possibleTargets = [
+            {
+                field:100,
+                pole:"N"
+            },
+            {
+                field:150,
+                pole:"S"
+            },
+            {
+                field:200,
+                pole:"N"
+            },
+            {
+                field:300,
+                pole:"S"
+            },
+            {
+                field:450,
+                pole:"N"
+            }
+        ];
+
+        finalTargets = [];
+
+        while(
+            finalTargets.length<3
+        ){
+
+            const candidate =
+                randomItem(
+                    possibleTargets
+                );
+
+            if(
+                !finalTargets.some(
+                    item=>
+                    item.field===
+                    candidate.field &&
+                    item.pole===
+                    candidate.pole
+                )
+            ){
+
+                finalTargets.push({
+                    ...candidate
+                });
+            }
+        }
+
+        finalIndex =
+            0;
+
+        document
+        .getElementById(
+            "stageName"
+        )
+        .textContent =
+            "Final - Electromagnet Security Lock";
+
+        updateFinalObjective();
+
+        document
+        .getElementById(
+            "coachTitle"
+        )
+        .textContent =
+            "FINAL MAGNETIC LOCK";
+
+        document
+        .getElementById(
+            "coachText"
+        )
+        .textContent =
+            "Match both field strength and magnetic polarity before each timer expires.";
+
+        document
+        .getElementById(
+            "coachFormula"
+        )
+        .textContent =
+            "Strength + Current Direction + Polarity";
+    }
+
+    activate(
+        currentButtons,
+        "current",
+        selectedCurrent
+    );
+
+    activate(
+        turnButtons,
+        "turns",
+        selectedTurns
+    );
+
+    activate(
+        directionButtons,
+        "direction",
+        currentDirection
+    );
+
+    updatePoleVisual();
+
+    updateHUD();
+
+    startTimer(
+        stage===7
+        ?
+        FINAL_TIME
+        :
+        STAGE_TIME
+    );
+}
+
+function updateFinalObjective(){
+
+    const target =
+        finalTargets[
+            finalIndex
+        ];
+
+    document
+    .getElementById(
+        "stageObjective"
+    )
+    .textContent =
+        `Lock ${finalIndex+1}/3: ${target.field} field units + TOP pole ${target.pole}.`;
+}
+
+/* ======================================================
+   EVALUATE
+====================================================== */
+
+function evaluateStage(){
+
+    let success =
+        false;
+
+    let title =
+        "";
+
+    let explanation =
+        "";
+
+    const strength =
+        fieldStrength();
+
+    if(
+        stage===1
+    ){
+
+        const relation =
+            magnetRelation();
+
+        success =
+            relation===
+            targetRelation;
+
+        title =
+            success
+            ?
+            "MAGNETIC INTERACTION CORRECT!"
+            :
+            "MAGNETIC INTERACTION INCORRECT";
+
+        explanation =
+        `
+        Fixed magnet facing pole:
+        <b>N</b><br>
+
+        Selected opposite magnet facing pole:
+        <b>${selectedFacingPole}</b><br><br>
+
+        Result:
+        <b>${relation}</b><br><br>
+
+        ${
+            selectedFacingPole==="N"
+            ?
+            "N facing N means like poles. Like poles repel."
+            :
+            "N facing S means unlike poles. Unlike poles attract."
+        }
+        `;
+    }
+
+    else if(
+        stage===2
+    ){
+
+        success =
+            selectedFieldDirection===
+            "N_TO_S";
+
+        title =
+            success
+            ?
+            "FIELD DIRECTION CORRECT!"
+            :
+            "FIELD DIRECTION INCORRECT";
+
+        explanation =
+        `
+        Outside a bar magnet,
+        magnetic field lines emerge from the
+        <b>North pole</b>
+        and enter the
+        <b>South pole</b>.<br><br>
+
+        Correct direction:<br>
+
+        <b>N -> S</b><br><br>
+
+        Inside the magnet,
+        the field completes the loop from S back toward N.
+        `;
+    }
+
+    else if(
+        stage===3
+    ){
+
+        success =
+            strength===
+            targetFieldStrength;
+
+        title =
+            success
+            ?
+            "CURRENT CALIBRATED!"
+            :
+            "FIELD STRENGTH INCORRECT";
+
+        explanation =
+        `
+        Coil turns =
+        <b>${selectedTurns}</b><br>
+
+        Current =
+        <b>${selectedCurrent} A</b><br><br>
+
+        Game electromagnet model:<br>
+
+        Field strength =
+        N x I<br>
+
+        =
+        ${selectedTurns}
+        x
+        ${selectedCurrent}<br>
+
+        =
+        <b>${strength} units</b><br><br>
+
+        Target =
+        <b>${targetFieldStrength} units</b>.
+        `;
+    }
+
+    else if(
+        stage===4
+    ){
+
+        success =
+            strength===
+            targetFieldStrength;
+
+        title =
+            success
+            ?
+            "COIL TURNS CALIBRATED!"
+            :
+            "COIL STRENGTH INCORRECT";
+
+        explanation =
+        `
+        Current =
+        <b>${selectedCurrent} A</b><br>
+
+        Coil turns =
+        <b>${selectedTurns}</b><br><br>
+
+        B proportional to N x I<br><br>
+
+        Game field strength =
+        ${selectedTurns}
+        x
+        ${selectedCurrent}<br>
+
+        =
+        <b>${strength} units</b>.<br><br>
+
+        Increasing the number of turns strengthens
+        the electromagnet when current is unchanged.
+        `;
+    }
+
+    else if(
+        stage===5
+    ){
+
+        const pole =
+            topCorePole();
+
+        success =
+            pole===
+            targetPole;
+
+        title =
+            success
+            ?
+            "POLARITY CORRECT!"
+            :
+            "WRONG MAGNETIC POLARITY";
+
+        explanation =
+        `
+        Current direction:
+        <b>${currentDirection.toUpperCase()}</b><br>
+
+        Top electromagnet pole:
+        <b>${pole}</b><br><br>
+
+        Target top pole:
+        <b>${targetPole}</b>.<br><br>
+
+        Reversing current through the coil reverses
+        the magnetic field direction and swaps the electromagnet poles.
+        `;
+    }
+
+    else if(
+        stage===6
+    ){
+
+        success =
+            strength===
+            targetLiftStrength;
+
+        title =
+            success
+            ?
+            "STEEL LOCK LIFTED!"
+            :
+            "MAGNETIC FORCE CALIBRATION INCORRECT";
+
+        explanation =
+        `
+        Current =
+        <b>${selectedCurrent} A</b><br>
+
+        Coil turns =
+        <b>${selectedTurns}</b><br><br>
+
+        Field strength =
+        ${selectedTurns}
+        x
+        ${selectedCurrent}<br>
+
+        =
+        <b>${strength} units</b><br><br>
+
+        Required lift strength =
+        <b>${targetLiftStrength} units</b>.<br><br>
+
+        ${
+            success
+            ?
+            "The electromagnet produced the required field and lifted the steel gate lock."
+            :
+            strength<targetLiftStrength
+            ?
+            "The electromagnet is too weak. Increase N, I, or both."
+            :
+            "The electromagnet is over the required calibration. Adjust N or I to hit the exact target."
+        }
+        `;
+
+        if(
+            success
+        ){
+
+            targetLiftHeight =
+                16;
+        }
+    }
+
+    else{
+
+        const target =
+            finalTargets[
+                finalIndex
+            ];
+
+        const pole =
+            topCorePole();
+
+        success =
+            strength===
+            target.field &&
+            pole===
+            target.pole;
+
+        if(
+            success
+        ){
+
+            score +=
+                100;
+
+            updateScore();
+
+            targetLiftHeight =
+                15;
+
+            finalIndex++;
+
+            if(
+                finalIndex<3
+            ){
+
+                updateFinalObjective();
+
+                startTimer(
+                    FINAL_TIME
+                );
+
+                return;
+            }
+
+            pauseTimer();
+
+            stageComplete =
+                true;
+
+            finishGame();
+
+            return;
+        }
+
+        showRetry(
+            "SECURITY LOCK INCORRECT",
+
+            `
+            Required field strength:
+            <b>${target.field} units</b><br>
+
+            Your field strength:
+            <b>${strength} units</b><br><br>
+
+            Required TOP pole:
+            <b>${target.pole}</b><br>
+
+            Your TOP pole:
+            <b>${pole}</b><br><br>
+
+            Adjust current, coil turns or current direction
+            before the timer reaches zero.
+            `
+        );
+
+        return;
+    }
+
+    if(
+        success
+    ){
+
+        score +=
+            100;
+
+        updateScore();
+
+        stageComplete =
+            true;
+
+        pauseTimer();
+
+        document
+        .getElementById(
+            "testButton"
+        )
+        .disabled =
+            true;
+
+        showStageResult(
+            title,
+            explanation
+        );
+    }
+
+    else{
+
+        showRetry(
+            title,
+            explanation
+        );
+    }
+}
+
+/* ======================================================
+   RETRY
+====================================================== */
+
+function showRetry(
+    title,
+    explanation
+){
+
+    const resultBox =
+        document.getElementById(
+            "resultBox"
+        );
+
+    document
+    .getElementById(
+        "resultTitle"
+    )
+    .textContent =
+        title;
+
+    document
+    .getElementById(
+        "resultText"
+    )
+    .innerHTML =
+        explanation;
+
+    document
+    .getElementById(
+        "question"
+    )
+    .textContent =
+        "Adjust the magnetic controls and try again before time runs out.";
+
+    document
+    .getElementById(
+        "questionHint"
+    )
+    .textContent =
+        "";
+
+    document
+    .getElementById(
+        "answers"
+    )
+    .innerHTML =
+        "";
+
+    document
+    .getElementById(
+        "feedback"
+    )
+    .style.display =
+        "none";
+
+    const next =
+        document.getElementById(
+            "nextButton"
+        );
+
+    next.style.display =
+        "block";
+
+    next.textContent =
+        "TRY AGAIN";
+
+    next.onclick =
+        ()=>{
+
+            resultBox
+            .classList
+            .remove(
+                "show"
+            );
+        };
+
+    resultBox
+    .classList
+    .add(
+        "show"
+    );
+}
+
+/* ======================================================
+   QUESTION HELPERS
+====================================================== */
+
+function shuffle(
+    array
+){
+
+    const copy =
+        [...array];
+
+    for(
+        let i=copy.length-1;
+        i>0;
+        i--
+    ){
+
+        const j =
+            Math.floor(
+                Math.random()*
+                (i+1)
+            );
+
+        [
+            copy[i],
+            copy[j]
+        ]=[
+            copy[j],
+            copy[i]
+        ];
+    }
+
+    return copy;
+}
+
+function options(
+    correct,
+    wrong1,
+    wrong2
+){
+
+    const list =
+        shuffle([
+            correct,
+            wrong1,
+            wrong2
+        ]);
+
+    return {
+
+        list,
+
+        correct:
+            list.indexOf(
+                correct
+            )
+    };
+}
+
+/* ======================================================
+   QUESTIONS
+====================================================== */
+
+function poleQuestion(){
+
+    const fixed =
+        randomItem([
+            "N",
+            "S"
+        ]);
+
+    const facing =
+        randomItem([
+            "N",
+            "S"
+        ]);
+
+    const result =
+        fixed===
+        facing
+        ?
+        "Repulsion"
+        :
+        "Attraction";
+
+    const option =
+        options(
+            result,
+            result==="Repulsion"
+            ?
+            "Attraction"
+            :
+            "Repulsion",
+            "No magnetic interaction"
+        );
+
+    return {
+
+        q:
+        `A ${fixed} pole faces a ${facing} pole. What happens?`,
+
+        hint:
+        "Like poles repel; unlike poles attract.",
+
+        answers:
+            option.list,
+
+        correct:
+            option.correct,
+
+        explanation:
+        `
+        ${
+            fixed===
+            facing
+            ?
+            "The facing poles are the same."
+            :
+            "The facing poles are different."
+        }<br><br>
+
+        Therefore the magnets show
+        <b>${result.toLowerCase()}</b>.
+        `
+    };
+}
+
+function fieldDirectionQuestion(){
+
+    return {
+
+        q:
+        "Outside a bar magnet, what is the conventional magnetic field direction?",
+
+        hint:
+        "Think about where field lines leave and enter.",
+
+        answers:[
+            "North to South",
+            "South to North",
+            "Only vertically upward"
+        ],
+
+        correct:0,
+
+        explanation:
+        `
+        Outside a bar magnet,
+        magnetic field lines leave the
+        <b>North pole</b>
+        and enter the
+        <b>South pole</b>.
+        `
+    };
+}
+
+function strengthQuestion(){
+
+    const turns =
+        randomItem([
+            50,
+            100,
+            150
+        ]);
+
+    const current =
+        randomItem([
+            1,
+            2,
+            3
+        ]);
+
+    const strength =
+        turns*
+        current;
+
+    const answer =
+        strength+
+        " units";
+
+    const option =
+        options(
+            answer,
+            strength/2+
+            " units",
+            strength+100+
+            " units"
+        );
+
+    return {
+
+        q:
+        `In this game model, an electromagnet has ${turns} turns and ${current} A current. Find its field strength.`,
+
+        hint:
+        "Field strength = N x I",
+
+        answers:
+            option.list,
+
+        correct:
+            option.correct,
+
+        explanation:
+        `
+        <b>Game model</b><br>
+
+        Field strength =
+        N x I<br><br>
+
+        =
+        ${turns}
+        x
+        ${current}<br><br>
+
+        =
+        <b>
+        ${strength} units
+        </b>.
+        `
+    };
+}
+
+function currentEffectQuestion(){
+
+    return {
+
+        q:
+        "If coil turns stay constant and current increases, what happens to electromagnet strength?",
+
+        hint:
+        "B increases with current.",
+
+        answers:[
+            "It increases",
+            "It decreases",
+            "It becomes zero"
+        ],
+
+        correct:0,
+
+        explanation:
+        `
+        Electromagnet field strength increases when current increases,
+        provided the other conditions remain the same.
+        `
+    };
+}
+
+function turnEffectQuestion(){
+
+    return {
+
+        q:
+        "If current stays constant, what happens when the number of coil turns increases?",
+
+        hint:
+        "More turns reinforce the magnetic field.",
+
+        answers:[
+            "Magnetic field becomes stronger",
+            "Magnetic field becomes weaker",
+            "Current must become zero"
+        ],
+
+        correct:0,
+
+        explanation:
+        `
+        Increasing the number of coil turns increases
+        the magnetic field produced by the electromagnet.
+        `
+    };
+}
+
+function polarityQuestion(){
+
+    return {
+
+        q:
+        "What happens to an electromagnet's poles when current direction is reversed?",
+
+        hint:
+        "Current determines magnetic field direction.",
+
+        answers:[
+            "North and South poles swap",
+            "Both poles disappear permanently",
+            "Only resistance changes"
+        ],
+
+        correct:0,
+
+        explanation:
+        `
+        Reversing current reverses the direction of the magnetic field.
+
+        Therefore the electromagnet's
+        <b>North and South poles interchange</b>.
+        `
+    };
+}
+
+function questionForStage(){
+
+    if(
+        stage===1
+    ){
+
+        return poleQuestion();
+    }
+
+    if(
+        stage===2
+    ){
+
+        return fieldDirectionQuestion();
+    }
+
+    if(
+        stage===3
+    ){
+
+        return randomItem([
+            strengthQuestion,
+            currentEffectQuestion
+        ])();
+    }
+
+    if(
+        stage===4
+    ){
+
+        return randomItem([
+            strengthQuestion,
+            turnEffectQuestion
+        ])();
+    }
+
+    if(
+        stage===5
+    ){
+
+        return polarityQuestion();
+    }
+
+    return randomItem([
+        strengthQuestion,
+        currentEffectQuestion,
+        turnEffectQuestion,
+        polarityQuestion
+    ])();
+}
+
+/* ======================================================
+   RESULT + QUIZ
+====================================================== */
+
+function showStageResult(
+    title,
+    explanation
+){
+
+    const resultBox =
+        document.getElementById(
+            "resultBox"
+        );
+
+    document
+    .getElementById(
+        "resultTitle"
+    )
+    .textContent =
+        title;
+
+    document
+    .getElementById(
+        "resultText"
+    )
+    .innerHTML =
+        explanation;
+
+    const question =
+        questionForStage();
+
+    document
+    .getElementById(
+        "question"
+    )
+    .textContent =
+        question.q;
+
+    document
+    .getElementById(
+        "questionHint"
+    )
+    .textContent =
+        question.hint;
+
+    const answers =
+        document.getElementById(
+            "answers"
+        );
+
+    const feedback =
+        document.getElementById(
+            "feedback"
+        );
+
+    const next =
+        document.getElementById(
+            "nextButton"
+        );
+
+    answers.innerHTML =
+        "";
+
+    feedback.style.display =
+        "none";
+
+    next.style.display =
+        "none";
+
+    question.answers.forEach(
+        (answer,index)=>{
+
+            const button =
+                document.createElement(
+                    "button"
+                );
+
+            button.className =
+                "answer";
+
+            button.textContent =
+                answer;
+
+            button.onclick =
+            ()=>{
+
+                answers
+                .querySelectorAll(
+                    "button"
+                )
+                .forEach(
+                    item=>
+                    item.disabled=
+                        true
+                );
+
+                feedback.style.display =
+                    "block";
+
+                if(
+                    index===
+                    question.correct
+                ){
+
+                    button.classList.add(
+                        "correct"
+                    );
+
+                    score +=
+                        50;
+
+                    feedback.innerHTML =
+                    `
+                    <b>
+                    CORRECT +50 POINTS
+                    </b><br><br>
+
+                    ${question.explanation}
+                    `;
+                }
+
+                else{
+
+                    button.classList.add(
+                        "wrong"
+                    );
+
+                    score -=
+                        50;
+
+                    feedback.innerHTML =
+                    `
+                    <b>
+                    WRONG ANSWER -50 POINTS
+                    </b><br><br>
+
+                    ${question.explanation}
+                    `;
+                }
+
+                updateScore();
+
+                next.style.display =
+                    "block";
+            };
+
+            answers.appendChild(
+                button
+            );
+        }
+    );
+
+    next.textContent =
+        stage<6
+        ?
+        "NEXT EXPERIMENT"
+        :
+        "START FINAL MAGNETIC LOCK";
+
+    next.onclick =
+    ()=>{
+
+        resultBox
+        .classList
+        .remove(
+            "show"
+        );
+
+        stage++;
+
+        prepareStage();
+    };
+
+    resultBox
+    .classList
+    .add(
+        "show"
+    );
+}
+
+/* ======================================================
+   SCORE
+====================================================== */
+
+function updateScore(){
+
+    document
+    .getElementById(
+        "score"
+    )
+    .textContent =
+        score;
+}
+
+/* ======================================================
+   MAGNET VISUAL
+====================================================== */
+
+function updateMagnetVisual(){
+
+    if(
+        selectedFacingPole===
+        "N"
+    ){
+
+        rightLeftHalf.material =
+            MAT.north;
+
+        rightRightHalf.material =
+            MAT.south;
+    }
+
+    else{
+
+        rightLeftHalf.material =
+            MAT.south;
+
+        rightRightHalf.material =
+            MAT.north;
+    }
+}
+
+/* ======================================================
+   ELECTROMAGNET POLES
+====================================================== */
+
+function updatePoleVisual(){
+
+    const pole =
+        topCorePole();
+
+    if(
+        pole==="N"
+    ){
+
+        topPole.material =
+            MAT.north;
+
+        bottomPole.material =
+            MAT.south;
+    }
+
+    else{
+
+        topPole.material =
+            MAT.south;
+
+        bottomPole.material =
+            MAT.north;
+    }
+}
+
+/* ======================================================
+   IRON FILINGS
+====================================================== */
+
+function updateFilings(){
+
+    filings.forEach(
+        filing=>{
+
+            const x =
+                filing.position.x;
+
+            const y =
+                filing.position.y-
+                1.6;
+
+            const r2 =
+                x*x+
+                y*y+
+                .1;
+
+            /*
+               Simple dipole-like orientation.
+               Magnet moment points from S toward N,
+               approximately toward negative X here.
+            */
+
+            const bx =
+                (
+                    2*x*x-
+                    y*y
+                ) /
+                Math.pow(
+                    r2,
+                    2.5
+                );
+
+            const by =
+                (
+                    3*x*y
+                ) /
+                Math.pow(
+                    r2,
+                    2.5
+                );
+
+            filing.rotation.z =
+                Math.atan2(
+                    by,
+                    bx
+                );
+        }
+    );
+}
+
+/* ======================================================
+   FIELD ANIMATION
+====================================================== */
+
+function updateFieldLines(){
+
+    const reverseBar =
+        selectedFieldDirection===
+        "S_TO_N";
+
+    barFieldDots.forEach(
+        item=>{
+
+            let t =
+                (
+                    animationTime*.18+
+                    item.offset
+                )%1;
+
+            if(
+                reverseBar
+            ){
+
+                t =
+                    1-t;
+            }
+
+            item.mesh.position.copy(
+                item.curve.getPoint(
+                    t
+                )
+            );
+        }
+    );
+
+    const strengthRatio =
+        THREE.MathUtils.clamp(
+            fieldStrength()/450,
+            .12,
+            1
+        );
+
+    electroFieldLines.forEach(
+        item=>{
+
+            item.line.material.opacity =
+                .18+
+                strengthRatio*.7;
+        }
+    );
+
+    electroFieldDots.forEach(
+        item=>{
+
+            let t =
+                (
+                    animationTime*
+                    (
+                        .12+
+                        selectedCurrent*.08
+                    )+
+                    item.offset
+                )%1;
+
+            if(
+                currentDirection===
+                "reverse"
+            ){
+
+                t =
+                    1-t;
+            }
+
+            item.mesh.position.copy(
+                item.curve.getPoint(
+                    t
+                )
+            );
+
+            const s =
+                .75+
+                strengthRatio*.6;
+
+            item.mesh.scale.setScalar(
+                s
+            );
+        }
+    );
+}
+
+/* ======================================================
+   COIL CURRENT
+====================================================== */
+
+function updateCurrentParticles(
+    dt
+){
+
+    currentParticles.forEach(
+        particle=>{
+
+            const direction =
+                currentDirection===
+                "forward"
+                ?
+                1
+                :
+                -1;
+
+            particle.t +=
+                dt*
+                (
+                    .07+
+                    selectedCurrent*.05
+                )*
+                direction;
+
+            if(
+                particle.t>1
+            ){
+
+                particle.t -=
+                    1;
+            }
+
+            if(
+                particle.t<0
+            ){
+
+                particle.t +=
+                    1;
+            }
+
+            particle.mesh.position.copy(
+                coilCurve.getPoint(
+                    particle.t
+                )
+            );
+        }
+    );
+}
+
+/* ======================================================
+   LIFT ANIMATION
+====================================================== */
+
+function updateLift(
+    dt
+){
+
+    liftHeight +=
+        (
+            targetLiftHeight-
+            liftHeight
+        )*
+        Math.min(
+            1,
+            dt*3
+        );
+
+    liftObject.position.y =
+        liftHeight;
+}
+
+/* ======================================================
+   MAGNET MOTION
+====================================================== */
+
+function updateMagnetInteraction(
+    dt
+){
+
+    if(
+        stage!==1
+    ){
+
+        rightMagnet.position.x =
+            5;
+
+        return;
+    }
+
+    const relation =
+        magnetRelation();
+
+    const targetX =
+        relation===
+        "ATTRACTION"
+        ?
+        3.7
+        :
+        6.4;
+
+    rightMagnet.position.x +=
+        (
+            targetX-
+            rightMagnet.position.x
+        )*
+        Math.min(
+            1,
+            dt*2.5
+        );
+}
+
+/* ======================================================
+   HUD
+====================================================== */
+
+function updateHUD(){
+
+    const strength =
+        fieldStrength();
+
+    const relation =
+        magnetRelation();
+
+    const pole =
+        topCorePole();
+
+    document
+    .getElementById(
+        "currentValue"
+    )
+    .textContent =
+        selectedCurrent;
+
+    document
+    .getElementById(
+        "turnValue"
+    )
+    .textContent =
+        selectedTurns;
+
+    document
+    .getElementById(
+        "fieldStrengthValue"
+    )
+    .textContent =
+        strength;
+
+    document
+    .getElementById(
+        "corePoleValue"
+    )
+    .textContent =
+        pole;
+
+    document
+    .getElementById(
+        "relationValue"
+    )
+    .textContent =
+        relation;
+
+    let targetText =
+        "--";
+
+    if(
+        stage===3 ||
+        stage===4
+    ){
+
+        targetText =
+            targetFieldStrength;
+    }
+
+    else if(
+        stage===6
+    ){
+
+        targetText =
+            targetLiftStrength;
+    }
+
+    else if(
+        stage===7 &&
+        finalTargets[
+            finalIndex
+        ]
+    ){
+
+        targetText =
+            finalTargets[
+                finalIndex
+            ].field;
+    }
+
+    document
+    .getElementById(
+        "targetFieldValue"
+    )
+    .textContent =
+        targetText;
+
+    const percent =
+        Math.min(
+            100,
+            strength/
+            450*
+            100
+        );
+
+    document
+    .getElementById(
+        "fieldFill"
+    )
+    .style.width =
+        percent+
+        "%";
+
+    document
+    .getElementById(
+        "fieldPercent"
+    )
+    .textContent =
+        percent.toFixed(0)+
+        "%";
+
+    if(
+        stage<=2
+    ){
+
+        document
+        .getElementById(
+            "equation"
+        )
+        .innerHTML =
+        `
+        <b>Permanent Magnet</b><br>
+
+        Facing poles:
+        N and
+        ${selectedFacingPole}<br><br>
+
+        Interaction =
+        <b>${relation}</b>
+        `;
+    }
+
+    else{
+
+        document
+        .getElementById(
+            "equation"
+        )
+        .innerHTML =
+        `
+        <b>Electromagnet Model</b><br>
+
+        B proportional to N x I<br><br>
+
+        Strength =
+        ${selectedTurns}
+        x
+        ${selectedCurrent}<br>
+
+        =
+        <b>
+        ${strength} units
+        </b><br><br>
+
+        Top pole =
+        <b>${pole}</b>
+        `;
+    }
+}
+
+/* ======================================================
+   CAMERA
+====================================================== */
+
+function updateCamera(){
+
+    if(
+        stage<=2
+    ){
+
+        camera.position.set(
+            15,
+            11,
+            -12
+        );
+
+        camera.lookAt(
+            0,
+            1.8,
+            10
+        );
+    }
+
+    else{
+
+        camera.position.set(
+            15,
+            13,
+            17
+        );
+
+        camera.lookAt(
+            0,
+            4.3,
+            39
+        );
+    }
+}
+
+/* ======================================================
+   FINAL
+====================================================== */
+
+function finishGame(){
+
+    finished =
+        true;
+
+    pauseTimer();
+
+    const strength =
+        fieldStrength();
+
+    document
+    .getElementById(
+        "finalCurrent"
+    )
+    .textContent =
+        selectedCurrent+
+        " A";
+
+    document
+    .getElementById(
+        "finalTurns"
+    )
+    .textContent =
+        selectedTurns;
+
+    document
+    .getElementById(
+        "finalField"
+    )
+    .textContent =
+        strength+
+        " units";
+
+    document
+    .getElementById(
+        "finalScore"
+    )
+    .textContent =
+        score;
+
+    document
+    .getElementById(
+        "finalExplanation"
+    )
+    .innerHTML =
+    `
+    <b>
+    MISSION PERFORMANCE
+    </b><br><br>
+
+    Correct magnetic experiment =
+    <b>+100 points</b><br>
+
+    Correct physics question =
+    <b>+50 points</b><br>
+
+    Wrong physics question =
+    <b>-50 points</b><br><br>
+
+    Final score =
+    <b>${score}</b><br><br>
+
+
+    <b>
+    1. MAGNETIC POLES
+    </b><br><br>
+
+    Every magnet has a North pole and South pole.<br><br>
+
+    Like poles repel:<br>
+
+    N-N or S-S ->
+    <b>repulsion</b>.<br><br>
+
+    Unlike poles attract:<br>
+
+    N-S ->
+    <b>attraction</b>.<br><br>
+
+
+    <b>
+    2. MAGNETIC FIELD
+    </b><br><br>
+
+    A magnetic field is the region around a magnet
+    where magnetic forces can act.<br><br>
+
+    Outside a bar magnet,
+    conventional field lines travel from:<br><br>
+
+    <b>
+    North -> South
+    </b>.<br><br>
+
+    The animated lines and aligned iron filings in the game
+    represented this field pattern.<br><br>
+
+
+    <b>
+    3. ELECTROMAGNET
+    </b><br><br>
+
+    Electric current through a coil produces a magnetic field.
+
+    Placing an iron core inside the coil strengthens
+    the magnetic effect.<br><br>
+
+
+    <b>
+    4. EFFECT OF CURRENT
+    </b><br><br>
+
+    Increasing current strengthens the electromagnet
+    when the number of turns is unchanged.<br><br>
+
+    In the game model:<br><br>
+
+    <b>
+    Field Strength = N x I
+    </b>.<br><br>
+
+
+    <b>
+    5. EFFECT OF COIL TURNS
+    </b><br><br>
+
+    Increasing the number of turns increases
+    the magnetic field produced by the coil.<br><br>
+
+    Your final settings were:<br><br>
+
+    N =
+    ${selectedTurns} turns<br>
+
+    I =
+    ${selectedCurrent} A<br><br>
+
+    Field strength =
+    ${selectedTurns}
+    x
+    ${selectedCurrent}<br>
+
+    =
+    <b>
+    ${strength} units
+    </b>.<br><br>
+
+
+    <b>
+    6. CURRENT DIRECTION AND POLARITY
+    </b><br><br>
+
+    Current direction controls the direction
+    of the magnetic field around the coil.<br><br>
+
+    Reversing current reverses the field.
+
+    Therefore the electromagnet's
+    North and South poles swap.<br><br>
+
+    Your final TOP core pole was
+    <b>
+    ${topCorePole()}
+    </b>.<br><br>
+
+
+    <b>
+    7. MAGNETIC LIFTING
+    </b><br><br>
+
+    A sufficiently strong electromagnet can attract
+    ferromagnetic materials such as iron or steel.
+
+    During the lift stage,
+    you adjusted current and coil turns to generate
+    the required magnetic strength and lift the steel lock.<br><br>
+
+
+    <b>
+    FINAL CONNECTION
+    </b><br>
+
+    Like poles repel.<br>
+
+    Unlike poles attract.<br>
+
+    Magnetic field lines outside a magnet go N to S.<br>
+
+    Electric current produces a magnetic field.<br>
+
+    More current strengthens an electromagnet.<br>
+
+    More coil turns strengthen an electromagnet.<br>
+
+    Reversing current reverses magnetic polarity.<br>
+
+    Electromagnets can be controlled electrically,
+    which makes them useful in relays, motors,
+    lifting devices and many engineering systems.<br><br>
+
+    You used all these principles under a timed
+    electromagnetic rescue mission.
+    `;
+
+    document
+    .getElementById(
+        "finish"
+    )
+    .classList.add(
+        "show"
+    );
+}
+
+/* ======================================================
+   LOOP
+====================================================== */
+
+let lastTime =
+    performance.now();
+
+function animate(
+    now
+){
+
+    requestAnimationFrame(
+        animate
+    );
+
+    const dt =
+        Math.min(
+            (
+                now-lastTime
+            )/1000,
+            .035
+        );
+
+    lastTime =
+        now;
+
+    if(
+        started &&
+        !failed &&
+        !finished
+    ){
+
+        animationTime +=
+            dt;
+
+        updateTimerPhysics(
+            dt
+        );
+
+        updateCurrentParticles(
+            dt
+        );
+
+        updateMagnetInteraction(
+            dt
+        );
+
+        updateLift(
+            dt
+        );
+    }
+
+    updateFieldLines();
+
+    updateFilings();
+
+    updateCamera();
+
+    renderer.render(
+        scene,
+        camera
+    );
+}
+
+/* ======================================================
+   INITIAL
+====================================================== */
+
+magnetLab.visible =
+    true;
+
+fieldMagnet.visible =
+    false;
+
+electroLab.visible =
+    false;
+
+liftObject.visible =
+    false;
+
+barFieldLines.forEach(
+    item=>
+    item.line.visible=
+        false
+);
+
+barFieldDots.forEach(
+    item=>
+    item.mesh.visible=
+        false
+);
+
+filings.forEach(
+    item=>
+    item.visible=
+        false
+);
+
+showGroup(
+    "poleGroup",
+    true
+);
+
+updateMagnetVisual();
+
+updatePoleVisual();
+
+updateHUD();
+
+updateScore();
+
+updateTimer();
+
+updateCamera();
+
+requestAnimationFrame(
+    animate
+);
+
+/* ======================================================
+   RESIZE
+====================================================== */
+
+addEventListener(
+    "resize",
+    ()=>{
+
+        camera.aspect =
+            innerWidth/
+            innerHeight;
+
+        camera.updateProjectionMatrix();
+
+        renderer.setSize(
+            innerWidth,
+            innerHeight
+        );
+    }
+);
+
+})();
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,3207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+<title>My Campus - Work Energy Power Mission</title>
+
+<style>
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0
+}
+
+html,body{
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    background:#07131d;
+    font-family:Segoe UI,Arial,sans-serif
+}
+
+#game{
+    position:fixed;
+    inset:0
+}
+
+canvas{
+    display:block
+}
+
+.hud{
+    position:fixed;
+    inset:0;
+    z-index:10;
+    color:#fff;
+    pointer-events:none
+}
+
+.glass{
+    background:linear-gradient(
+        135deg,
+        rgba(5,20,32,.94),
+        rgba(7,29,44,.80)
+    );
+    border:1px solid rgba(255,255,255,.13);
+    border-radius:15px;
+    box-shadow:0 14px 40px rgba(0,0,0,.28);
+    backdrop-filter:blur(13px)
+}
+
+.title{
+    position:absolute;
+    left:18px;
+    top:18px;
+    width:355px;
+    padding:14px 17px
+}
+
+.eyebrow{
+    color:#68e4ff;
+    font-size:10px;
+    font-weight:900;
+    letter-spacing:1.6px
+}
+
+.title h1{
+    margin-top:4px;
+    font-size:20px
+}
+
+.title p{
+    margin-top:5px;
+    color:#aec0cc;
+    font-size:11px;
+    line-height:1.4
+}
+
+.progress{
+    position:absolute;
+    left:50%;
+    top:18px;
+    transform:translateX(-50%);
+    width:440px;
+    padding:11px 14px
+}
+
+.progress-top{
+    display:flex;
+    justify-content:space-between;
+    color:#9fb2c0;
+    font-size:9px;
+    font-weight:900
+}
+
+.track{
+    height:7px;
+    margin-top:7px;
+    overflow:hidden;
+    border-radius:20px;
+    background:rgba(255,255,255,.10)
+}
+
+#progressFill{
+    width:0%;
+    height:100%;
+    background:linear-gradient(90deg,#49ddff,#6eff9c)
+}
+
+.stage{
+    position:absolute;
+    top:18px;
+    right:18px;
+    width:195px;
+    padding:12px;
+    text-align:center
+}
+
+.stage small{
+    color:#98adbc;
+    font-size:9px;
+    font-weight:900
+}
+
+.stage strong{
+    display:block;
+    margin-top:3px;
+    color:#68e4ff;
+    font-size:16px
+}
+
+.force-panel{
+    position:absolute;
+    left:18px;
+    top:155px;
+    width:285px;
+    padding:14px;
+    pointer-events:auto
+}
+
+.panel-title{
+    color:#69e5ff;
+    font-size:10px;
+    font-weight:950;
+    letter-spacing:1.1px
+}
+
+.force-buttons{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:7px;
+    margin-top:9px
+}
+
+.force-buttons button{
+    padding:10px 5px;
+    border:1px solid rgba(255,255,255,.13);
+    border-radius:9px;
+    background:rgba(255,255,255,.06);
+    color:white;
+    font-weight:900;
+    cursor:pointer
+}
+
+.force-buttons button.active{
+    background:#64e1ff;
+    color:#04131c
+}
+
+.force-help{
+    margin-top:8px;
+    color:#9eb1bf;
+    font-size:9px;
+    line-height:1.4
+}
+
+.metrics{
+    position:absolute;
+    right:18px;
+    bottom:18px;
+    width:340px;
+    padding:15px
+}
+
+.metric-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:7px
+}
+
+.metric{
+    padding:8px;
+    border-radius:9px;
+    background:rgba(255,255,255,.05)
+}
+
+.metric label{
+    display:block;
+    color:#91a6b5;
+    font-size:8px;
+    font-weight:900
+}
+
+.metric strong{
+    display:block;
+    margin-top:2px;
+    font-size:14px
+}
+
+.metric strong.highlight{
+    color:#70e5ff
+}
+
+.energy-row{
+    margin-top:9px
+}
+
+.energy-label{
+    display:flex;
+    justify-content:space-between;
+    margin-bottom:3px;
+    color:#a3b5c2;
+    font-size:8px;
+    font-weight:900
+}
+
+.energy-track{
+    height:6px;
+    overflow:hidden;
+    border-radius:15px;
+    background:rgba(255,255,255,.08)
+}
+
+.energy-fill{
+    height:100%;
+    width:0%;
+    border-radius:15px;
+    transition:width .1s linear
+}
+
+#peFill{
+    background:linear-gradient(90deg,#ffd65c,#ff9e42)
+}
+
+#keFill{
+    background:linear-gradient(90deg,#56dfff,#68ff9b)
+}
+
+.equation{
+    margin-top:10px;
+    padding:10px;
+    border:1px solid rgba(78,219,255,.16);
+    border-radius:10px;
+    background:rgba(77,220,255,.07);
+    font-size:10px;
+    line-height:1.45
+}
+
+.equation b{
+    color:#6ee5ff
+}
+
+.coach{
+    position:absolute;
+    left:50%;
+    bottom:14px;
+    transform:translateX(-50%);
+    width:min(690px,42vw);
+    padding:12px 16px;
+    text-align:center
+}
+
+#coachTitle{
+    color:#65e3ff;
+    font-size:10px;
+    font-weight:950;
+    letter-spacing:1px
+}
+
+#coachText{
+    margin-top:4px;
+    color:#e2ecf2;
+    font-size:11px;
+    line-height:1.45
+}
+
+#coachFormula{
+    margin-top:4px;
+    color:#92a9b8;
+    font-size:10px
+}
+
+.controls{
+    position:absolute;
+    left:50%;
+    top:95px;
+    transform:translateX(-50%);
+    padding:8px 13px;
+    font-size:10px
+}
+
+/* START */
+
+.mission{
+    position:fixed;
+    inset:0;
+    z-index:40;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:rgba(2,8,14,.72);
+    backdrop-filter:blur(7px);
+    color:#fff;
+    pointer-events:auto
+}
+
+.mission-box{
+    width:min(650px,92vw);
+    padding:25px;
+    text-align:center
+}
+
+.mission-box h2{
+    font-size:30px
+}
+
+.mission-box p{
+    margin-top:10px;
+    color:#b5c7d3;
+    font-size:12px;
+    line-height:1.6
+}
+
+.mission-box button{
+    margin-top:18px;
+    padding:12px 25px;
+    border:0;
+    border-radius:10px;
+    background:#61e1ff;
+    color:#03131c;
+    font-weight:950;
+    cursor:pointer
+}
+
+/* POWER STATION */
+
+.power-station{
+    position:fixed;
+    top:125px;
+    left:50%;
+    transform:translateX(-50%);
+    z-index:65;
+    width:min(680px,90vw);
+    display:none;
+    padding:18px;
+    color:white;
+    pointer-events:auto
+}
+
+.power-station.show{
+    display:block
+}
+
+.power-station h3{
+    margin-top:5px;
+    font-size:20px
+}
+
+.power-station p{
+    margin-top:5px;
+    color:#b8c9d5;
+    font-size:11px;
+    line-height:1.5
+}
+
+.machine-buttons{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:9px;
+    margin-top:13px
+}
+
+.machine-buttons button{
+    padding:12px;
+    border:1px solid rgba(255,255,255,.14);
+    border-radius:10px;
+    background:rgba(255,255,255,.07);
+    color:white;
+    font-weight:900;
+    cursor:pointer
+}
+
+.machine-buttons button:hover{
+    background:rgba(73,216,255,.15)
+}
+
+#machineResult{
+    display:none;
+    margin-top:11px;
+    padding:10px;
+    border-radius:9px;
+    background:rgba(70,215,255,.08);
+    font-size:11px;
+    line-height:1.5
+}
+
+/* QUESTION */
+
+.challenge{
+    position:fixed;
+    top:120px;
+    left:50%;
+    transform:translateX(-50%);
+    z-index:70;
+    width:min(720px,90vw);
+    display:none;
+    padding:18px;
+    color:#fff;
+    pointer-events:auto
+}
+
+.challenge.show{
+    display:block
+}
+
+.challenge-badge{
+    color:#ffe16b;
+    font-size:10px;
+    font-weight:950;
+    letter-spacing:1.2px
+}
+
+.challenge h3{
+    margin-top:6px;
+    font-size:19px
+}
+
+.challenge-hint{
+    margin-top:4px;
+    color:#b7c8d4;
+    font-size:11px
+}
+
+.answers{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:8px;
+    margin-top:12px
+}
+
+.answer{
+    padding:10px;
+    border:1px solid rgba(255,255,255,.14);
+    border-radius:9px;
+    background:rgba(255,255,255,.07);
+    color:#fff;
+    font-weight:900;
+    cursor:pointer
+}
+
+.answer:hover{
+    background:rgba(70,215,255,.15)
+}
+
+.answer:disabled{
+    opacity:.6
+}
+
+.feedback{
+    display:none;
+    max-height:240px;
+    overflow:auto;
+    margin-top:10px;
+    padding:11px;
+    border:1px solid rgba(82,218,255,.17);
+    border-radius:10px;
+    background:rgba(66,214,255,.08);
+    font-size:11px;
+    line-height:1.55
+}
+
+.feedback b{
+    color:#6ee5ff
+}
+
+.continue{
+    display:none;
+    margin:10px auto 0;
+    padding:10px 23px;
+    border:0;
+    border-radius:9px;
+    background:#61e1ff;
+    color:#03131c;
+    font-weight:900;
+    cursor:pointer
+}
+
+/* FINISH */
+
+.finish{
+    position:fixed;
+    inset:0;
+    z-index:80;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    background:rgba(1,7,13,.84);
+    backdrop-filter:blur(10px);
+    color:#fff;
+    pointer-events:auto
+}
+
+.finish.show{
+    display:flex
+}
+
+.finish-box{
+    width:min(800px,94vw);
+    max-height:93vh;
+    overflow:auto;
+    padding:27px
+}
+
+.finish-box h2{
+    text-align:center;
+    font-size:32px
+}
+
+.finish-sub{
+    margin-top:5px;
+    text-align:center;
+    color:#a9bbc8;
+    font-size:11px
+}
+
+.final-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:8px;
+    margin-top:15px
+}
+
+.final-card{
+    padding:12px;
+    border-radius:10px;
+    background:rgba(255,255,255,.055);
+    text-align:center
+}
+
+.final-card strong{
+    display:block;
+    color:#69e3ff;
+    font-size:18px
+}
+
+.final-card span{
+    color:#92a7b5;
+    font-size:8px
+}
+
+.explanation{
+    margin-top:15px;
+    padding:16px;
+    border:1px solid rgba(89,220,255,.18);
+    border-radius:11px;
+    background:rgba(68,212,255,.075);
+    font-size:11px;
+    line-height:1.65
+}
+
+.explanation b{
+    color:#6ee5ff
+}
+
+.restart{
+    display:block;
+    margin:16px auto 0;
+    padding:11px 25px;
+    border:0;
+    border-radius:9px;
+    background:#61e1ff;
+    color:#03131c;
+    font-weight:900;
+    cursor:pointer
+}
+</style>
+</head>
+
+<body>
+
+<div id="game"></div>
+
+<div class="hud">
+
+<div class="title glass">
+    <div class="eyebrow">MY CAMPUS - PHYSICS GAME</div>
+    <h1>Campus Energy Mission</h1>
+    <p id="studentText"></p>
+</div>
+
+<div class="progress glass">
+    <div class="progress-top">
+        <span>STORE</span>
+        <span id="progressText">0 / 1200 m</span>
+        <span>ENERGY LAB</span>
+    </div>
+    <div class="track">
+        <div id="progressFill"></div>
+    </div>
+</div>
+
+<div class="stage glass">
+    <small>CURRENT CONCEPT</small>
+    <strong id="stageText">Work</strong>
+</div>
+
+<div class="controls glass">
+    W / UP = Apply Force | S / DOWN = Brake | A D = Steer
+</div>
+
+<div class="force-panel glass">
+
+    <div class="panel-title">
+        SELECT APPLIED FORCE
+    </div>
+
+    <div class="force-buttons">
+        <button data-force="150">150 N</button>
+        <button data-force="300" class="active">300 N</button>
+        <button data-force="450">450 N</button>
+    </div>
+
+    <div class="force-help">
+        Keyboard: 1 = 150 N, 2 = 300 N, 3 = 450 N.
+        Apply force and observe work, kinetic energy, potential energy and power.
+    </div>
+
+</div>
+
+<div class="metrics glass">
+
+    <div class="metric-grid">
+
+        <div class="metric">
+            <label>APPLIED FORCE</label>
+            <strong><span id="force">0</span> N</strong>
+        </div>
+
+        <div class="metric">
+            <label>DISTANCE</label>
+            <strong><span id="distance">0</span> m</strong>
+        </div>
+
+        <div class="metric">
+            <label>HEIGHT</label>
+            <strong><span id="height">0.0</span> m</strong>
+        </div>
+
+        <div class="metric">
+            <label>SPEED</label>
+            <strong><span id="speed">0.0</span> m/s</strong>
+        </div>
+
+        <div class="metric">
+            <label>WORK DONE</label>
+            <strong class="highlight"><span id="work">0</span> J</strong>
+        </div>
+
+        <div class="metric">
+            <label>POWER</label>
+            <strong class="highlight"><span id="power">0</span> W</strong>
+        </div>
+
+        <div class="metric">
+            <label>POTENTIAL ENERGY</label>
+            <strong><span id="pe">0</span> J</strong>
+        </div>
+
+        <div class="metric">
+            <label>KINETIC ENERGY</label>
+            <strong><span id="ke">0</span> J</strong>
+        </div>
+
+    </div>
+
+    <div class="energy-row">
+        <div class="energy-label">
+            <span>POTENTIAL ENERGY</span>
+            <span id="pePercent">0%</span>
+        </div>
+        <div class="energy-track">
+            <div id="peFill" class="energy-fill"></div>
+        </div>
+    </div>
+
+    <div class="energy-row">
+        <div class="energy-label">
+            <span>KINETIC ENERGY</span>
+            <span id="kePercent">0%</span>
+        </div>
+        <div class="energy-track">
+            <div id="keFill" class="energy-fill"></div>
+        </div>
+    </div>
+
+    <div class="equation" id="equation">
+        <b>Work:</b> W = F x d
+    </div>
+
+</div>
+
+<div class="coach glass">
+    <div id="coachTitle">WORK</div>
+    <div id="coachText">
+        Apply a force and move the cart. Work is done when force causes displacement.
+    </div>
+    <div id="coachFormula">
+        Work = Force x Distance
+    </div>
+</div>
+
+</div>
+
+<div id="mission" class="mission">
+
+    <div class="mission-box glass">
+
+        <h2>Energy Lab Delivery Mission</h2>
+
+        <p>
+            Move the research cart from the campus store to the Energy Lab.
+            Push it across the flat section, climb the energy ramp, descend while
+            potential energy converts into kinetic energy, and operate a powered
+            lifting machine before the final delivery.
+        </p>
+
+        <button id="startBtn">
+            Start Energy Mission
+        </button>
+
+    </div>
+
+</div>
+
+<div id="powerStation" class="power-station glass">
+
+    <div class="challenge-badge">
+        POWER STATION
+    </div>
+
+    <h3>
+        Choose a motor to lift a 60 kg crate by 6 m
+    </h3>
+
+    <p>
+        Every motor performs the same amount of work.
+        The difference is how quickly it performs that work.
+        Higher power means less time for the same work.
+    </p>
+
+    <div class="machine-buttons">
+        <button data-power="600">600 W Motor</button>
+        <button data-power="1200">1200 W Motor</button>
+        <button data-power="2400">2400 W Motor</button>
+    </div>
+
+    <div id="machineResult"></div>
+
+</div>
+
+<div id="challenge" class="challenge glass">
+
+    <div class="challenge-badge">
+        ENERGY BOOST CHALLENGE
+    </div>
+
+    <h3 id="question"></h3>
+
+    <div id="challengeHint" class="challenge-hint"></div>
+
+    <div id="answers" class="answers"></div>
+
+    <div id="feedback" class="feedback"></div>
+
+    <button id="continueBtn" class="continue">
+        Continue Mission
+    </button>
+
+</div>
+
+<div id="finish" class="finish">
+
+    <div class="finish-box glass">
+
+        <h2>Energy Mission Complete!</h2>
+
+        <div class="finish-sub">
+            Your actual gameplay values now explain Work, Energy and Power.
+        </div>
+
+        <div class="final-grid">
+
+            <div class="final-card">
+                <strong id="finalWork">-</strong>
+                <span>TOTAL APPLIED WORK</span>
+            </div>
+
+            <div class="final-card">
+                <strong id="finalPE">-</strong>
+                <span>MAX POTENTIAL ENERGY</span>
+            </div>
+
+            <div class="final-card">
+                <strong id="finalKE">-</strong>
+                <span>MAX KINETIC ENERGY</span>
+            </div>
+
+            <div class="final-card">
+                <strong id="finalPower">-</strong>
+                <span>SELECTED MOTOR</span>
+            </div>
+
+        </div>
+
+        <div id="finalExplanation" class="explanation"></div>
+
+        <button class="restart" onclick="location.reload()">
+            Play Again - New Questions
+        </button>
+
+    </div>
+
+</div>
+
+<script src="../../vendor/three-0.160.1.min.js"></script>
+
+<script>
+(() => {
+
+"use strict";
+
+/* ======================================================
+   CONFIG
+====================================================== */
+
+const TRACK_LENGTH = 1200;
+const MASS = 50;
+const GRAVITY = 9.81;
+
+const studentName =
+    localStorage.getItem("student_name") ||
+    sessionStorage.getItem("student_name") ||
+    "Student";
+
+document.getElementById("studentText").textContent =
+    studentName +
+    " - use Work, Energy and Power to complete the Energy Lab mission.";
+
+/* ======================================================
+   THREE
+====================================================== */
+
+const scene = new THREE.Scene();
+
+scene.background =
+    new THREE.Color(0x87cbea);
+
+scene.fog =
+    new THREE.Fog(
+        0x87cbea,
+        170,
+        550
+    );
+
+const camera =
+    new THREE.PerspectiveCamera(
+        58,
+        innerWidth / innerHeight,
+        .1,
+        750
+    );
+
+const renderer =
+    new THREE.WebGLRenderer({
+        antialias:true,
+        powerPreference:"high-performance"
+    });
+
+renderer.setSize(
+    innerWidth,
+    innerHeight
+);
+
+renderer.setPixelRatio(
+    Math.min(devicePixelRatio,2)
+);
+
+renderer.shadowMap.enabled = true;
+
+renderer.outputColorSpace =
+    THREE.SRGBColorSpace;
+
+renderer.toneMapping =
+    THREE.ACESFilmicToneMapping;
+
+document
+    .getElementById("game")
+    .appendChild(renderer.domElement);
+
+scene.add(
+    new THREE.HemisphereLight(
+        0xdaf3ff,
+        0x4c7348,
+        2.5
+    )
+);
+
+const sun =
+    new THREE.DirectionalLight(
+        0xffefcf,
+        4
+    );
+
+sun.position.set(
+    -70,
+    110,
+    -40
+);
+
+sun.castShadow = true;
+
+sun.shadow.mapSize.set(
+    2048,
+    2048
+);
+
+scene.add(sun);
+
+/* ======================================================
+   MATERIALS
+====================================================== */
+
+const MAT = {
+
+    road:new THREE.MeshStandardMaterial({
+        color:0x353a3f,
+        roughness:.92
+    }),
+
+    grass:new THREE.MeshStandardMaterial({
+        color:0x57994a,
+        roughness:1
+    }),
+
+    concrete:new THREE.MeshStandardMaterial({
+        color:0xb1b9bc,
+        roughness:.9
+    }),
+
+    white:new THREE.MeshStandardMaterial({
+        color:0xf6f6ee
+    }),
+
+    dark:new THREE.MeshStandardMaterial({
+        color:0x161b20,
+        roughness:.55,
+        metalness:.3
+    }),
+
+    blue:new THREE.MeshStandardMaterial({
+        color:0x189fdf,
+        roughness:.5,
+        metalness:.25
+    }),
+
+    orange:new THREE.MeshStandardMaterial({
+        color:0xe19a36,
+        roughness:.7
+    }),
+
+    yellow:new THREE.MeshStandardMaterial({
+        color:0xf0bf3d,
+        roughness:.6
+    }),
+
+    green:new THREE.MeshStandardMaterial({
+        color:0x42b978,
+        roughness:.7
+    }),
+
+    red:new THREE.MeshStandardMaterial({
+        color:0xd95555,
+        roughness:.7
+    })
+};
+
+function box(
+    w,h,d,
+    material,
+    x,y,z,
+    parent=scene
+){
+
+    const mesh =
+        new THREE.Mesh(
+            new THREE.BoxGeometry(
+                w,h,d
+            ),
+            material
+        );
+
+    mesh.position.set(
+        x,y,z
+    );
+
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+
+    parent.add(mesh);
+
+    return mesh;
+}
+
+/* ======================================================
+   TRACK HEIGHT
+
+   0 - 300        flat / work
+   300 - 480      uphill
+   480 - 580      top
+   580 - 760      downhill
+   760 - 1200     flat
+====================================================== */
+
+function heightAt(z){
+
+    if(z < 300){
+        return 0;
+    }
+
+    if(z < 480){
+        return (
+            (z-300) /
+            180 *
+            18
+        );
+    }
+
+    if(z < 580){
+        return 18;
+    }
+
+    if(z < 760){
+        return (
+            18 -
+            (
+                (z-580) /
+                180 *
+                18
+            )
+        );
+    }
+
+    return 0;
+}
+
+function slopeAt(z){
+
+    const before =
+        heightAt(
+            Math.max(
+                0,
+                z-1
+            )
+        );
+
+    const after =
+        heightAt(
+            Math.min(
+                TRACK_LENGTH,
+                z+1
+            )
+        );
+
+    return (
+        after-before
+    )/2;
+}
+
+/* ======================================================
+   WORLD
+====================================================== */
+
+const ground =
+    new THREE.Mesh(
+        new THREE.PlaneGeometry(
+            160,
+            TRACK_LENGTH+260
+        ),
+        MAT.grass
+    );
+
+ground.rotation.x =
+    -Math.PI/2;
+
+ground.position.z =
+    TRACK_LENGTH/2;
+
+ground.receiveShadow = true;
+
+scene.add(ground);
+
+/* segmented elevated road */
+
+const SEGMENT = 6;
+
+for(
+    let z=-25;
+    z<TRACK_LENGTH+20;
+    z+=SEGMENT
+){
+
+    const mid =
+        z+
+        SEGMENT/2;
+
+    const h =
+        heightAt(
+            Math.max(
+                0,
+                mid
+            )
+        );
+
+    const slope =
+        slopeAt(
+            Math.max(
+                0,
+                mid
+            )
+        );
+
+    const angle =
+        Math.atan(
+            slope
+        );
+
+    const road =
+        box(
+            17,
+            .10,
+            SEGMENT+.7,
+            MAT.road,
+            0,
+            h+.04,
+            mid
+        );
+
+    road.rotation.x =
+        -angle;
+
+    /* edge lines */
+
+    [-8.1,8.1]
+        .forEach(
+            x=>{
+
+                const line =
+                    box(
+                        .14,
+                        .025,
+                        SEGMENT+.5,
+                        MAT.white,
+                        x,
+                        h+.105,
+                        mid
+                    );
+
+                line.rotation.x =
+                    -angle;
+            }
+        );
+
+    /* center broken line */
+
+    if(
+        Math.floor(
+            Math.abs(z)/
+            SEGMENT
+        )%2===0
+    ){
+
+        const marker =
+            box(
+                .14,
+                .025,
+                3.3,
+                MAT.white,
+                0,
+                h+.11,
+                mid
+            );
+
+        marker.rotation.x =
+            -angle;
+    }
+
+    /* ramp supports */
+
+    if(h>1){
+
+        box(
+            .7,
+            h,
+            .7,
+            MAT.concrete,
+            -6,
+            h/2,
+            mid
+        );
+
+        box(
+            .7,
+            h,
+            .7,
+            MAT.concrete,
+            6,
+            h/2,
+            mid
+        );
+    }
+}
+
+/* side buildings */
+
+function building(
+    x,z,
+    color
+){
+
+    const material =
+        new THREE.MeshStandardMaterial({
+            color,
+            roughness:.82
+        });
+
+    const h =
+        8+
+        Math.random()*8;
+
+    box(
+        14,h,14,
+        material,
+        x,
+        h/2,
+        z
+    );
+
+    box(
+        14.3,.3,14.3,
+        MAT.dark,
+        x,
+        h+.15,
+        z
+    );
+}
+
+for(
+    let z=40;
+    z<TRACK_LENGTH;
+    z+=95
+){
+
+    building(
+        -28,
+        z,
+        0xd6d0c2
+    );
+
+    building(
+        28,
+        z+45,
+        0xb7c4cd
+    );
+}
+
+/* zone markers */
+
+function strip(
+    z,
+    material
+){
+
+    box(
+        17,
+        .035,
+        4,
+        material,
+        0,
+        heightAt(z)+.12,
+        z
+    );
+}
+
+strip(
+    300,
+    MAT.yellow
+);
+
+strip(
+    580,
+    MAT.green
+);
+
+strip(
+    820,
+    MAT.blue
+);
+
+strip(
+    1080,
+    MAT.orange
+);
+
+strip(
+    1200,
+    MAT.white
+);
+
+/* ======================================================
+   PLAYER CART
+====================================================== */
+
+const cart =
+    new THREE.Group();
+
+scene.add(cart);
+
+/* cart body */
+
+box(
+    2.2,.48,3.1,
+    MAT.blue,
+    0,.78,0,
+    cart
+);
+
+box(
+    2.25,.32,.28,
+    MAT.dark,
+    0,.7,1.68,
+    cart
+);
+
+/* crate */
+
+box(
+    1.4,1.05,1.35,
+    MAT.orange,
+    0,1.55,.15,
+    cart
+);
+
+/* person */
+
+box(
+    .7,1.15,.5,
+    new THREE.MeshStandardMaterial({
+        color:0x196da5
+    }),
+    0,2.1,-2,
+    cart
+);
+
+const head =
+    new THREE.Mesh(
+        new THREE.SphereGeometry(
+            .33,
+            18,
+            14
+        ),
+        new THREE.MeshStandardMaterial({
+            color:0xc58a63
+        })
+    );
+
+head.position.set(
+    0,
+    3.0,
+    -2
+);
+
+cart.add(head);
+
+/* handle */
+
+box(
+    1.4,.12,.12,
+    MAT.dark,
+    0,1.55,-1.45,
+    cart
+);
+
+box(
+    .12,1.25,.12,
+    MAT.dark,
+    -.6,1.17,-1.45,
+    cart
+);
+
+box(
+    .12,1.25,.12,
+    MAT.dark,
+    .6,1.17,-1.45,
+    cart
+);
+
+/* wheels */
+
+function wheel(x,z){
+
+    const mesh =
+        new THREE.Mesh(
+            new THREE.CylinderGeometry(
+                .4,.4,.28,18
+            ),
+            MAT.dark
+        );
+
+    mesh.rotation.z =
+        Math.PI/2;
+
+    mesh.position.set(
+        x,.42,z
+    );
+
+    mesh.castShadow = true;
+
+    cart.add(mesh);
+}
+
+wheel(-1.05,-1);
+wheel(1.05,-1);
+wheel(-1.05,1);
+wheel(1.05,1);
+
+/* ======================================================
+   POWER STATION SCENE
+====================================================== */
+
+/* crane tower */
+
+box(
+    .5,10,.5,
+    MAT.dark,
+    7,
+    5,
+    855
+);
+
+box(
+    8,.45,.45,
+    MAT.dark,
+    3.3,
+    10,
+    855
+);
+
+/* gate */
+
+const gate =
+    box(
+        16,
+        3,
+        .4,
+        MAT.red,
+        0,
+        1.5,
+        875
+    );
+
+/* lifted crate */
+
+const craneCrate =
+    box(
+        1.8,
+        1.8,
+        1.8,
+        MAT.orange,
+        7,
+        .9,
+        855
+    );
+
+/* ======================================================
+   STATE
+====================================================== */
+
+let started = false;
+let finished = false;
+let challengeActive = false;
+
+let selectedForce = 300;
+
+let positionZ = 0;
+let lateralX = 0;
+let velocity = 0;
+let acceleration = 0;
+
+let elapsed = 0;
+let lastTime =
+    performance.now();
+
+let totalAppliedWork = 0;
+let maxPE = 0;
+let maxKE = 0;
+let maxInstantPower = 0;
+
+let powerEventTriggered = false;
+let powerEventComplete = false;
+let powerAnimating = false;
+
+let selectedMachinePower = 0;
+let machineWork = 0;
+let machineTime = 0;
+let machineElapsed = 0;
+
+/* ======================================================
+   FORCE SELECT
+====================================================== */
+
+const forceButtons =
+    [...document.querySelectorAll(
+        ".force-buttons button"
+    )];
+
+function setForce(
+    value
+){
+
+    selectedForce =
+        value;
+
+    forceButtons.forEach(
+        button=>{
+
+            button.classList.toggle(
+                "active",
+                Number(
+                    button.dataset.force
+                )===value
+            );
+        }
+    );
+}
+
+forceButtons.forEach(
+    button=>{
+
+        button.onclick =
+            ()=>setForce(
+                Number(
+                    button.dataset.force
+                )
+            );
+    }
+);
+
+/* ======================================================
+   INPUT
+====================================================== */
+
+const keys = {};
+
+addEventListener(
+    "keydown",
+    event=>{
+
+        keys[
+            event.key.toLowerCase()
+        ] = true;
+
+        if(event.key==="1"){
+            setForce(150);
+        }
+
+        if(event.key==="2"){
+            setForce(300);
+        }
+
+        if(event.key==="3"){
+            setForce(450);
+        }
+    }
+);
+
+addEventListener(
+    "keyup",
+    event=>{
+
+        keys[
+            event.key.toLowerCase()
+        ] = false;
+    }
+);
+
+function pressed(...names){
+
+    return names.some(
+        name=>keys[name]
+    );
+}
+
+/* ======================================================
+   START
+====================================================== */
+
+document
+    .getElementById("startBtn")
+    .onclick =
+    ()=>{
+
+        started = true;
+
+        document
+            .getElementById("mission")
+            .style.display =
+            "none";
+
+        lastTime =
+            performance.now();
+    };
+
+/* ======================================================
+   RANDOM QUESTIONS
+====================================================== */
+
+function randomItem(
+    array
+){
+
+    return array[
+        Math.floor(
+            Math.random()*
+            array.length
+        )
+    ];
+}
+
+function shuffle(
+    array
+){
+
+    const copy =
+        [...array];
+
+    for(
+        let i=copy.length-1;
+        i>0;
+        i--
+    ){
+
+        const j =
+            Math.floor(
+                Math.random()*
+                (i+1)
+            );
+
+        [
+            copy[i],
+            copy[j]
+        ]=[
+            copy[j],
+            copy[i]
+        ];
+    }
+
+    return copy;
+}
+
+function makeOptions(
+    correct,
+    wrong1,
+    wrong2
+){
+
+    const options =
+        shuffle([
+            correct,
+            wrong1,
+            wrong2
+        ]);
+
+    return {
+        options,
+        correct:
+            options.indexOf(
+                correct
+            )
+    };
+}
+
+/* WORK */
+
+function workQuestion(){
+
+    const force =
+        randomItem([
+            100,150,200,250
+        ]);
+
+    const distance =
+        randomItem([
+            10,20,30,40
+        ]);
+
+    const work =
+        force*distance;
+
+    const answer =
+        work+" J";
+
+    const options =
+        makeOptions(
+            answer,
+            work/2+" J",
+            work+1000+" J"
+        );
+
+    return {
+
+        id:
+            "work_"+
+            force+"_"+
+            distance,
+
+        q:
+            `A ${force} N force moves a cart ${distance} m in the same direction. How much work is done?`,
+
+        hint:
+            "Work = Force x Distance",
+
+        options:
+            options.options,
+
+        correct:
+            options.correct,
+
+        explanation:
+        `
+        <b>Formula</b><br>
+        Work = Force x Distance<br><br>
+
+        <b>Substitute</b><br>
+        W = ${force} x ${distance}<br><br>
+
+        <b>Answer</b><br>
+        W = <b>${work} J</b><br><br>
+
+        <b>Game connection</b><br>
+        Every time you hold W, your selected force moves
+        the cart forward. The game accumulates the work done
+        from force and displacement.
+        `
+    };
+}
+
+/* PE */
+
+function peQuestion(){
+
+    const mass =
+        randomItem([
+            10,20,30,40
+        ]);
+
+    const height =
+        randomItem([
+            5,10,15
+        ]);
+
+    const pe =
+        mass*10*height;
+
+    const answer =
+        pe+" J";
+
+    const options =
+        makeOptions(
+            answer,
+            pe/2+" J",
+            pe+1000+" J"
+        );
+
+    return {
+
+        id:
+            "pe_"+mass+"_"+height,
+
+        q:
+            `Using g = 10 m/s^2, what potential energy does a ${mass} kg object have at ${height} m height?`,
+
+        hint:
+            "PE = mgh",
+
+        options:
+            options.options,
+
+        correct:
+            options.correct,
+
+        explanation:
+        `
+        <b>Formula</b><br>
+        PE = mgh<br><br>
+
+        <b>Substitute</b><br>
+        PE = ${mass} x 10 x ${height}<br><br>
+
+        <b>Answer</b><br>
+        PE = <b>${pe} J</b><br><br>
+
+        <b>Game connection</b><br>
+        As your cart climbs the ramp, height increases.
+        Therefore gravitational potential energy increases.
+        `
+    };
+}
+
+/* KE */
+
+function keQuestion(){
+
+    const mass =
+        randomItem([
+            20,30,40,50
+        ]);
+
+    const speed =
+        randomItem([
+            4,6,8,10
+        ]);
+
+    const ke =
+        .5*
+        mass*
+        speed*
+        speed;
+
+    const answer =
+        ke.toFixed(0)+
+        " J";
+
+    const options =
+        makeOptions(
+            answer,
+            (ke/2).toFixed(0)+" J",
+            (ke*2).toFixed(0)+" J"
+        );
+
+    return {
+
+        id:
+            "ke_"+mass+"_"+speed,
+
+        q:
+            `A ${mass} kg cart moves at ${speed} m/s. What is its kinetic energy?`,
+
+        hint:
+            "KE = 1/2 mv^2",
+
+        options:
+            options.options,
+
+        correct:
+            options.correct,
+
+        explanation:
+        `
+        <b>Formula</b><br>
+        KE = 1/2 mv^2<br><br>
+
+        <b>Substitute</b><br>
+        KE = 0.5 x ${mass} x ${speed}^2<br><br>
+
+        <b>Answer</b><br>
+        KE = <b>${ke.toFixed(0)} J</b><br><br>
+
+        <b>Game connection</b><br>
+        Kinetic energy depends strongly on speed because
+        velocity is squared. When your cart speeds up on the
+        downhill section, kinetic energy rises quickly.
+        `
+    };
+}
+
+/* POWER */
+
+function powerQuestion(){
+
+    const work =
+        randomItem([
+            1200,1800,2400,3000
+        ]);
+
+    const time =
+        randomItem([
+            2,3,4,5
+        ]);
+
+    const power =
+        work/time;
+
+    const answer =
+        power.toFixed(0)+
+        " W";
+
+    const options =
+        makeOptions(
+            answer,
+            (power/2).toFixed(0)+" W",
+            (power*2).toFixed(0)+" W"
+        );
+
+    return {
+
+        id:
+            "power_"+work+"_"+time,
+
+        q:
+            `${work} J of work is completed in ${time} s. What is the power?`,
+
+        hint:
+            "Power = Work / Time",
+
+        options:
+            options.options,
+
+        correct:
+            options.correct,
+
+        explanation:
+        `
+        <b>Formula</b><br>
+        Power = Work / Time<br><br>
+
+        <b>Substitute</b><br>
+        P = ${work} / ${time}<br><br>
+
+        <b>Answer</b><br>
+        P = <b>${power.toFixed(0)} W</b><br><br>
+
+        <b>Game connection</b><br>
+        At the power station all motors lift the same crate
+        through the same height, so they perform the same work.
+        The higher-power motor performs that work in less time.
+        `
+    };
+}
+
+const questionGenerators = [
+    workQuestion,
+    peQuestion,
+    keQuestion,
+    powerQuestion
+];
+
+let previousQuestionIds = [];
+
+try{
+
+    previousQuestionIds =
+        JSON.parse(
+            localStorage.getItem(
+                "energyGamePreviousQuestions"
+            ) || "[]"
+        );
+
+}catch(error){
+
+    previousQuestionIds = [];
+}
+
+const selectedQuestions = [];
+
+for(
+    const generator of
+    shuffle(questionGenerators)
+){
+
+    let question = null;
+
+    for(
+        let attempt=0;
+        attempt<10;
+        attempt++
+    ){
+
+        const candidate =
+            generator();
+
+        if(
+            !previousQuestionIds
+            .includes(
+                candidate.id
+            )
+        ){
+
+            question =
+                candidate;
+
+            break;
+        }
+    }
+
+    question =
+        question ||
+        generator();
+
+    selectedQuestions.push(
+        question
+    );
+
+    if(
+        selectedQuestions.length===3
+    ){
+
+        break;
+    }
+}
+
+localStorage.setItem(
+    "energyGamePreviousQuestions",
+    JSON.stringify(
+        selectedQuestions.map(
+            question=>
+            question.id
+        )
+    )
+);
+
+const challenges =
+    selectedQuestions.map(
+        (question,index)=>({
+
+            ...question,
+
+            at:[
+                230,
+                555,
+                1030
+            ][index],
+
+            asked:false
+        })
+    );
+
+/* ======================================================
+   QUESTION UI
+====================================================== */
+
+const challengeBox =
+    document.getElementById(
+        "challenge"
+    );
+
+function openChallenge(
+    challenge
+){
+
+    challengeActive = true;
+    challenge.asked = true;
+
+    velocity *= .2;
+
+    document
+        .getElementById("question")
+        .textContent =
+        challenge.q;
+
+    document
+        .getElementById("challengeHint")
+        .textContent =
+        challenge.hint;
+
+    const answers =
+        document.getElementById(
+            "answers"
+        );
+
+    const feedback =
+        document.getElementById(
+            "feedback"
+        );
+
+    const continueButton =
+        document.getElementById(
+            "continueBtn"
+        );
+
+    answers.innerHTML = "";
+
+    feedback.style.display =
+        "none";
+
+    continueButton.style.display =
+        "none";
+
+    challenge.options.forEach(
+        (option,index)=>{
+
+            const button =
+                document.createElement(
+                    "button"
+                );
+
+            button.className =
+                "answer";
+
+            button.textContent =
+                option;
+
+            button.onclick =
+                ()=>{
+
+                    answers
+                        .querySelectorAll(
+                            "button"
+                        )
+                        .forEach(
+                            item=>
+                            item.disabled=true
+                        );
+
+                    feedback.style.display =
+                        "block";
+
+                    if(
+                        index===
+                        challenge.correct
+                    ){
+
+                        feedback.innerHTML =
+                        `
+                        <b>CORRECT</b><br><br>
+
+                        ${challenge.explanation}
+
+                        <br><br>
+
+                        <b>ENERGY BOOST:</b>
+                        Your cart receives a short speed boost.
+                        `;
+
+                        velocity += 2;
+                    }
+                    else{
+
+                        feedback.innerHTML =
+                        `
+                        <b>NOT CORRECT - FOLLOW THE COMPLETE METHOD</b><br><br>
+
+                        ${challenge.explanation}
+                        `;
+                    }
+
+                    continueButton.style.display =
+                        "block";
+                };
+
+            answers.appendChild(
+                button
+            );
+        }
+    );
+
+    continueButton.onclick =
+        ()=>{
+
+            challengeBox
+                .classList
+                .remove(
+                    "show"
+                );
+
+            challengeActive = false;
+
+            lastTime =
+                performance.now();
+        };
+
+    challengeBox
+        .classList
+        .add(
+            "show"
+        );
+}
+
+/* ======================================================
+   POWER STATION
+====================================================== */
+
+const powerStation =
+    document.getElementById(
+        "powerStation"
+    );
+
+const machineButtons =
+    [...document.querySelectorAll(
+        ".machine-buttons button"
+    )];
+
+machineButtons.forEach(
+    button=>{
+
+        button.onclick =
+            ()=>{
+
+                if(powerAnimating){
+                    return;
+                }
+
+                selectedMachinePower =
+                    Number(
+                        button.dataset.power
+                    );
+
+                const liftMass =
+                    60;
+
+                const liftHeight =
+                    6;
+
+                machineWork =
+                    liftMass *
+                    GRAVITY *
+                    liftHeight;
+
+                machineTime =
+                    machineWork /
+                    selectedMachinePower;
+
+                machineElapsed = 0;
+
+                powerAnimating = true;
+
+                document
+                    .getElementById(
+                        "machineResult"
+                    )
+                    .style.display =
+                    "block";
+
+                document
+                    .getElementById(
+                        "machineResult"
+                    )
+                    .innerHTML =
+                    `
+                    <b>Work required:</b><br>
+                    W = mgh =
+                    60 x 9.81 x 6 =
+                    ${machineWork.toFixed(0)} J<br><br>
+
+                    <b>Selected motor:</b>
+                    ${selectedMachinePower} W<br><br>
+
+                    <b>Lift time:</b><br>
+                    t = W / P =
+                    ${machineWork.toFixed(0)} /
+                    ${selectedMachinePower}
+                    =
+                    ${machineTime.toFixed(2)} s<br><br>
+
+                    Watch the crane.
+                    `;
+            };
+    }
+);
+
+function updatePowerAnimation(
+    dt
+){
+
+    if(!powerAnimating){
+        return;
+    }
+
+    elapsed += dt;
+
+    machineElapsed += dt;
+
+    const ratio =
+        THREE.MathUtils.clamp(
+            machineElapsed/
+            machineTime,
+            0,
+            1
+        );
+
+    craneCrate.position.y =
+        .9 +
+        ratio*6;
+
+    document
+        .getElementById(
+            "coachTitle"
+        )
+        .textContent =
+        "POWER IN ACTION";
+
+    document
+        .getElementById(
+            "coachText"
+        )
+        .textContent =
+        `${selectedMachinePower} W motor is doing ${machineWork.toFixed(0)} J of work. More power completes the same work in less time.`;
+
+    document
+        .getElementById(
+            "coachFormula"
+        )
+        .textContent =
+        "Power = Work / Time";
+
+    if(ratio>=1){
+
+        powerAnimating = false;
+        powerEventComplete = true;
+
+        gate.visible = false;
+
+        powerStation
+            .classList
+            .remove(
+                "show"
+            );
+
+        positionZ = 885;
+
+        velocity = 1;
+
+        lastTime =
+            performance.now();
+    }
+}
+
+/* ======================================================
+   PHYSICS
+====================================================== */
+
+function updatePhysics(
+    dt
+){
+
+    const oldZ =
+        positionZ;
+
+    const oldHeight =
+        heightAt(
+            positionZ
+        );
+
+    let appliedForce = 0;
+
+    if(
+        pressed(
+            "w",
+            "arrowup"
+        )
+    ){
+
+        appliedForce =
+            selectedForce;
+    }
+
+    const slope =
+        slopeAt(
+            positionZ
+        );
+
+    const gravityComponent =
+        MASS *
+        GRAVITY *
+        slope;
+
+    const frictionForce =
+        35;
+
+    const brakingForce =
+        pressed(
+            "s",
+            "arrowdown"
+        )
+        ? 350
+        : 0;
+
+    let netForce =
+        appliedForce -
+        frictionForce -
+        gravityComponent -
+        brakingForce;
+
+    if(
+        velocity<=0 &&
+        netForce<0
+    ){
+
+        netForce=0;
+    }
+
+    acceleration =
+        netForce /
+        MASS;
+
+    velocity +=
+        acceleration*
+        dt;
+
+    velocity =
+        THREE.MathUtils.clamp(
+            velocity,
+            0,
+            14
+        );
+
+    positionZ +=
+        velocity*
+        dt;
+
+    const steer =
+        3.5*
+        dt;
+
+    /*
+       Camera looks toward +Z.
+       Screen-left corresponds world +X.
+    */
+
+    if(
+        pressed(
+            "a",
+            "arrowleft"
+        )
+    ){
+
+        lateralX +=
+            steer;
+    }
+
+    if(
+        pressed(
+            "d",
+            "arrowright"
+        )
+    ){
+
+        lateralX -=
+            steer;
+    }
+
+    lateralX =
+        THREE.MathUtils.clamp(
+            lateralX,
+            -6.3,
+            6.3
+        );
+
+    const newHeight =
+        heightAt(
+            positionZ
+        );
+
+    cart.position.set(
+        lateralX,
+        newHeight+.1,
+        positionZ
+    );
+
+    cart.rotation.x =
+        -Math.atan(
+            slope
+        );
+
+    const displacement =
+        Math.max(
+            0,
+            positionZ-oldZ
+        );
+
+    if(appliedForce>0){
+
+        totalAppliedWork +=
+            appliedForce*
+            displacement;
+    }
+
+    const potentialEnergy =
+        MASS*
+        GRAVITY*
+        newHeight;
+
+    const kineticEnergy =
+        .5*
+        MASS*
+        velocity*
+        velocity;
+
+    const instantPower =
+        appliedForce*
+        velocity;
+
+    maxPE =
+        Math.max(
+            maxPE,
+            potentialEnergy
+        );
+
+    maxKE =
+        Math.max(
+            maxKE,
+            kineticEnergy
+        );
+
+    maxInstantPower =
+        Math.max(
+            maxInstantPower,
+            instantPower
+        );
+
+    updateHUD(
+        appliedForce,
+        potentialEnergy,
+        kineticEnergy,
+        instantPower,
+        oldHeight
+    );
+}
+
+/* ======================================================
+   EVENTS
+====================================================== */
+
+function updateEvents(){
+
+    if(
+        positionZ>=815 &&
+        !powerEventTriggered
+    ){
+
+        powerEventTriggered = true;
+
+        velocity = 0;
+
+        positionZ = 815;
+
+        powerStation
+            .classList
+            .add(
+                "show"
+            );
+    }
+}
+
+function checkChallenges(){
+
+    if(
+        challengeActive ||
+        powerAnimating ||
+        (
+            powerEventTriggered &&
+            !powerEventComplete
+        )
+    ){
+
+        return;
+    }
+
+    for(
+        const challenge of
+        challenges
+    ){
+
+        if(
+            !challenge.asked &&
+            positionZ>=challenge.at
+        ){
+
+            openChallenge(
+                challenge
+            );
+
+            break;
+        }
+    }
+}
+
+/* ======================================================
+   LIVE HUD
+====================================================== */
+
+function updateHUD(
+    appliedForce,
+    potentialEnergy,
+    kineticEnergy,
+    instantPower
+){
+
+    const height =
+        heightAt(
+            positionZ
+        );
+
+    document
+        .getElementById("force")
+        .textContent =
+        appliedForce.toFixed(0);
+
+    document
+        .getElementById("distance")
+        .textContent =
+        positionZ.toFixed(0);
+
+    document
+        .getElementById("height")
+        .textContent =
+        height.toFixed(1);
+
+    document
+        .getElementById("speed")
+        .textContent =
+        velocity.toFixed(1);
+
+    document
+        .getElementById("work")
+        .textContent =
+        totalAppliedWork.toFixed(0);
+
+    document
+        .getElementById("power")
+        .textContent =
+        instantPower.toFixed(0);
+
+    document
+        .getElementById("pe")
+        .textContent =
+        potentialEnergy.toFixed(0);
+
+    document
+        .getElementById("ke")
+        .textContent =
+        kineticEnergy.toFixed(0);
+
+    document
+        .getElementById("progressText")
+        .textContent =
+        Math.min(
+            TRACK_LENGTH,
+            positionZ
+        ).toFixed(0)+
+        " / "+
+        TRACK_LENGTH+
+        " m";
+
+    document
+        .getElementById("progressFill")
+        .style.width =
+        Math.min(
+            100,
+            positionZ/
+            TRACK_LENGTH*
+            100
+        )+"%";
+
+    const maxPossiblePE =
+        MASS*
+        GRAVITY*
+        18;
+
+    const maxDisplayKE =
+        .5*
+        MASS*
+        14*
+        14;
+
+    const pePercent =
+        THREE.MathUtils.clamp(
+            potentialEnergy/
+            maxPossiblePE*
+            100,
+            0,
+            100
+        );
+
+    const kePercent =
+        THREE.MathUtils.clamp(
+            kineticEnergy/
+            maxDisplayKE*
+            100,
+            0,
+            100
+        );
+
+    document
+        .getElementById("peFill")
+        .style.width =
+        pePercent+"%";
+
+    document
+        .getElementById("keFill")
+        .style.width =
+        kePercent+"%";
+
+    document
+        .getElementById("pePercent")
+        .textContent =
+        pePercent.toFixed(0)+"%";
+
+    document
+        .getElementById("kePercent")
+        .textContent =
+        kePercent.toFixed(0)+"%";
+
+    updateCoach(
+        appliedForce,
+        potentialEnergy,
+        kineticEnergy,
+        instantPower
+    );
+}
+
+/* ======================================================
+   COACH
+====================================================== */
+
+function updateCoach(
+    appliedForce,
+    potentialEnergy,
+    kineticEnergy,
+    instantPower
+){
+
+    const title =
+        document.getElementById(
+            "coachTitle"
+        );
+
+    const text =
+        document.getElementById(
+            "coachText"
+        );
+
+    const formula =
+        document.getElementById(
+            "coachFormula"
+        );
+
+    const stage =
+        document.getElementById(
+            "stageText"
+        );
+
+    const equation =
+        document.getElementById(
+            "equation"
+        );
+
+    if(positionZ<300){
+
+        stage.textContent =
+            "Work";
+
+        title.textContent =
+            "WORK";
+
+        text.textContent =
+            `You are applying ${appliedForce.toFixed(0)} N. Work is done only when that force causes displacement.`;
+
+        formula.textContent =
+            "Work = Force x Distance";
+
+        equation.innerHTML =
+            `
+            <b>Live Work</b><br>
+            Total applied work =
+            ${totalAppliedWork.toFixed(0)} J
+            `;
+    }
+
+    else if(positionZ<580){
+
+        stage.textContent =
+            "Potential Energy";
+
+        title.textContent =
+            "CLIMBING: POTENTIAL ENERGY INCREASES";
+
+        text.textContent =
+            `Your cart is ${heightAt(positionZ).toFixed(1)} m above the ground. As height increases, gravitational potential energy increases.`;
+
+        formula.textContent =
+            "PE = mgh";
+
+        equation.innerHTML =
+            `
+            <b>Potential Energy</b><br>
+            PE =
+            ${MASS} x
+            ${GRAVITY} x
+            ${heightAt(positionZ).toFixed(1)}
+            =
+            ${potentialEnergy.toFixed(0)} J
+            `;
+    }
+
+    else if(positionZ<780){
+
+        stage.textContent =
+            "Energy Conversion";
+
+        title.textContent =
+            "DOWNHILL: PE CONVERTS TO KE";
+
+        text.textContent =
+            "The cart is losing height. Potential energy decreases while motion energy increases. Gravity assists the downhill motion.";
+
+        formula.textContent =
+            "PE decreases -> KE increases";
+
+        equation.innerHTML =
+            `
+            <b>Energy Conversion</b><br>
+            PE =
+            ${potentialEnergy.toFixed(0)} J<br>
+            KE =
+            ${kineticEnergy.toFixed(0)} J
+            `;
+    }
+
+    else if(positionZ<900){
+
+        stage.textContent =
+            "Power";
+
+        title.textContent =
+            "POWER STATION";
+
+        text.textContent =
+            "Power tells how quickly work is completed. Choose a motor and watch the same lifting work take different amounts of time.";
+
+        formula.textContent =
+            "Power = Work / Time";
+
+        equation.innerHTML =
+            `
+            <b>Instant Mechanical Power</b><br>
+            P = Force x Velocity<br>
+            =
+            ${appliedForce.toFixed(0)} x
+            ${velocity.toFixed(1)}
+            =
+            ${instantPower.toFixed(0)} W
+            `;
+    }
+
+    else{
+
+        stage.textContent =
+            "Final Energy Mission";
+
+        title.textContent =
+            "FINAL DELIVERY";
+
+        text.textContent =
+            "Work, kinetic energy, potential energy and power have all affected the mission. Reach the Energy Lab.";
+
+        formula.textContent =
+            "Energy can change form; power tells how fast work is done.";
+
+        equation.innerHTML =
+            `
+            <b>Current Energy</b><br>
+            PE = ${potentialEnergy.toFixed(0)} J<br>
+            KE = ${kineticEnergy.toFixed(0)} J
+            `;
+    }
+}
+
+/* ======================================================
+   CAMERA
+====================================================== */
+
+function updateCamera(){
+
+    /*
+       Same reliable orientation as Newton game.
+       Camera behind cart, looking toward +Z.
+    */
+
+    camera.position.set(
+        cart.position.x,
+        cart.position.y + 5.2,
+        cart.position.z - 11
+    );
+
+    camera.lookAt(
+        cart.position.x,
+        cart.position.y + 1.3,
+        cart.position.z + 6
+    );
+}
+
+/* ======================================================
+   FINISH
+====================================================== */
+
+function finishGame(){
+
+    if(finished){
+        return;
+    }
+
+    finished = true;
+
+    const selectedPowerText =
+        selectedMachinePower>0
+        ? selectedMachinePower+" W"
+        : "Not selected";
+
+    document
+        .getElementById("finish")
+        .classList
+        .add(
+            "show"
+        );
+
+    document
+        .getElementById("finalWork")
+        .textContent =
+        totalAppliedWork.toFixed(0)+
+        " J";
+
+    document
+        .getElementById("finalPE")
+        .textContent =
+        maxPE.toFixed(0)+
+        " J";
+
+    document
+        .getElementById("finalKE")
+        .textContent =
+        maxKE.toFixed(0)+
+        " J";
+
+    document
+        .getElementById("finalPower")
+        .textContent =
+        selectedPowerText;
+
+    document
+        .getElementById("finalExplanation")
+        .innerHTML =
+        `
+        <b>HOW YOUR GAMEPLAY DEMONSTRATED WORK, ENERGY AND POWER</b><br><br>
+
+        <b>1. Work</b><br>
+
+        Work is done when a force causes displacement.<br><br>
+
+        <b>W = F x d</b><br><br>
+
+        During the mission, every time you applied force and the cart moved,
+        the game added that force-displacement contribution to your total.<br><br>
+
+        Your total applied work was approximately
+        <b>${totalAppliedWork.toFixed(0)} J</b>.<br><br>
+
+        If you selected a larger force while covering the same distance,
+        more work was done by your applied force.<br><br>
+
+        <b>2. Gravitational Potential Energy</b><br>
+
+        On the uphill ramp, the cart gained height.<br><br>
+
+        PE = mgh<br><br>
+
+        At the maximum height of 18 m:<br><br>
+
+        PE =
+        ${MASS} x
+        ${GRAVITY} x
+        18<br>
+
+        =
+        <b>${(MASS*GRAVITY*18).toFixed(0)} J</b>.<br><br>
+
+        Your maximum measured potential energy was
+        <b>${maxPE.toFixed(0)} J</b>.<br><br>
+
+        Higher position means greater gravitational potential energy.<br><br>
+
+        <b>3. Kinetic Energy</b><br>
+
+        Kinetic energy is the energy of motion.<br><br>
+
+        <b>KE = 1/2 mv^2</b><br><br>
+
+        As the cart accelerated,
+        its kinetic energy increased.
+
+        Your maximum kinetic energy during the mission was
+        <b>${maxKE.toFixed(0)} J</b>.<br><br>
+
+        Because velocity is squared in the equation,
+        increasing speed has a strong effect on kinetic energy.<br><br>
+
+        <b>4. Energy Conversion</b><br>
+
+        At the top of the ramp,
+        gravitational potential energy was high.<br><br>
+
+        During the downhill section,
+        height decreased.
+
+        Therefore potential energy decreased while the cart's motion
+        and kinetic energy increased.<br><br>
+
+        This demonstrated conversion between
+        <b>potential energy and kinetic energy</b>.<br><br>
+
+        <b>5. Power</b><br>
+
+        Power measures how quickly work is completed.<br><br>
+
+        <b>Power = Work / Time</b><br><br>
+
+        The crane lifted a 60 kg crate through 6 m.<br><br>
+
+        Work required:<br>
+
+        W = mgh<br>
+
+        = 60 x 9.81 x 6<br>
+
+        = <b>${machineWork.toFixed(0)} J</b>.<br><br>
+
+        You selected a
+        <b>${selectedMachinePower} W</b>
+        motor.<br><br>
+
+        The theoretical lift time was:<br>
+
+        t = W / P<br>
+
+        =
+        ${machineWork.toFixed(0)} /
+        ${selectedMachinePower}<br>
+
+        =
+        <b>${machineTime.toFixed(2)} s</b>.<br><br>
+
+        A higher-power motor performs the same work in less time.
+        The amount of work does not need to change; the rate of doing
+        that work changes.<br><br>
+
+        <b>6. Instant Power During Motion</b><br>
+
+        While pushing the moving cart, the game also calculated mechanical power from:<br><br>
+
+        <b>P = F x v</b><br><br>
+
+        Your highest measured instantaneous pushing power was approximately
+        <b>${maxInstantPower.toFixed(0)} W</b>.<br><br>
+
+        <b>FINAL CONNECTION</b><br>
+
+        Work = force causing displacement.<br>
+
+        Potential Energy = energy stored because of height.<br>
+
+        Kinetic Energy = energy because of motion.<br>
+
+        Energy can transform from one form to another.<br>
+
+        Power = how quickly work is performed.<br><br>
+
+        These equations were not separate from the gameplay:
+        they controlled how the cart climbed, accelerated, descended
+        and how quickly the crane completed its task.
+        `;
+}
+
+/* ======================================================
+   LOOP
+====================================================== */
+
+function animate(
+    now
+){
+
+    requestAnimationFrame(
+        animate
+    );
+
+    const dt =
+        Math.min(
+            (
+                now-lastTime
+            )/1000,
+            .035
+        );
+
+    lastTime = now;
+
+    if(
+        started &&
+        !finished
+    ){
+
+        if(powerAnimating){
+
+            updatePowerAnimation(
+                dt
+            );
+        }
+
+        else if(
+            !challengeActive &&
+            !(
+                powerEventTriggered &&
+                !powerEventComplete
+            )
+        ){
+
+            elapsed += dt;
+
+            updatePhysics(
+                dt
+            );
+
+            updateEvents();
+
+            checkChallenges();
+
+            if(
+                positionZ>=TRACK_LENGTH
+            ){
+
+                positionZ =
+                    TRACK_LENGTH;
+
+                finishGame();
+            }
+        }
+    }
+
+    updateCamera();
+
+    renderer.render(
+        scene,
+        camera
+    );
+}
+
+/* INITIAL */
+
+cart.position.set(
+    0,
+    .1,
+    0
+);
+
+updateCamera();
+
+updateHUD(
+    0,
+    0,
+    0,
+    0
+);
+
+requestAnimationFrame(
+    animate
+);
+
+addEventListener(
+    "resize",
+    ()=>{
+
+        camera.aspect =
+            innerWidth/
+            innerHeight;
+
+        camera.updateProjectionMatrix();
+
+        renderer.setSize(
+            innerWidth,
+            innerHeight
+        );
+    }
+);
+
+})();
+</script>
+
+</body>
+</html>

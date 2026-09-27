@@ -1,0 +1,4433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+<title>My Campus - Momentum Collision Arena</title>
+
+<style>
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0
+}
+
+html,body{
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    background:#06121c;
+    font-family:Segoe UI,Arial,sans-serif
+}
+
+#game{
+    position:fixed;
+    inset:0
+}
+
+canvas{
+    display:block
+}
+
+.hud{
+    position:fixed;
+    inset:0;
+    z-index:10;
+    color:#fff;
+    pointer-events:none
+}
+
+.glass{
+    background:linear-gradient(
+        135deg,
+        rgba(5,20,32,.95),
+        rgba(7,29,44,.84)
+    );
+
+    border:1px solid rgba(255,255,255,.13);
+    border-radius:15px;
+
+    box-shadow:0 14px 40px rgba(0,0,0,.28);
+    backdrop-filter:blur(13px)
+}
+
+/* ======================================================
+   HEADER
+====================================================== */
+
+.title{
+    position:absolute;
+    top:18px;
+    left:18px;
+
+    width:360px;
+    padding:14px 17px
+}
+
+.eyebrow{
+    color:#66e3ff;
+    font-size:10px;
+    font-weight:900;
+    letter-spacing:1.5px
+}
+
+.title h1{
+    margin-top:4px;
+    font-size:20px
+}
+
+.title p{
+    margin-top:5px;
+    color:#aec0cc;
+    font-size:11px;
+    line-height:1.4
+}
+
+/* ======================================================
+   STAGE
+====================================================== */
+
+.stage-panel{
+    position:absolute;
+    top:18px;
+    left:50%;
+
+    transform:translateX(-50%);
+
+    width:430px;
+    padding:12px;
+
+    text-align:center
+}
+
+.stage-panel small{
+    color:#98adbc;
+    font-size:9px;
+    font-weight:900
+}
+
+.stage-panel strong{
+    display:block;
+
+    margin-top:3px;
+
+    color:#69e4ff;
+    font-size:18px
+}
+
+.stage-panel p{
+    margin-top:3px;
+
+    color:#b8c8d2;
+    font-size:9px
+}
+
+/* ======================================================
+   SCORE + TIMER
+====================================================== */
+
+.status-panel{
+    position:absolute;
+    top:18px;
+    right:18px;
+
+    width:220px;
+
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+
+    padding:10px
+}
+
+.status-box{
+    padding:6px;
+
+    border-radius:9px;
+    background:rgba(255,255,255,.05);
+
+    text-align:center
+}
+
+.status-box small{
+    display:block;
+
+    color:#98adbc;
+    font-size:8px;
+    font-weight:900
+}
+
+.status-box strong{
+    display:block;
+
+    margin-top:2px;
+    font-size:22px
+}
+
+#score{
+    color:#ffe16a
+}
+
+#timerValue{
+    color:#69e4ff
+}
+
+#timerValue.warning{
+    color:#ffc95c
+}
+
+#timerValue.danger{
+    color:#ff6262;
+    animation:pulse .55s infinite alternate
+}
+
+@keyframes pulse{
+    from{
+        transform:scale(1)
+    }
+
+    to{
+        transform:scale(1.13)
+    }
+}
+
+/* ======================================================
+   CONTROLS
+====================================================== */
+
+.controls{
+    position:absolute;
+    top:150px;
+    left:18px;
+
+    width:315px;
+    padding:14px;
+
+    pointer-events:auto
+}
+
+.panel-title{
+    color:#69e5ff;
+    font-size:10px;
+    font-weight:950;
+    letter-spacing:1px
+}
+
+.control-label{
+    margin-top:11px;
+
+    color:#a9bac6;
+    font-size:9px;
+    font-weight:900
+}
+
+.option-row{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:6px;
+    margin-top:5px
+}
+
+.option-row button{
+    min-height:38px;
+    padding:7px 4px;
+
+    border:1px solid rgba(255,255,255,.14);
+    border-radius:8px;
+
+    background:rgba(255,255,255,.06);
+    color:#fff;
+
+    font-size:9px;
+    font-weight:900;
+
+    cursor:pointer
+}
+
+.option-row button.active{
+    background:#63e1ff;
+    color:#03131c
+}
+
+#bumperGroup{
+    display:none
+}
+
+.launch-button{
+    width:100%;
+
+    margin-top:13px;
+    padding:11px;
+
+    border:0;
+    border-radius:9px;
+
+    background:#63e1ff;
+    color:#03131c;
+
+    font-weight:950;
+    cursor:pointer
+}
+
+.launch-button:disabled{
+    opacity:.45;
+    cursor:not-allowed
+}
+
+.control-help{
+    margin-top:8px;
+
+    color:#95a9b7;
+    font-size:9px;
+    line-height:1.45
+}
+
+/* ======================================================
+   LIVE VALUES
+====================================================== */
+
+.values{
+    position:absolute;
+    right:18px;
+    bottom:18px;
+
+    width:355px;
+    padding:15px
+}
+
+.value-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:7px
+}
+
+.value{
+    padding:9px;
+
+    border-radius:9px;
+    background:rgba(255,255,255,.05)
+}
+
+.value label{
+    display:block;
+
+    color:#92a7b5;
+    font-size:8px;
+    font-weight:900
+}
+
+.value strong{
+    display:block;
+
+    margin-top:2px;
+    font-size:14px
+}
+
+.value strong.highlight{
+    color:#69e4ff
+}
+
+.bar-title{
+    display:flex;
+    justify-content:space-between;
+
+    margin-top:10px;
+
+    color:#9cafbc;
+    font-size:8px;
+    font-weight:900
+}
+
+.bar{
+    height:7px;
+
+    margin-top:4px;
+    overflow:hidden;
+
+    border-radius:20px;
+    background:rgba(255,255,255,.08)
+}
+
+#progressFill{
+    width:0%;
+    height:100%;
+
+    background:linear-gradient(
+        90deg,
+        #54dcff,
+        #79ff9d,
+        #ffe267
+    )
+}
+
+.equation{
+    margin-top:10px;
+    padding:10px;
+
+    border:1px solid rgba(83,220,255,.17);
+    border-radius:10px;
+
+    background:rgba(71,216,255,.07);
+
+    font-size:10px;
+    line-height:1.5
+}
+
+.equation b{
+    color:#69e4ff
+}
+
+/* ======================================================
+   COACH
+====================================================== */
+
+.coach{
+    position:absolute;
+    left:50%;
+    bottom:15px;
+
+    transform:translateX(-50%);
+
+    width:min(680px,41vw);
+    padding:12px 16px;
+
+    text-align:center
+}
+
+#coachTitle{
+    color:#66e3ff;
+
+    font-size:10px;
+    font-weight:950;
+    letter-spacing:1px
+}
+
+#coachText{
+    margin-top:4px;
+
+    color:#e2ecf2;
+    font-size:11px;
+    line-height:1.45
+}
+
+#coachFormula{
+    margin-top:4px;
+
+    color:#93a9b7;
+    font-size:10px
+}
+
+/* ======================================================
+   START
+====================================================== */
+
+.start-screen{
+    position:fixed;
+    inset:0;
+
+    z-index:40;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    background:rgba(2,8,14,.77);
+    backdrop-filter:blur(8px);
+
+    color:#fff;
+    pointer-events:auto
+}
+
+.start-box{
+    width:min(680px,92vw);
+    padding:27px;
+    text-align:center
+}
+
+.start-box h2{
+    font-size:31px
+}
+
+.start-box p{
+    margin-top:10px;
+
+    color:#b7c8d3;
+    font-size:12px;
+    line-height:1.6
+}
+
+.rules{
+    margin-top:13px;
+    padding:11px;
+
+    border-radius:10px;
+    background:rgba(255,255,255,.05);
+
+    color:#d7e6ed;
+    font-size:11px;
+    line-height:1.6
+}
+
+.rules b{
+    color:#69e4ff
+}
+
+.start-box button{
+    margin-top:18px;
+    padding:12px 26px;
+
+    border:0;
+    border-radius:10px;
+
+    background:#61e1ff;
+    color:#03131c;
+
+    font-weight:950;
+    cursor:pointer
+}
+
+/* ======================================================
+   RESULT
+====================================================== */
+
+.result{
+    position:fixed;
+
+    top:78px;
+    left:50%;
+
+    transform:translateX(-50%);
+
+    z-index:70;
+
+    width:min(760px,92vw);
+    max-height:calc(100vh - 98px);
+
+    display:none;
+    flex-direction:column;
+
+    padding:18px;
+
+    overflow:hidden;
+
+    color:#fff;
+    pointer-events:auto
+}
+
+.result.show{
+    display:flex
+}
+
+/*
+   IMPORTANT:
+   CONTENT scrolls.
+   NEXT button does NOT scroll.
+*/
+
+.result-content{
+    min-height:0;
+    overflow-y:auto;
+    padding-right:6px
+}
+
+.result-badge{
+    color:#ffe16b;
+
+    font-size:10px;
+    font-weight:950;
+    letter-spacing:1.1px
+}
+
+.result h3{
+    margin-top:5px;
+    font-size:20px
+}
+
+.result-text{
+    margin-top:8px;
+    padding:11px;
+
+    border-radius:9px;
+    background:rgba(255,255,255,.05);
+
+    color:#dce8ef;
+    font-size:11px;
+    line-height:1.55
+}
+
+.question-label{
+    margin-top:12px;
+
+    color:#69e4ff;
+    font-size:10px;
+    font-weight:950
+}
+
+#question{
+    margin-top:5px;
+    font-size:16px
+}
+
+#questionHint{
+    margin-top:4px;
+
+    color:#a2b5c2;
+    font-size:10px
+}
+
+.answers{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+
+    gap:8px;
+    margin-top:10px
+}
+
+.answer{
+    padding:10px;
+
+    border:1px solid rgba(255,255,255,.14);
+    border-radius:9px;
+
+    background:rgba(255,255,255,.07);
+    color:#fff;
+
+    font-weight:900;
+    cursor:pointer
+}
+
+.answer.correct{
+    background:rgba(63,207,116,.24);
+    border-color:#6aed98
+}
+
+.answer.wrong{
+    background:rgba(255,72,72,.24);
+    border-color:#ff7676
+}
+
+.answer:disabled{
+    opacity:.75
+}
+
+#feedback{
+    display:none;
+
+    max-height:130px;
+    overflow-y:auto;
+
+    margin-top:10px;
+    padding:11px;
+
+    border:1px solid rgba(80,218,255,.17);
+    border-radius:10px;
+
+    background:rgba(69,214,255,.08);
+
+    font-size:11px;
+    line-height:1.55
+}
+
+#feedback b{
+    color:#6de4ff
+}
+
+.result-footer{
+    flex:0 0 auto;
+    padding-top:11px
+}
+
+.next-btn{
+    display:none;
+
+    width:min(330px,90%);
+
+    margin:0 auto;
+    padding:12px;
+
+    border:0;
+    border-radius:9px;
+
+    background:#61e1ff;
+    color:#03131c;
+
+    font-weight:950;
+    cursor:pointer
+}
+
+/* ======================================================
+   FAILURE
+====================================================== */
+
+.failure{
+    position:fixed;
+    inset:0;
+
+    z-index:100;
+
+    display:none;
+    align-items:center;
+    justify-content:center;
+
+    background:rgba(13,3,7,.93);
+    backdrop-filter:blur(11px);
+
+    color:#fff;
+    pointer-events:auto
+}
+
+.failure.show{
+    display:flex
+}
+
+.failure-box{
+    width:min(630px,92vw);
+    padding:30px;
+
+    text-align:center;
+
+    border:1px solid rgba(255,90,90,.35);
+    border-radius:16px;
+
+    background:linear-gradient(
+        135deg,
+        rgba(40,8,14,.96),
+        rgba(18,12,20,.95)
+    )
+}
+
+.failure-icon{
+    font-size:52px
+}
+
+.failure-box h2{
+    margin-top:8px;
+
+    color:#ff6868;
+    font-size:32px
+}
+
+.failure-box p{
+    margin-top:10px;
+
+    color:#d8c5ca;
+    font-size:12px;
+    line-height:1.6
+}
+
+.failure-stage{
+    margin-top:13px;
+    padding:11px;
+
+    border-radius:9px;
+    background:rgba(255,255,255,.05);
+
+    font-size:11px;
+    line-height:1.5
+}
+
+.failure-box button{
+    margin-top:18px;
+    padding:12px 25px;
+
+    border:0;
+    border-radius:9px;
+
+    background:#ff6262;
+    color:white;
+
+    font-weight:950;
+    cursor:pointer
+}
+
+/* ======================================================
+   FINISH
+====================================================== */
+
+.finish{
+    position:fixed;
+    inset:0;
+
+    z-index:90;
+
+    display:none;
+
+    align-items:center;
+    justify-content:center;
+
+    background:rgba(1,7,13,.87);
+    backdrop-filter:blur(11px);
+
+    color:#fff;
+    pointer-events:auto
+}
+
+.finish.show{
+    display:flex
+}
+
+.finish-box{
+    width:min(840px,94vw);
+    max-height:93vh;
+
+    overflow:auto;
+    padding:27px
+}
+
+.finish-box h2{
+    text-align:center;
+    font-size:32px
+}
+
+.finish-sub{
+    margin-top:5px;
+
+    text-align:center;
+
+    color:#aabcc8;
+    font-size:11px
+}
+
+.final-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+
+    gap:8px;
+    margin-top:15px
+}
+
+.final-card{
+    padding:12px;
+
+    border-radius:10px;
+    background:rgba(255,255,255,.055);
+
+    text-align:center
+}
+
+.final-card strong{
+    display:block;
+
+    color:#69e4ff;
+    font-size:18px
+}
+
+.final-card span{
+    color:#92a7b5;
+    font-size:8px
+}
+
+.final-explanation{
+    margin-top:15px;
+    padding:16px;
+
+    border:1px solid rgba(89,220,255,.18);
+    border-radius:11px;
+
+    background:rgba(68,212,255,.075);
+
+    font-size:11px;
+    line-height:1.65
+}
+
+.final-explanation b{
+    color:#6ee5ff
+}
+
+.restart{
+    display:block;
+
+    margin:16px auto 0;
+    padding:11px 25px;
+
+    border:0;
+    border-radius:9px;
+
+    background:#61e1ff;
+    color:#03131c;
+
+    font-weight:900;
+    cursor:pointer
+}
+</style>
+</head>
+
+<body>
+
+<div id="game"></div>
+
+<div class="hud">
+
+<div class="title glass">
+
+    <div class="eyebrow">
+        MY CAMPUS - PHYSICS GAME
+    </div>
+
+    <h1>
+        Campus Collision Lab
+    </h1>
+
+    <p id="studentText"></p>
+
+</div>
+
+<div class="stage-panel glass">
+
+    <small>
+        CURRENT COLLISION MISSION
+    </small>
+
+    <strong id="stageName">
+        Momentum Transfer
+    </strong>
+
+    <p id="stageObjective">
+        Transfer momentum and stop the target cart inside the green zone.
+    </p>
+
+</div>
+
+<div class="status-panel glass">
+
+    <div class="status-box">
+
+        <small>
+            SCORE
+        </small>
+
+        <strong id="score">
+            0
+        </strong>
+
+    </div>
+
+    <div class="status-box">
+
+        <small>
+            TIME LEFT
+        </small>
+
+        <strong id="timerValue">
+            30
+        </strong>
+
+    </div>
+
+</div>
+
+<div class="controls glass">
+
+    <div class="panel-title">
+        COLLISION CONTROL PANEL
+    </div>
+
+    <div class="control-label">
+        PLAYER CART MASS
+    </div>
+
+    <div
+        id="massButtons"
+        class="option-row">
+
+        <button data-mass="20">
+            20 kg
+        </button>
+
+        <button
+            data-mass="40"
+            class="active">
+
+            40 kg
+
+        </button>
+
+        <button data-mass="60">
+            60 kg
+        </button>
+
+    </div>
+
+    <div class="control-label">
+        LAUNCH SPEED
+    </div>
+
+    <div
+        id="speedButtons"
+        class="option-row">
+
+        <button data-speed="3">
+            3 m/s
+        </button>
+
+        <button data-speed="6">
+            6 m/s
+        </button>
+
+        <button
+            data-speed="9"
+            class="active">
+
+            9 m/s
+
+        </button>
+
+    </div>
+
+    <div
+        id="bumperGroup">
+
+        <div class="control-label">
+            IMPACT PROTECTION
+        </div>
+
+        <div
+            id="bumperButtons"
+            class="option-row">
+
+            <button
+                data-bumper="hard"
+                class="active">
+
+                HARD
+
+            </button>
+
+            <button data-bumper="soft">
+                SOFT
+            </button>
+
+            <button data-bumper="foam">
+                FOAM
+            </button>
+
+        </div>
+
+    </div>
+
+    <button
+        id="launchButton"
+        class="launch-button">
+
+        LAUNCH CART
+
+    </button>
+
+    <div
+        id="controlHelp"
+        class="control-help">
+
+        Choose mass and speed, then launch. Keyboard: SPACE.
+
+    </div>
+
+</div>
+
+<div class="values glass">
+
+    <div class="value-grid">
+
+        <div class="value">
+
+            <label>
+                PLAYER MASS
+            </label>
+
+            <strong>
+
+                <span id="massValue">
+                    40
+                </span>
+
+                kg
+
+            </strong>
+
+        </div>
+
+        <div class="value">
+
+            <label>
+                PLAYER VELOCITY
+            </label>
+
+            <strong class="highlight">
+
+                <span id="velocityValue">
+                    0.00
+                </span>
+
+                m/s
+
+            </strong>
+
+        </div>
+
+        <div class="value">
+
+            <label>
+                PLAYER MOMENTUM
+            </label>
+
+            <strong>
+
+                <span id="momentumValue">
+                    0.00
+                </span>
+
+                kg·m/s
+
+            </strong>
+
+        </div>
+
+        <div class="value">
+
+            <label>
+                TARGET MOMENTUM
+            </label>
+
+            <strong>
+
+                <span id="targetMomentumValue">
+                    0.00
+                </span>
+
+                kg·m/s
+
+            </strong>
+
+        </div>
+
+        <div class="value">
+
+            <label>
+                IMPULSE
+            </label>
+
+            <strong>
+
+                <span id="impulseValue">
+                    0.00
+                </span>
+
+                N·s
+
+            </strong>
+
+        </div>
+
+        <div class="value">
+
+            <label>
+                AVG COLLISION FORCE
+            </label>
+
+            <strong>
+
+                <span id="forceValue">
+                    0
+                </span>
+
+                N
+
+            </strong>
+
+        </div>
+
+    </div>
+
+    <div class="bar-title">
+
+        <span>
+            MISSION PROGRESS
+        </span>
+
+        <span id="progressPercent">
+            0%
+        </span>
+
+    </div>
+
+    <div class="bar">
+        <div id="progressFill"></div>
+    </div>
+
+    <div
+        id="equation"
+        class="equation">
+
+        <b>Momentum</b><br>
+
+        p = mv
+
+    </div>
+
+</div>
+
+<div class="coach glass">
+
+    <div id="coachTitle">
+        MOMENTUM
+    </div>
+
+    <div id="coachText">
+        Choose the correct cart mass and launch speed so the target stops inside the green zone.
+    </div>
+
+    <div id="coachFormula">
+        p = mv
+    </div>
+
+</div>
+
+</div>
+
+<!-- START -->
+
+<div
+    id="startScreen"
+    class="start-screen">
+
+    <div class="start-box glass">
+
+        <h2>
+            Momentum Collision Arena
+        </h2>
+
+        <p>
+            Complete three collision experiments involving momentum,
+            impulse and collisions before each mission timer reaches zero.
+        </p>
+
+        <div class="rules">
+
+            <b>MISSION RULES</b><br>
+
+            Each collision mission:
+            <b>30 seconds</b><br>
+
+            Correct mission:
+            <b>+100 points</b><br>
+
+            Correct physics answer:
+            <b>+50 points</b><br>
+
+            Target not reached / mission not completed before timer reaches zero:
+            <b>MISSION FAILED</b>
+
+        </div>
+
+        <button id="startButton">
+            Start Timed Collision Mission
+        </button>
+
+    </div>
+
+</div>
+
+<!-- RESULT -->
+
+<div
+    id="resultBox"
+    class="result glass">
+
+    <div class="result-content">
+
+        <div class="result-badge">
+            COLLISION RESULT
+        </div>
+
+        <h3 id="resultTitle"></h3>
+
+        <div
+            id="resultText"
+            class="result-text">
+        </div>
+
+        <div class="question-label">
+            PHYSICS CHECK
+        </div>
+
+        <div id="question"></div>
+
+        <div id="questionHint"></div>
+
+        <div
+            id="answers"
+            class="answers">
+        </div>
+
+        <div id="feedback"></div>
+
+    </div>
+
+    <!-- stays visible even if explanation scrolls -->
+
+    <div class="result-footer">
+
+        <button
+            id="nextBtn"
+            class="next-btn">
+
+            NEXT EXPERIMENT
+
+        </button>
+
+    </div>
+
+</div>
+
+<!-- FAILURE -->
+
+<div
+    id="failure"
+    class="failure">
+
+    <div class="failure-box">
+
+        <div class="failure-icon">
+            ⚠
+        </div>
+
+        <h2>
+            MISSION FAILED
+        </h2>
+
+        <p>
+            The required collision result was not achieved
+            before the timer reached zero.
+        </p>
+
+        <div
+            id="failureStage"
+            class="failure-stage">
+        </div>
+
+        <button onclick="location.reload()">
+            RESTART COLLISION MISSION
+        </button>
+
+    </div>
+
+</div>
+
+<!-- FINISH -->
+
+<div
+    id="finish"
+    class="finish">
+
+    <div class="finish-box glass">
+
+        <h2>
+            Collision Mission Complete!
+        </h2>
+
+        <div class="finish-sub">
+            Momentum, impulse and collision behaviour were successfully demonstrated.
+        </div>
+
+        <div class="final-grid">
+
+            <div class="final-card">
+
+                <strong id="finalMomentum">
+                    -
+                </strong>
+
+                <span>
+                    MAX MOMENTUM
+                </span>
+
+            </div>
+
+            <div class="final-card">
+
+                <strong id="finalImpulse">
+                    -
+                </strong>
+
+                <span>
+                    MAX IMPULSE
+                </span>
+
+            </div>
+
+            <div class="final-card">
+
+                <strong id="finalForce">
+                    -
+                </strong>
+
+                <span>
+                    MAX FORCE
+                </span>
+
+            </div>
+
+            <div class="final-card">
+
+                <strong id="finalScore">
+                    -
+                </strong>
+
+                <span>
+                    FINAL SCORE
+                </span>
+
+            </div>
+
+        </div>
+
+        <div
+            id="finalExplanation"
+            class="final-explanation">
+        </div>
+
+        <button
+            class="restart"
+            onclick="location.reload()">
+
+            Run New Collision Mission
+
+        </button>
+
+    </div>
+
+</div>
+
+<script src="../../vendor/three-0.160.1.min.js"></script>
+
+<script>
+(() => {
+
+"use strict";
+
+/* ======================================================
+   CONFIG
+====================================================== */
+
+const STAGE_TIME = 30;
+
+const TARGET_MASS = 40;
+
+const BUMPER_DATA = {
+
+    hard:{
+        label:"HARD",
+        contactTime:.15
+    },
+
+    soft:{
+        label:"SOFT",
+        contactTime:.55
+    },
+
+    foam:{
+        label:"FOAM",
+        contactTime:1.0
+    }
+};
+
+const studentName =
+    localStorage.getItem("student_name") ||
+    sessionStorage.getItem("student_name") ||
+    "Student";
+
+document
+.getElementById("studentText")
+.textContent =
+    studentName +
+    " - complete each collision mission before the countdown expires.";
+
+/* ======================================================
+   THREE
+====================================================== */
+
+const scene =
+    new THREE.Scene();
+
+scene.background =
+    new THREE.Color(0x80c4e4);
+
+scene.fog =
+    new THREE.Fog(
+        0x80c4e4,
+        80,
+        180
+    );
+
+const camera =
+    new THREE.PerspectiveCamera(
+        58,
+        innerWidth/innerHeight,
+        .1,
+        250
+    );
+
+const renderer =
+    new THREE.WebGLRenderer({
+        antialias:true,
+        powerPreference:"high-performance"
+    });
+
+renderer.setSize(
+    innerWidth,
+    innerHeight
+);
+
+renderer.setPixelRatio(
+    Math.min(
+        devicePixelRatio,
+        2
+    )
+);
+
+renderer.shadowMap.enabled =
+    true;
+
+renderer.outputColorSpace =
+    THREE.SRGBColorSpace;
+
+renderer.toneMapping =
+    THREE.ACESFilmicToneMapping;
+
+renderer.toneMappingExposure =
+    1.06;
+
+document
+.getElementById("game")
+.appendChild(
+    renderer.domElement
+);
+
+/* ======================================================
+   LIGHT
+====================================================== */
+
+scene.add(
+    new THREE.HemisphereLight(
+        0xe1f7ff,
+        0x476343,
+        2.7
+    )
+);
+
+const sun =
+    new THREE.DirectionalLight(
+        0xffefd2,
+        4
+    );
+
+sun.position.set(
+    -30,
+    65,
+    -35
+);
+
+sun.castShadow =
+    true;
+
+sun.shadow.mapSize.set(
+    2048,
+    2048
+);
+
+scene.add(sun);
+
+/* ======================================================
+   MATERIALS
+====================================================== */
+
+const MAT = {
+
+    road:
+    new THREE.MeshStandardMaterial({
+        color:0x343d44,
+        roughness:.9
+    }),
+
+    edge:
+    new THREE.MeshStandardMaterial({
+        color:0xb8c1c6,
+        roughness:.8
+    }),
+
+    blue:
+    new THREE.MeshStandardMaterial({
+        color:0x188bd0,
+        roughness:.45,
+        metalness:.25
+    }),
+
+    red:
+    new THREE.MeshStandardMaterial({
+        color:0xdf5055,
+        roughness:.5,
+        metalness:.2
+    }),
+
+    dark:
+    new THREE.MeshStandardMaterial({
+        color:0x161c21,
+        roughness:.55
+    }),
+
+    green:
+    new THREE.MeshStandardMaterial({
+        color:0x44d27a,
+        transparent:true,
+        opacity:.5,
+        roughness:.6
+    }),
+
+    wall:
+    new THREE.MeshStandardMaterial({
+        color:0x777f84,
+        roughness:.8
+    }),
+
+    hard:
+    new THREE.MeshStandardMaterial({
+        color:0xd85050,
+        roughness:.7
+    }),
+
+    soft:
+    new THREE.MeshStandardMaterial({
+        color:0xe0a43f,
+        roughness:.75
+    }),
+
+    foam:
+    new THREE.MeshStandardMaterial({
+        color:0x4fc47b,
+        roughness:.85
+    })
+};
+
+function box(
+    w,
+    h,
+    d,
+    material,
+    x,
+    y,
+    z,
+    parent=scene
+){
+
+    const mesh =
+        new THREE.Mesh(
+            new THREE.BoxGeometry(
+                w,h,d
+            ),
+            material
+        );
+
+    mesh.position.set(
+        x,y,z
+    );
+
+    mesh.castShadow =
+        true;
+
+    mesh.receiveShadow =
+        true;
+
+    parent.add(mesh);
+
+    return mesh;
+}
+
+/* ======================================================
+   WORLD
+====================================================== */
+
+box(
+    20,
+    .25,
+    82,
+    MAT.road,
+    0,
+    -.12,
+    22
+);
+
+box(
+    1,
+    .6,
+    82,
+    MAT.edge,
+    -10,
+    .2,
+    22
+);
+
+box(
+    1,
+    .6,
+    82,
+    MAT.edge,
+    10,
+    .2,
+    22
+);
+
+/* road markings */
+
+for(
+    let z=-12;
+    z<63;
+    z+=7
+){
+
+    box(
+        .18,
+        .03,
+        3.5,
+        MAT.edge,
+        0,
+        .03,
+        z
+    );
+}
+
+/* ======================================================
+   CART FACTORY
+====================================================== */
+
+function makeCart(
+    material
+){
+
+    const group =
+        new THREE.Group();
+
+    const body =
+        box(
+            3.2,
+            1.2,
+            4.2,
+            material,
+            0,
+            1.25,
+            0,
+            group
+        );
+
+    box(
+        2.5,
+        .8,
+        2.1,
+        material,
+        0,
+        2.2,
+        -.25,
+        group
+    );
+
+    const wheelMaterial =
+        MAT.dark;
+
+    [
+        [-1.6,.55,-1.35],
+        [1.6,.55,-1.35],
+        [-1.6,.55,1.35],
+        [1.6,.55,1.35]
+    ]
+    .forEach(
+        pos=>{
+
+            const wheel =
+                new THREE.Mesh(
+                    new THREE.CylinderGeometry(
+                        .48,
+                        .48,
+                        .35,
+                        18
+                    ),
+                    wheelMaterial
+                );
+
+            wheel.rotation.z =
+                Math.PI/2;
+
+            wheel.position.set(
+                ...pos
+            );
+
+            group.add(wheel);
+        }
+    );
+
+    scene.add(group);
+
+    return group;
+}
+
+const playerCart =
+    makeCart(
+        MAT.blue
+    );
+
+const targetCart =
+    makeCart(
+        MAT.red
+    );
+
+/* ======================================================
+   GREEN TARGET ZONE
+====================================================== */
+
+const zone =
+    box(
+        8,
+        .08,
+        8,
+        MAT.green,
+        0,
+        .07,
+        39
+    );
+
+/* ======================================================
+   WALL
+====================================================== */
+
+const wallGroup =
+    new THREE.Group();
+
+scene.add(wallGroup);
+
+wallGroup.position.set(
+    0,
+    0,
+    25
+);
+
+box(
+    14,
+    7,
+    1.3,
+    MAT.wall,
+    0,
+    3.5,
+    0,
+    wallGroup
+);
+
+const bumper =
+    box(
+        9,
+        2.2,
+        1.2,
+        MAT.hard,
+        0,
+        1.7,
+        -1.2,
+        wallGroup
+    );
+
+wallGroup.visible =
+    false;
+
+/* ======================================================
+   MOMENTUM ARROWS
+====================================================== */
+
+const arrowGroup =
+    new THREE.Group();
+
+scene.add(
+    arrowGroup
+);
+
+function clearArrows(){
+
+    while(
+        arrowGroup.children.length
+    ){
+
+        arrowGroup.remove(
+            arrowGroup.children[0]
+        );
+    }
+}
+
+function addMomentumArrow(
+    x,
+    z,
+    length,
+    color,
+    forward=true
+){
+
+    const direction =
+        new THREE.Vector3(
+            0,
+            0,
+            forward ? 1 : -1
+        );
+
+    const arrow =
+        new THREE.ArrowHelper(
+            direction,
+            new THREE.Vector3(
+                x,
+                3.2,
+                z
+            ),
+            Math.max(
+                1.3,
+                Math.min(
+                    7,
+                    length
+                )
+            ),
+            color,
+            .8,
+            .5
+        );
+
+    arrowGroup.add(
+        arrow
+    );
+}
+
+/* ======================================================
+   STATE
+====================================================== */
+
+let started = false;
+let failed = false;
+let finished = false;
+
+let stage = 1;
+let score = 0;
+
+let playerMass = 40;
+let launchSpeed = 9;
+let bumperType = "hard";
+
+let playerVelocity = 0;
+let targetVelocity = 0;
+let combinedVelocity = 0;
+
+let launched = false;
+let collided = false;
+let stageComplete = false;
+
+let retryWaiting = false;
+let retryDelay = 0;
+
+let timerRemaining =
+    STAGE_TIME;
+
+let timerRunning = false;
+
+let lastCollision = {
+
+    initialMomentum:0,
+    targetMomentum:0,
+    impulse:0,
+    force:0,
+    contactTime:0,
+    finalVelocity:0
+};
+
+let maxMomentum = 0;
+let maxImpulse = 0;
+let maxForce = 0;
+
+/* ======================================================
+   BUTTONS
+====================================================== */
+
+const massButtons =
+    [
+        ...document.querySelectorAll(
+            "#massButtons button"
+        )
+    ];
+
+const speedButtons =
+    [
+        ...document.querySelectorAll(
+            "#speedButtons button"
+        )
+    ];
+
+const bumperButtons =
+    [
+        ...document.querySelectorAll(
+            "#bumperButtons button"
+        )
+    ];
+
+function activate(
+    buttons,
+    key,
+    value
+){
+
+    buttons.forEach(
+        button=>{
+
+            button.classList.toggle(
+                "active",
+                String(
+                    button.dataset[key]
+                )===
+                String(value)
+            );
+        }
+    );
+}
+
+massButtons.forEach(
+    button=>{
+
+        button.onclick =
+        ()=>{
+
+            if(launched){
+                return;
+            }
+
+            playerMass =
+                Number(
+                    button.dataset.mass
+                );
+
+            activate(
+                massButtons,
+                "mass",
+                playerMass
+            );
+
+            updateHUD();
+        };
+    }
+);
+
+speedButtons.forEach(
+    button=>{
+
+        button.onclick =
+        ()=>{
+
+            if(launched){
+                return;
+            }
+
+            launchSpeed =
+                Number(
+                    button.dataset.speed
+                );
+
+            activate(
+                speedButtons,
+                "speed",
+                launchSpeed
+            );
+
+            updateHUD();
+        };
+    }
+);
+
+bumperButtons.forEach(
+    button=>{
+
+        button.onclick =
+        ()=>{
+
+            if(launched){
+                return;
+            }
+
+            bumperType =
+                button.dataset.bumper;
+
+            activate(
+                bumperButtons,
+                "bumper",
+                bumperType
+            );
+
+            updateBumperVisual();
+            updateHUD();
+        };
+    }
+);
+
+/* ======================================================
+   START
+====================================================== */
+
+document
+.getElementById(
+    "startButton"
+)
+.onclick =
+()=>{
+
+    started =
+        true;
+
+    document
+    .getElementById(
+        "startScreen"
+    )
+    .style.display =
+        "none";
+
+    prepareStage();
+};
+
+/* ======================================================
+   LAUNCH
+====================================================== */
+
+document
+.getElementById(
+    "launchButton"
+)
+.onclick =
+()=>{
+
+    launchCart();
+};
+
+addEventListener(
+    "keydown",
+    event=>{
+
+        if(
+            event.code==="Space" &&
+            started &&
+            !failed &&
+            !finished
+        ){
+
+            event.preventDefault();
+
+            launchCart();
+        }
+    }
+);
+
+function launchCart(){
+
+    if(
+        !started ||
+        failed ||
+        finished ||
+        stageComplete ||
+        launched ||
+        retryWaiting
+    ){
+
+        return;
+    }
+
+    launched =
+        true;
+
+    collided =
+        false;
+
+    playerVelocity =
+        launchSpeed;
+
+    targetVelocity =
+        0;
+
+    combinedVelocity =
+        0;
+
+    document
+    .getElementById(
+        "launchButton"
+    )
+    .disabled =
+        true;
+
+    const momentum =
+        playerMass*
+        launchSpeed;
+
+    maxMomentum =
+        Math.max(
+            maxMomentum,
+            momentum
+        );
+
+    document
+    .getElementById(
+        "coachText"
+    )
+    .textContent =
+        "Cart launched. Watch the collision result.";
+
+    updateHUD();
+}
+
+/* ======================================================
+   TIMER
+====================================================== */
+
+function startTimer(){
+
+    timerRemaining =
+        STAGE_TIME;
+
+    timerRunning =
+        true;
+
+    updateTimerDisplay();
+}
+
+function pauseTimer(){
+
+    timerRunning =
+        false;
+}
+
+function updateMissionTimer(
+    dt
+){
+
+    if(
+        !started ||
+        failed ||
+        finished ||
+        !timerRunning
+    ){
+
+        return;
+    }
+
+    timerRemaining -=
+        dt;
+
+    if(
+        timerRemaining<=0
+    ){
+
+        timerRemaining =
+            0;
+
+        updateTimerDisplay();
+
+        failMission();
+
+        return;
+    }
+
+    updateTimerDisplay();
+}
+
+function updateTimerDisplay(){
+
+    const element =
+        document.getElementById(
+            "timerValue"
+        );
+
+    element.textContent =
+        Math.ceil(
+            Math.max(
+                0,
+                timerRemaining
+            )
+        );
+
+    element.classList.remove(
+        "warning",
+        "danger"
+    );
+
+    if(
+        timerRemaining<=5
+    ){
+
+        element.classList.add(
+            "danger"
+        );
+    }
+
+    else if(
+        timerRemaining<=10
+    ){
+
+        element.classList.add(
+            "warning"
+        );
+    }
+}
+
+/* ======================================================
+   FAILURE
+====================================================== */
+
+function failMission(){
+
+    if(
+        failed ||
+        finished
+    ){
+        return;
+    }
+
+    failed =
+        true;
+
+    timerRunning =
+        false;
+
+    playerVelocity =
+        0;
+
+    targetVelocity =
+        0;
+
+    combinedVelocity =
+        0;
+
+    document
+    .getElementById(
+        "launchButton"
+    )
+    .disabled =
+        true;
+
+    let reason =
+        "";
+
+    if(
+        stage===1
+    ){
+
+        reason =
+            "The target cart did not stop inside the green delivery zone in time.";
+    }
+
+    else if(
+        stage===2
+    ){
+
+        reason =
+            "A safe collision was not achieved before the timer expired.";
+    }
+
+    else{
+
+        reason =
+            "The perfectly inelastic collision experiment was not completed in time.";
+    }
+
+    document
+    .getElementById(
+        "failureStage"
+    )
+    .innerHTML =
+    `
+    Failed during:<br>
+
+    <b>
+    ${
+        document
+        .getElementById(
+            "stageName"
+        )
+        .textContent
+    }
+    </b><br><br>
+
+    ${reason}<br><br>
+
+    Final score:
+    <b>${score}</b>
+    `;
+
+    document
+    .getElementById(
+        "failure"
+    )
+    .classList.add(
+        "show"
+    );
+}
+
+/* ======================================================
+   STAGES
+====================================================== */
+
+function prepareStage(){
+
+    stageComplete =
+        false;
+
+    launched =
+        false;
+
+    collided =
+        false;
+
+    retryWaiting =
+        false;
+
+    retryDelay =
+        0;
+
+    playerVelocity =
+        0;
+
+    targetVelocity =
+        0;
+
+    combinedVelocity =
+        0;
+
+    clearArrows();
+
+    lastCollision = {
+        initialMomentum:0,
+        targetMomentum:0,
+        impulse:0,
+        force:0,
+        contactTime:0,
+        finalVelocity:0
+    };
+
+    document
+    .getElementById(
+        "launchButton"
+    )
+    .disabled =
+        false;
+
+    document
+    .getElementById(
+        "bumperGroup"
+    )
+    .style.display =
+        stage===2
+        ?
+        "block"
+        :
+        "none";
+
+    /* ----------------------------------------------
+       STAGE 1
+    ---------------------------------------------- */
+
+    if(
+        stage===1
+    ){
+
+        playerCart.visible =
+            true;
+
+        targetCart.visible =
+            true;
+
+        wallGroup.visible =
+            false;
+
+        zone.visible =
+            true;
+
+        playerCart.position.set(
+            0,
+            0,
+            -8
+        );
+
+        targetCart.position.set(
+            0,
+            0,
+            18
+        );
+
+        document
+        .getElementById(
+            "stageName"
+        )
+        .textContent =
+            "Stage 1 - Momentum Transfer";
+
+        document
+        .getElementById(
+            "stageObjective"
+        )
+        .textContent =
+            "Hit the target cart and make it stop inside the green zone before time runs out.";
+
+        document
+        .getElementById(
+            "coachTitle"
+        )
+        .textContent =
+            "MOMENTUM TRANSFER";
+
+        document
+        .getElementById(
+            "coachText"
+        )
+        .textContent =
+            "Choose mass and speed carefully. Too little momentum stops short; too much overshoots.";
+
+        document
+        .getElementById(
+            "coachFormula"
+        )
+        .textContent =
+            "Momentum: p = mv";
+    }
+
+    /* ----------------------------------------------
+       STAGE 2
+    ---------------------------------------------- */
+
+    else if(
+        stage===2
+    ){
+
+        playerCart.visible =
+            true;
+
+        targetCart.visible =
+            false;
+
+        wallGroup.visible =
+            true;
+
+        zone.visible =
+            false;
+
+        playerCart.position.set(
+            0,
+            0,
+            -7
+        );
+
+        document
+        .getElementById(
+            "stageName"
+        )
+        .textContent =
+            "Stage 2 - Impulse Safety";
+
+        document
+        .getElementById(
+            "stageObjective"
+        )
+        .textContent =
+            "Hit the barrier with average collision force below 1500 N before time runs out.";
+
+        document
+        .getElementById(
+            "coachTitle"
+        )
+        .textContent =
+            "IMPULSE";
+
+        document
+        .getElementById(
+            "coachText"
+        )
+        .textContent =
+            "For the same momentum change, increasing collision time reduces average force.";
+
+        document
+        .getElementById(
+            "coachFormula"
+        )
+        .textContent =
+            "Impulse = Δp = Favg × Δt";
+    }
+
+    /* ----------------------------------------------
+       STAGE 3
+    ---------------------------------------------- */
+
+    else{
+
+        playerCart.visible =
+            true;
+
+        targetCart.visible =
+            true;
+
+        wallGroup.visible =
+            false;
+
+        zone.visible =
+            false;
+
+        playerCart.position.set(
+            0,
+            0,
+            -8
+        );
+
+        targetCart.position.set(
+            0,
+            0,
+            18
+        );
+
+        document
+        .getElementById(
+            "stageName"
+        )
+        .textContent =
+            "Stage 3 - Perfectly Inelastic Collision";
+
+        document
+        .getElementById(
+            "stageObjective"
+        )
+        .textContent =
+            "Collide with the target cart, stick together and complete the momentum experiment before time expires.";
+
+        document
+        .getElementById(
+            "coachTitle"
+        )
+        .textContent =
+            "PERFECTLY INELASTIC COLLISION";
+
+        document
+        .getElementById(
+            "coachText"
+        )
+        .textContent =
+            "After collision the two carts move together with one shared velocity.";
+
+        document
+        .getElementById(
+            "coachFormula"
+        )
+        .textContent =
+            "m₁u₁ + m₂u₂ = (m₁+m₂)v";
+    }
+
+    updateBumperVisual();
+
+    updateHUD();
+
+    startTimer();
+}
+
+/* ======================================================
+   RETRY WITHOUT RESETTING TIMER
+====================================================== */
+
+function scheduleRetry(
+    message
+){
+
+    playerVelocity =
+        0;
+
+    targetVelocity =
+        0;
+
+    combinedVelocity =
+        0;
+
+    launched =
+        false;
+
+    collided =
+        false;
+
+    retryWaiting =
+        true;
+
+    retryDelay =
+        1.2;
+
+    document
+    .getElementById(
+        "launchButton"
+    )
+    .disabled =
+        true;
+
+    document
+    .getElementById(
+        "coachTitle"
+    )
+    .textContent =
+        "TRY AGAIN";
+
+    document
+    .getElementById(
+        "coachText"
+    )
+    .textContent =
+        message;
+}
+
+function resetAttemptOnly(){
+
+    retryWaiting =
+        false;
+
+    clearArrows();
+
+    lastCollision = {
+        initialMomentum:0,
+        targetMomentum:0,
+        impulse:0,
+        force:0,
+        contactTime:0,
+        finalVelocity:0
+    };
+
+    if(
+        stage===1
+    ){
+
+        playerCart.position.set(
+            0,0,-8
+        );
+
+        targetCart.position.set(
+            0,0,18
+        );
+
+        document
+        .getElementById(
+            "coachTitle"
+        )
+        .textContent =
+            "MOMENTUM TRANSFER";
+
+        document
+        .getElementById(
+            "coachText"
+        )
+        .textContent =
+            "Adjust mass or speed and launch again. The mission timer is still running.";
+    }
+
+    else if(
+        stage===2
+    ){
+
+        playerCart.position.set(
+            0,0,-7
+        );
+
+        document
+        .getElementById(
+            "coachTitle"
+        )
+        .textContent =
+            "IMPULSE";
+
+        document
+        .getElementById(
+            "coachText"
+        )
+        .textContent =
+            "Adjust mass, speed or bumper and retry. The timer is still running.";
+    }
+
+    document
+    .getElementById(
+        "launchButton"
+    )
+    .disabled =
+        false;
+
+    updateHUD();
+}
+
+/* ======================================================
+   STAGE 1 PHYSICS
+====================================================== */
+
+function updateStage1(
+    dt
+){
+
+    if(
+        !launched ||
+        retryWaiting
+    ){
+        return;
+    }
+
+    if(
+        !collided
+    ){
+
+        playerCart.position.z +=
+            playerVelocity*
+            dt;
+
+        if(
+            playerCart.position.z>=
+            targetCart.position.z-3.7
+        ){
+
+            const m1 =
+                playerMass;
+
+            const m2 =
+                TARGET_MASS;
+
+            const u1 =
+                playerVelocity;
+
+            const initialMomentum =
+                m1*u1;
+
+            const v1 =
+                (
+                    (m1-m2)/
+                    (m1+m2)
+                )*
+                u1;
+
+            const v2 =
+                (
+                    2*m1/
+                    (m1+m2)
+                )*
+                u1;
+
+            playerVelocity =
+                Math.max(
+                    0,
+                    v1
+                );
+
+            targetVelocity =
+                v2;
+
+            collided =
+                true;
+
+            lastCollision.initialMomentum =
+                initialMomentum;
+
+            lastCollision.targetMomentum =
+                m2*v2;
+
+            lastCollision.impulse =
+                Math.abs(
+                    m2*v2
+                );
+
+            lastCollision.finalVelocity =
+                v2;
+
+            maxImpulse =
+                Math.max(
+                    maxImpulse,
+                    lastCollision.impulse
+                );
+
+            clearArrows();
+
+            addMomentumArrow(
+                0,
+                playerCart.position.z,
+                initialMomentum/60,
+                0x4edcff,
+                true
+            );
+
+            addMomentumArrow(
+                0,
+                targetCart.position.z,
+                Math.abs(
+                    m2*v2
+                )/60,
+                0xffd85a,
+                true
+            );
+        }
+    }
+
+    else{
+
+        if(
+            playerVelocity>0
+        ){
+
+            playerCart.position.z +=
+                playerVelocity*
+                dt;
+
+            playerVelocity =
+                Math.max(
+                    0,
+                    playerVelocity-
+                    1.2*dt
+                );
+        }
+
+        if(
+            targetVelocity>0
+        ){
+
+            targetCart.position.z +=
+                targetVelocity*
+                dt;
+
+            targetVelocity =
+                Math.max(
+                    0,
+                    targetVelocity-
+                    1.8*dt
+                );
+        }
+
+        if(
+            targetVelocity<=.03
+        ){
+
+            targetVelocity =
+                0;
+
+            const z =
+                targetCart.position.z;
+
+            if(
+                z>=35 &&
+                z<=43
+            ){
+
+                completeStage(
+
+                    "TARGET DELIVERED!",
+
+                    `
+                    Player mass =
+                    <b>${playerMass} kg</b><br>
+
+                    Launch speed =
+                    <b>${launchSpeed} m/s</b><br><br>
+
+                    Initial momentum:<br>
+
+                    p =
+                    mv<br>
+
+                    =
+                    ${playerMass}
+                    ×
+                    ${launchSpeed}<br>
+
+                    =
+                    <b>
+                    ${(playerMass*launchSpeed).toFixed(1)}
+                    kg·m/s
+                    </b><br><br>
+
+                    After the collision,
+                    momentum was transferred to the red target cart.
+
+                    The target finally stopped at
+                    <b>${z.toFixed(1)} m</b>
+                    inside the green delivery zone.
+                    `
+                );
+            }
+
+            else{
+
+                scheduleRetry(
+                    z<35
+                    ?
+                    `Target stopped short at ${z.toFixed(1)} m. Increase useful momentum.`
+                    :
+                    `Target overshot to ${z.toFixed(1)} m. Reduce useful momentum.`
+                );
+            }
+        }
+    }
+}
+
+/* ======================================================
+   STAGE 2 PHYSICS
+====================================================== */
+
+function updateStage2(
+    dt
+){
+
+    if(
+        !launched ||
+        retryWaiting ||
+        collided
+    ){
+        return;
+    }
+
+    playerCart.position.z +=
+        playerVelocity*
+        dt;
+
+    if(
+        playerCart.position.z>=
+        21.5
+    ){
+
+        collided =
+            true;
+
+        const momentumBefore =
+            playerMass*
+            playerVelocity;
+
+        const impulse =
+            Math.abs(
+                0-
+                momentumBefore
+            );
+
+        const contactTime =
+            BUMPER_DATA[
+                bumperType
+            ].contactTime;
+
+        const force =
+            impulse/
+            contactTime;
+
+        lastCollision = {
+
+            initialMomentum:
+                momentumBefore,
+
+            targetMomentum:
+                0,
+
+            impulse,
+
+            force,
+
+            contactTime,
+
+            finalVelocity:
+                0
+        };
+
+        maxImpulse =
+            Math.max(
+                maxImpulse,
+                impulse
+            );
+
+        maxForce =
+            Math.max(
+                maxForce,
+                force
+            );
+
+        playerVelocity =
+            0;
+
+        clearArrows();
+
+        addMomentumArrow(
+            0,
+            playerCart.position.z,
+            momentumBefore/60,
+            0xffd85a,
+            true
+        );
+
+        if(
+            force<1500
+        ){
+
+            completeStage(
+
+                "SAFE IMPACT!",
+
+                `
+                Cart mass =
+                <b>${playerMass} kg</b><br>
+
+                Impact speed =
+                <b>${launchSpeed} m/s</b><br>
+
+                Protection =
+                <b>${BUMPER_DATA[bumperType].label}</b><br><br>
+
+                Momentum before impact:<br>
+
+                p =
+                mv<br>
+
+                =
+                ${playerMass}
+                ×
+                ${launchSpeed}<br>
+
+                =
+                <b>
+                ${momentumBefore.toFixed(1)}
+                kg·m/s
+                </b><br><br>
+
+                Impulse:<br>
+
+                J =
+                Δp =
+                <b>
+                ${impulse.toFixed(1)}
+                N·s
+                </b><br><br>
+
+                Average force:<br>
+
+                F =
+                J / Δt<br>
+
+                =
+                ${impulse.toFixed(1)}
+                /
+                ${contactTime.toFixed(2)}<br>
+
+                =
+                <b>
+                ${force.toFixed(0)} N
+                </b><br><br>
+
+                Safety limit =
+                <b>1500 N</b>.
+
+                Your impact stayed below the limit.
+                `
+            );
+        }
+
+        else{
+
+            scheduleRetry(
+                `Impact force was ${force.toFixed(0)} N — above the 1500 N safety limit. Increase impact time or reduce momentum.`
+            );
+        }
+    }
+}
+
+/* ======================================================
+   STAGE 3 PHYSICS
+====================================================== */
+
+function updateStage3(
+    dt
+){
+
+    if(
+        !launched ||
+        retryWaiting
+    ){
+        return;
+    }
+
+    if(
+        !collided
+    ){
+
+        playerCart.position.z +=
+            playerVelocity*
+            dt;
+
+        if(
+            playerCart.position.z>=
+            targetCart.position.z-3.7
+        ){
+
+            collided =
+                true;
+
+            const m1 =
+                playerMass;
+
+            const m2 =
+                TARGET_MASS;
+
+            const u1 =
+                playerVelocity;
+
+            const initialMomentum =
+                m1*u1;
+
+            combinedVelocity =
+                initialMomentum/
+                (m1+m2);
+
+            lastCollision = {
+
+                initialMomentum,
+
+                targetMomentum:
+                    m2*
+                    combinedVelocity,
+
+                impulse:
+                    Math.abs(
+                        m2*
+                        combinedVelocity
+                    ),
+
+                force:0,
+
+                contactTime:0,
+
+                finalVelocity:
+                    combinedVelocity
+            };
+
+            maxImpulse =
+                Math.max(
+                    maxImpulse,
+                    lastCollision.impulse
+                );
+
+            playerVelocity =
+                0;
+
+            targetVelocity =
+                0;
+
+            clearArrows();
+
+            addMomentumArrow(
+                0,
+                targetCart.position.z,
+                initialMomentum/60,
+                0x58e2ff,
+                true
+            );
+        }
+    }
+
+    else{
+
+        targetCart.position.z +=
+            combinedVelocity*
+            dt;
+
+        playerCart.position.z =
+            targetCart.position.z-
+            3.3;
+
+        combinedVelocity =
+            Math.max(
+                0,
+                combinedVelocity-
+                1.25*dt
+            );
+
+        if(
+            combinedVelocity<=.03
+        ){
+
+            combinedVelocity =
+                0;
+
+            const initialMomentum =
+                playerMass*
+                launchSpeed;
+
+            const sharedVelocity =
+                initialMomentum/
+                (
+                    playerMass+
+                    TARGET_MASS
+                );
+
+            completeStage(
+
+                "CARTS MOVED TOGETHER!",
+
+                `
+                Player mass =
+                <b>${playerMass} kg</b><br>
+
+                Target mass =
+                <b>${TARGET_MASS} kg</b><br>
+
+                Player initial speed =
+                <b>${launchSpeed} m/s</b><br><br>
+
+                Before collision:<br>
+
+                p =
+                m₁u₁<br>
+
+                =
+                ${playerMass}
+                ×
+                ${launchSpeed}<br>
+
+                =
+                <b>
+                ${initialMomentum.toFixed(1)}
+                kg·m/s
+                </b><br><br>
+
+                Perfectly inelastic collision:<br>
+
+                m₁u₁ =
+                (m₁+m₂)v<br><br>
+
+                v =
+                ${initialMomentum.toFixed(1)}
+                /
+                ${
+                    playerMass+
+                    TARGET_MASS
+                }<br>
+
+                =
+                <b>
+                ${sharedVelocity.toFixed(2)}
+                m/s
+                </b><br><br>
+
+                The carts moved together after impact,
+                which is the defining behaviour of a
+                perfectly inelastic collision.
+                `
+            );
+        }
+    }
+}
+
+/* ======================================================
+   COMPLETE STAGE
+====================================================== */
+
+function completeStage(
+    title,
+    explanation
+){
+
+    if(
+        stageComplete
+    ){
+        return;
+    }
+
+    stageComplete =
+        true;
+
+    launched =
+        false;
+
+    pauseTimer();
+
+    score +=
+        100;
+
+    updateScore();
+
+    document
+    .getElementById(
+        "launchButton"
+    )
+    .disabled =
+        true;
+
+    showStageResult(
+        title,
+        explanation
+    );
+}
+
+/* ======================================================
+   QUESTIONS
+====================================================== */
+
+function randomItem(
+    array
+){
+
+    return array[
+        Math.floor(
+            Math.random()*
+            array.length
+        )
+    ];
+}
+
+function shuffle(
+    array
+){
+
+    const copy =
+        [...array];
+
+    for(
+        let i=
+            copy.length-1;
+
+        i>0;
+
+        i--
+    ){
+
+        const j =
+            Math.floor(
+                Math.random()*
+                (i+1)
+            );
+
+        [
+            copy[i],
+            copy[j]
+        ]=[
+            copy[j],
+            copy[i]
+        ];
+    }
+
+    return copy;
+}
+
+function optionSet(
+    correct,
+    wrong1,
+    wrong2
+){
+
+    const list =
+        shuffle([
+            correct,
+            wrong1,
+            wrong2
+        ]);
+
+    return {
+
+        list,
+
+        correct:
+            list.indexOf(
+                correct
+            )
+    };
+}
+
+function momentumQuestion(){
+
+    const mass =
+        randomItem([
+            20,
+            40,
+            60
+        ]);
+
+    const speed =
+        randomItem([
+            3,
+            6,
+            9
+        ]);
+
+    const momentum =
+        mass*
+        speed;
+
+    const answer =
+        momentum+
+        " kg·m/s";
+
+    const options =
+        optionSet(
+            answer,
+            mass+
+            " kg·m/s",
+            speed+
+            " kg·m/s"
+        );
+
+    return {
+
+        q:
+        `A ${mass} kg cart moves at ${speed} m/s. What is its momentum?`,
+
+        hint:
+        "Use p = mv.",
+
+        answers:
+            options.list,
+
+        correct:
+            options.correct,
+
+        explanation:
+        `
+        <b>Momentum</b><br>
+
+        p =
+        mv<br><br>
+
+        =
+        ${mass}
+        ×
+        ${speed}<br><br>
+
+        =
+        <b>
+        ${momentum}
+        kg·m/s
+        </b>.
+        `
+    };
+}
+
+function impulseQuestion(){
+
+    return {
+
+        q:
+        "For the same change in momentum, what reduces average collision force?",
+
+        hint:
+        "Use J = FΔt.",
+
+        answers:[
+            "Increasing collision time",
+            "Decreasing collision time",
+            "Increasing mass without changing anything else"
+        ],
+
+        correct:0,
+
+        explanation:
+        `
+        Impulse is:<br><br>
+
+        <b>
+        J = Favg × Δt
+        </b><br><br>
+
+        For the same impulse,
+        increasing the collision time means
+        the average force can be smaller.
+
+        This is why soft padding and crumple zones
+        reduce impact force.
+        `
+    };
+}
+
+function inelasticQuestion(){
+
+    return {
+
+        q:
+        "What defines a perfectly inelastic collision?",
+
+        hint:
+        "Think about what the objects do after impact.",
+
+        answers:[
+            "The objects stick together",
+            "Both objects must stop instantly",
+            "Momentum becomes zero"
+        ],
+
+        correct:0,
+
+        explanation:
+        `
+        In a perfectly inelastic collision,
+        the objects
+        <b>stick together</b>
+        and move with one common velocity immediately after impact.
+
+        Momentum is conserved for the isolated collision,
+        while kinetic energy is not fully conserved.
+        `
+    };
+}
+
+function questionForStage(){
+
+    if(
+        stage===1
+    ){
+        return momentumQuestion();
+    }
+
+    if(
+        stage===2
+    ){
+        return impulseQuestion();
+    }
+
+    return inelasticQuestion();
+}
+
+/* ======================================================
+   RESULT
+====================================================== */
+
+function showStageResult(
+    title,
+    explanation
+){
+
+    const resultBox =
+        document.getElementById(
+            "resultBox"
+        );
+
+    document
+    .getElementById(
+        "resultTitle"
+    )
+    .textContent =
+        title;
+
+    document
+    .getElementById(
+        "resultText"
+    )
+    .innerHTML =
+        explanation;
+
+    const question =
+        questionForStage();
+
+    document
+    .getElementById(
+        "question"
+    )
+    .textContent =
+        question.q;
+
+    document
+    .getElementById(
+        "questionHint"
+    )
+    .textContent =
+        question.hint;
+
+    const answers =
+        document.getElementById(
+            "answers"
+        );
+
+    const feedback =
+        document.getElementById(
+            "feedback"
+        );
+
+    const next =
+        document.getElementById(
+            "nextBtn"
+        );
+
+    answers.innerHTML =
+        "";
+
+    feedback.style.display =
+        "none";
+
+    next.style.display =
+        "none";
+
+    question.answers.forEach(
+        (answer,index)=>{
+
+            const button =
+                document.createElement(
+                    "button"
+                );
+
+            button.className =
+                "answer";
+
+            button.textContent =
+                answer;
+
+            button.onclick =
+            ()=>{
+
+                answers
+                .querySelectorAll(
+                    "button"
+                )
+                .forEach(
+                    item=>
+                    item.disabled=
+                        true
+                );
+
+                feedback.style.display =
+                    "block";
+
+                if(
+                    index===
+                    question.correct
+                ){
+
+                    button.classList.add(
+                        "correct"
+                    );
+
+                    score +=
+                        50;
+
+                    feedback.innerHTML =
+                    `
+                    <b>
+                    CORRECT +50 POINTS
+                    </b><br><br>
+
+                    ${question.explanation}
+                    `;
+                }
+
+                else{
+
+                    button.classList.add(
+                        "wrong"
+                    );
+
+                    feedback.innerHTML =
+                    `
+                    <b>
+                    NOT CORRECT
+                    </b><br><br>
+
+                    ${question.explanation}
+                    `;
+                }
+
+                updateScore();
+
+                next.style.display =
+                    "block";
+            };
+
+            answers.appendChild(
+                button
+            );
+        }
+    );
+
+    next.textContent =
+        stage<3
+        ?
+        "NEXT EXPERIMENT"
+        :
+        "VIEW FINAL PHYSICS REPORT";
+
+    next.onclick =
+    ()=>{
+
+        resultBox
+        .classList
+        .remove(
+            "show"
+        );
+
+        if(
+            stage<3
+        ){
+
+            stage++;
+
+            prepareStage();
+        }
+
+        else{
+
+            finishGame();
+        }
+    };
+
+    resultBox
+    .classList
+    .add(
+        "show"
+    );
+}
+
+/* ======================================================
+   BUMPER
+====================================================== */
+
+function updateBumperVisual(){
+
+    bumper.material =
+        MAT[
+            bumperType
+        ];
+}
+
+/* ======================================================
+   HUD
+====================================================== */
+
+function updateHUD(){
+
+    let displayedVelocity =
+        0;
+
+    if(
+        stage===3 &&
+        collided
+    ){
+
+        displayedVelocity =
+            combinedVelocity;
+    }
+
+    else{
+
+        displayedVelocity =
+            playerVelocity;
+    }
+
+    const momentum =
+        playerMass*
+        displayedVelocity;
+
+    const targetMomentum =
+        stage===3 &&
+        collided
+        ?
+        TARGET_MASS*
+        combinedVelocity
+        :
+        TARGET_MASS*
+        targetVelocity;
+
+    document
+    .getElementById(
+        "massValue"
+    )
+    .textContent =
+        playerMass;
+
+    document
+    .getElementById(
+        "velocityValue"
+    )
+    .textContent =
+        displayedVelocity
+        .toFixed(2);
+
+    document
+    .getElementById(
+        "momentumValue"
+    )
+    .textContent =
+        momentum
+        .toFixed(2);
+
+    document
+    .getElementById(
+        "targetMomentumValue"
+    )
+    .textContent =
+        targetMomentum
+        .toFixed(2);
+
+    document
+    .getElementById(
+        "impulseValue"
+    )
+    .textContent =
+        lastCollision
+        .impulse
+        .toFixed(2);
+
+    document
+    .getElementById(
+        "forceValue"
+    )
+    .textContent =
+        lastCollision
+        .force
+        .toFixed(0);
+
+    let progress =
+        0;
+
+    if(
+        stage===1
+    ){
+
+        progress =
+            THREE.MathUtils.clamp(
+                (
+                    targetCart.position.z-
+                    18
+                )/
+                (
+                    39-
+                    18
+                )*
+                100,
+                0,
+                100
+            );
+    }
+
+    else if(
+        stage===2
+    ){
+
+        progress =
+            THREE.MathUtils.clamp(
+                (
+                    playerCart.position.z+
+                    7
+                )/
+                (
+                    21.5+
+                    7
+                )*
+                100,
+                0,
+                100
+            );
+    }
+
+    else{
+
+        progress =
+            collided
+            ?
+            100
+            :
+            THREE.MathUtils.clamp(
+                (
+                    playerCart.position.z+
+                    8
+                )/
+                26*
+                100,
+                0,
+                100
+            );
+    }
+
+    document
+    .getElementById(
+        "progressFill"
+    )
+    .style.width =
+        progress+
+        "%";
+
+    document
+    .getElementById(
+        "progressPercent"
+    )
+    .textContent =
+        Math.round(
+            progress
+        )+
+        "%";
+
+    if(
+        stage===1
+    ){
+
+        document
+        .getElementById(
+            "equation"
+        )
+        .innerHTML =
+        `
+        <b>Momentum</b><br>
+
+        p = mv<br><br>
+
+        p =
+        ${playerMass}
+        ×
+        ${
+            launched
+            ?
+            launchSpeed
+            :
+            0
+        }<br>
+
+        =
+        <b>
+        ${
+            launched
+            ?
+            (
+                playerMass*
+                launchSpeed
+            ).toFixed(1)
+            :
+            "0.0"
+        }
+        kg·m/s
+        </b>
+        `;
+    }
+
+    else if(
+        stage===2
+    ){
+
+        const dt =
+            BUMPER_DATA[
+                bumperType
+            ].contactTime;
+
+        document
+        .getElementById(
+            "equation"
+        )
+        .innerHTML =
+        `
+        <b>Impulse</b><br>
+
+        J =
+        Δp =
+        Favg × Δt<br><br>
+
+        Protection =
+        ${BUMPER_DATA[bumperType].label}<br>
+
+        Contact time =
+        ${dt.toFixed(2)} s
+        `;
+    }
+
+    else{
+
+        const shared =
+            (
+                playerMass*
+                launchSpeed
+            )/
+            (
+                playerMass+
+                TARGET_MASS
+            );
+
+        document
+        .getElementById(
+            "equation"
+        )
+        .innerHTML =
+        `
+        <b>Perfectly Inelastic</b><br>
+
+        m₁u₁ =
+        (m₁+m₂)v<br><br>
+
+        v =
+        ${
+            playerMass*
+            launchSpeed
+        } /
+        ${
+            playerMass+
+            TARGET_MASS
+        }<br>
+
+        =
+        <b>
+        ${shared.toFixed(2)}
+        m/s
+        </b>
+        `;
+    }
+}
+
+function updateScore(){
+
+    document
+    .getElementById(
+        "score"
+    )
+    .textContent =
+        score;
+}
+
+/* ======================================================
+   CAMERA
+====================================================== */
+
+function updateCamera(){
+
+    let followZ =
+        playerCart.position.z;
+
+    if(
+        stage===1 &&
+        collided
+    ){
+
+        followZ =
+            targetCart.position.z;
+    }
+
+    else if(
+        stage===3 &&
+        collided
+    ){
+
+        followZ =
+            targetCart.position.z;
+    }
+
+    camera.position.set(
+        13,
+        9,
+        followZ-
+        16
+    );
+
+    camera.lookAt(
+        0,
+        1.3,
+        followZ+
+        7
+    );
+}
+
+/* ======================================================
+   FINAL
+====================================================== */
+
+function finishGame(){
+
+    finished =
+        true;
+
+    pauseTimer();
+
+    document
+    .getElementById(
+        "finalMomentum"
+    )
+    .textContent =
+        maxMomentum.toFixed(0)+
+        " kg·m/s";
+
+    document
+    .getElementById(
+        "finalImpulse"
+    )
+    .textContent =
+        maxImpulse.toFixed(0)+
+        " N·s";
+
+    document
+    .getElementById(
+        "finalForce"
+    )
+    .textContent =
+        maxForce.toFixed(0)+
+        " N";
+
+    document
+    .getElementById(
+        "finalScore"
+    )
+    .textContent =
+        score;
+
+    document
+    .getElementById(
+        "finalExplanation"
+    )
+    .innerHTML =
+    `
+    <b>
+    1. MOMENTUM
+    </b><br><br>
+
+    Momentum depends on both mass and velocity:<br><br>
+
+    <b>
+    p = mv
+    </b><br><br>
+
+    A heavier or faster cart carries more momentum.
+
+    In the first mission you had to control momentum carefully:
+    too little momentum left the target short of the delivery zone,
+    while too much momentum caused it to overshoot.<br><br>
+
+
+    <b>
+    2. MOMENTUM TRANSFER
+    </b><br><br>
+
+    During a collision,
+    interacting objects exchange momentum.
+
+    The moving blue cart transferred momentum
+    to the initially stationary red cart.<br><br>
+
+
+    <b>
+    3. IMPULSE
+    </b><br><br>
+
+    Impulse equals change in momentum:<br><br>
+
+    <b>
+    J = Δp
+    </b><br><br>
+
+    Impulse is also related to force and collision time:<br><br>
+
+    <b>
+    J = Favg × Δt
+    </b>.<br><br>
+
+
+    <b>
+    4. COLLISION SAFETY
+    </b><br><br>
+
+    For the same change in momentum,
+    increasing collision time reduces average force.
+
+    This is the principle demonstrated by the
+    HARD, SOFT and FOAM impact systems.<br><br>
+
+
+    <b>
+    5. PERFECTLY INELASTIC COLLISION
+    </b><br><br>
+
+    In the final experiment,
+    the two carts stuck together after collision
+    and moved with one shared velocity.<br><br>
+
+    The relationship used was:<br><br>
+
+    <b>
+    m₁u₁ + m₂u₂ =
+    (m₁+m₂)v
+    </b>.<br><br>
+
+
+    <b>
+    TIMED MISSION CONNECTION
+    </b><br><br>
+
+    Each experiment had to be completed within
+    <b>${STAGE_TIME} seconds</b>.
+
+    If the required destination or safe collision condition
+    was not achieved before the timer reached zero,
+    the mission failed.<br><br>
+
+
+    <b>
+    FINAL CONNECTION
+    </b><br>
+
+    Mass and velocity determine momentum.<br>
+
+    Collisions transfer momentum.<br>
+
+    Impulse measures momentum change.<br>
+
+    Longer collision time can reduce average impact force.<br>
+
+    In perfectly inelastic collisions,
+    objects move together after impact.
+    `;
+
+    document
+    .getElementById(
+        "finish"
+    )
+    .classList.add(
+        "show"
+    );
+}
+
+/* ======================================================
+   UPDATE
+====================================================== */
+
+function updatePhysics(
+    dt
+){
+
+    if(
+        retryWaiting
+    ){
+
+        retryDelay -=
+            dt;
+
+        if(
+            retryDelay<=0
+        ){
+
+            resetAttemptOnly();
+        }
+
+        return;
+    }
+
+    if(
+        stageComplete ||
+        failed ||
+        finished
+    ){
+
+        return;
+    }
+
+    if(
+        stage===1
+    ){
+
+        updateStage1(
+            dt
+        );
+    }
+
+    else if(
+        stage===2
+    ){
+
+        updateStage2(
+            dt
+        );
+    }
+
+    else{
+
+        updateStage3(
+            dt
+        );
+    }
+}
+
+/* ======================================================
+   LOOP
+====================================================== */
+
+let lastTime =
+    performance.now();
+
+function animate(
+    now
+){
+
+    requestAnimationFrame(
+        animate
+    );
+
+    const dt =
+        Math.min(
+            (
+                now-
+                lastTime
+            )/
+            1000,
+            .035
+        );
+
+    lastTime =
+        now;
+
+    if(
+        started &&
+        !failed &&
+        !finished
+    ){
+
+        updateMissionTimer(
+            dt
+        );
+
+        updatePhysics(
+            dt
+        );
+    }
+
+    updateHUD();
+
+    updateCamera();
+
+    renderer.render(
+        scene,
+        camera
+    );
+}
+
+/* ======================================================
+   INITIAL
+====================================================== */
+
+playerCart.position.set(
+    0,0,-8
+);
+
+targetCart.position.set(
+    0,0,18
+);
+
+updateBumperVisual();
+
+updateScore();
+
+updateTimerDisplay();
+
+updateHUD();
+
+updateCamera();
+
+requestAnimationFrame(
+    animate
+);
+
+/* ======================================================
+   RESIZE
+====================================================== */
+
+addEventListener(
+    "resize",
+    ()=>{
+
+        camera.aspect =
+            innerWidth/
+            innerHeight;
+
+        camera.updateProjectionMatrix();
+
+        renderer.setSize(
+            innerWidth,
+            innerHeight
+        );
+    }
+);
+
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,7242 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Forces & Newton's Laws | My Campus
+    </title>
+
+
+    <!-- THREE.JS FOR REAL 3D -->
+    <script
+        src="assets/vendor/three-0.160.1.min.js"
+    ></script>
+
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+
+        :root {
+            --bg: #f4f7fb;
+            --surface: #ffffff;
+
+            --text: #172033;
+            --muted: #64748b;
+            --border: #e2e8f0;
+
+            --primary: #4f46e5;
+            --primary-dark: #3730a3;
+            --primary-soft: #eef2ff;
+
+            --success: #16a34a;
+            --success-soft: #ecfdf5;
+
+            --danger: #dc2626;
+            --danger-soft: #fef2f2;
+
+            --warning: #ea580c;
+            --warning-soft: #fff7ed;
+
+            --blue-soft: #eff6ff;
+
+            --shadow:
+                0 18px 50px
+                rgba(15,23,42,0.08);
+        }
+
+
+        body {
+            min-height: 100vh;
+
+            background:
+                radial-gradient(
+                    circle at top left,
+                    #eef2ff,
+                    transparent 36%
+                ),
+                var(--bg);
+
+            color: var(--text);
+
+            font-family:
+                Inter,
+                system-ui,
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                sans-serif;
+        }
+
+
+        button,
+        input {
+            font: inherit;
+        }
+
+
+        button {
+            cursor: pointer;
+        }
+
+
+        /* =====================================================
+           HEADER
+        ====================================================== */
+
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            padding: 15px 28px;
+
+            background:
+                rgba(255,255,255,0.95);
+
+            backdrop-filter: blur(14px);
+
+            border-bottom:
+                1px solid var(--border);
+        }
+
+
+        .brand-wrap {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+
+        .back-btn {
+            width: 42px;
+            height: 42px;
+
+            border:
+                1px solid var(--border);
+
+            border-radius: 12px;
+
+            background: white;
+
+            font-size: 20px;
+        }
+
+
+        .brand h1 {
+            font-size: 18px;
+            font-weight: 850;
+        }
+
+
+        .brand p {
+            margin-top: 3px;
+
+            color: var(--muted);
+
+            font-size: 12px;
+        }
+
+
+        .topic-pill {
+            padding: 9px 13px;
+
+            border-radius: 999px;
+
+            background:
+                var(--primary-soft);
+
+            color:
+                var(--primary-dark);
+
+            font-size: 12px;
+            font-weight: 850;
+        }
+
+
+        /* =====================================================
+           PAGE
+        ====================================================== */
+
+        .page {
+            width:
+                min(
+                    1320px,
+                    calc(100% - 30px)
+                );
+
+            margin:
+                28px auto 70px;
+        }
+
+
+        /* =====================================================
+           HERO
+        ====================================================== */
+
+        .hero {
+            padding: 31px;
+
+            border-radius: 27px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #1e1b4b,
+                    #4338ca 52%,
+                    #7c3aed
+                );
+
+            color: white;
+
+            box-shadow: var(--shadow);
+        }
+
+
+        .hero-badge {
+            display: inline-block;
+
+            padding: 7px 11px;
+
+            border-radius: 999px;
+
+            background:
+                rgba(255,255,255,0.14);
+
+            border:
+                1px solid
+                rgba(255,255,255,0.20);
+
+            font-size: 11px;
+            font-weight: 900;
+        }
+
+
+        .hero h2 {
+            margin-top: 15px;
+
+            font-size:
+                clamp(
+                    30px,
+                    4vw,
+                    47px
+                );
+        }
+
+
+        .hero p {
+            max-width: 850px;
+
+            margin-top: 12px;
+
+            color:
+                rgba(255,255,255,0.83);
+
+            line-height: 1.7;
+        }
+
+
+        /* =====================================================
+           TABS
+        ====================================================== */
+
+        .tabs {
+            display: grid;
+
+            grid-template-columns:
+                repeat(3,1fr);
+
+            gap: 12px;
+
+            margin-top: 22px;
+        }
+
+
+        .tab-btn {
+            min-height: 57px;
+
+            padding: 15px;
+
+            border:
+                1px solid var(--border);
+
+            border-radius: 15px;
+
+            background: white;
+
+            color: var(--text);
+
+            font-weight: 850;
+        }
+
+
+        .tab-btn.active {
+            border-color: #a5b4fc;
+
+            background:
+                var(--primary-soft);
+
+            color:
+                var(--primary-dark);
+        }
+
+
+        /* =====================================================
+           LAB
+        ====================================================== */
+
+        .lab {
+            display: none;
+
+            grid-template-columns:
+                minmax(0,1.55fr)
+                minmax(310px,0.45fr);
+
+            gap: 20px;
+
+            margin-top: 20px;
+        }
+
+
+        .lab.active {
+            display: grid;
+        }
+
+
+        .sim-card,
+        .control-card {
+            overflow: hidden;
+
+            border:
+                1px solid var(--border);
+
+            border-radius: 23px;
+
+            background: white;
+
+            box-shadow:
+                0 12px 35px
+                rgba(15,23,42,0.055);
+        }
+
+
+        .sim-header {
+            display: flex;
+            justify-content: space-between;
+
+            gap: 15px;
+
+            padding: 20px 22px;
+
+            border-bottom:
+                1px solid var(--border);
+        }
+
+
+        .sim-header h3 {
+            font-size: 21px;
+        }
+
+
+        .sim-header p {
+            margin-top: 5px;
+
+            color: var(--muted);
+
+            font-size: 13px;
+        }
+
+
+        .three-hint {
+            color: var(--primary);
+
+            font-size: 11px;
+            font-weight: 800;
+
+            white-space: nowrap;
+        }
+
+
+        /* =====================================================
+           3D AREA
+        ====================================================== */
+
+        .three-stage {
+            position: relative;
+
+            width: 100%;
+            height: 510px;
+
+            overflow: hidden;
+
+            background:
+                linear-gradient(
+                    #dbeafe,
+                    #f8fafc
+                );
+        }
+
+
+        .three-stage canvas {
+            width: 100%;
+            height: 100%;
+
+            display: block;
+
+            cursor: grab;
+        }
+
+
+        .three-stage canvas:active {
+            cursor: grabbing;
+        }
+
+
+        .scene-hud {
+            position: absolute;
+
+            top: 15px;
+            left: 15px;
+            right: 15px;
+
+            z-index: 10;
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(4,minmax(0,1fr));
+
+            gap: 8px;
+
+            pointer-events: none;
+        }
+
+
+        .scene-hud.three-items {
+            grid-template-columns:
+                repeat(3,minmax(0,1fr));
+        }
+
+
+        .hud-item {
+            padding: 9px 10px;
+
+            border-radius: 12px;
+
+            background:
+                rgba(255,255,255,0.93);
+
+            border:
+                1px solid
+                rgba(226,232,240,0.96);
+
+            box-shadow:
+                0 7px 18px
+                rgba(15,23,42,0.07);
+
+            text-align: center;
+        }
+
+
+        .hud-item small {
+            display: block;
+
+            color: var(--muted);
+
+            font-size: 9px;
+
+            font-weight: 800;
+
+            text-transform: uppercase;
+        }
+
+
+        .hud-item strong {
+            display: block;
+
+            margin-top: 3px;
+
+            font-size: 14px;
+        }
+
+
+        .scene-message {
+            position: absolute;
+
+            left: 50%;
+            bottom: 16px;
+
+            z-index: 15;
+
+            transform:
+                translateX(-50%);
+
+            min-width:
+                min(520px,90%);
+
+            padding: 11px 14px;
+
+            border-radius: 13px;
+
+            background:
+                rgba(255,255,255,0.94);
+
+            border:
+                1px solid var(--border);
+
+            box-shadow:
+                0 7px 20px
+                rgba(15,23,42,0.09);
+
+            text-align: center;
+
+            font-size: 12px;
+
+            font-weight: 750;
+
+            line-height: 1.55;
+
+            pointer-events: none;
+        }
+
+
+        /* =====================================================
+           3D FULLSCREEN / MAXIMIZE
+        ====================================================== */
+
+        .fullscreen-btn {
+            position: absolute;
+
+            top: 82px;
+            right: 16px;
+
+            z-index: 50;
+
+            display: flex;
+            align-items: center;
+            gap: 7px;
+
+            min-height: 38px;
+
+            padding: 8px 12px;
+
+            border:
+                1px solid rgba(255,255,255,0.75);
+
+            border-radius: 11px;
+
+            background:
+                rgba(15,23,42,0.84);
+
+            color: white;
+
+            box-shadow:
+                0 8px 22px
+                rgba(15,23,42,0.18);
+
+            backdrop-filter: blur(10px);
+
+            font-size: 11px;
+
+            font-weight: 850;
+
+            cursor: pointer;
+
+            transition:
+                transform 0.18s ease,
+                background 0.18s ease;
+        }
+
+
+        .fullscreen-btn:hover {
+            transform:
+                translateY(-1px);
+
+            background:
+                rgba(79,70,229,0.95);
+        }
+
+
+        .fullscreen-icon {
+            font-size: 17px;
+
+            line-height: 1;
+        }
+
+
+        /*
+            Browser Fullscreen Mode
+        */
+
+        .three-stage:fullscreen {
+            width: 100vw !important;
+            height: 100vh !important;
+
+            border-radius: 0 !important;
+
+            background: #dbeafe;
+        }
+
+
+        .three-stage:-webkit-full-screen {
+            width: 100vw !important;
+            height: 100vh !important;
+
+            border-radius: 0 !important;
+
+            background: #dbeafe;
+        }
+
+
+        .three-stage:fullscreen canvas,
+        .three-stage:-webkit-full-screen canvas {
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+
+        /*
+            Make information larger in fullscreen.
+        */
+
+        .three-stage:fullscreen .scene-hud,
+        .three-stage:-webkit-full-screen .scene-hud {
+            top: 22px;
+            left: 22px;
+            right: 22px;
+
+            gap: 12px;
+        }
+
+
+        .three-stage:fullscreen .hud-item,
+        .three-stage:-webkit-full-screen .hud-item {
+            padding: 13px 15px;
+
+            border-radius: 14px;
+        }
+
+
+        .three-stage:fullscreen .hud-item small,
+        .three-stage:-webkit-full-screen .hud-item small {
+            font-size: 11px;
+        }
+
+
+        .three-stage:fullscreen .hud-item strong,
+        .three-stage:-webkit-full-screen .hud-item strong {
+            font-size: 18px;
+        }
+
+
+        .three-stage:fullscreen .fullscreen-btn,
+        .three-stage:-webkit-full-screen .fullscreen-btn {
+            top: auto;
+            right: 24px;
+            bottom: 24px;
+
+            min-height: 46px;
+
+            padding: 11px 16px;
+
+            border-radius: 13px;
+
+            font-size: 13px;
+        }
+
+
+        .three-stage:fullscreen .scene-message,
+        .three-stage:-webkit-full-screen .scene-message {
+            bottom: 24px;
+
+            min-width:
+                min(
+                    700px,
+                    70vw
+                );
+
+            padding: 14px 18px;
+
+            font-size: 14px;
+        }
+
+
+        /*
+            We move the fullscreen button to the right,
+            so scene-message and button do not overlap.
+        */
+
+        .three-stage:fullscreen .scene-message,
+        .three-stage:-webkit-full-screen .scene-message {
+            bottom: 86px;
+        }
+
+
+        /*
+            Helpful fullscreen badge.
+        */
+
+        .fullscreen-mode-label {
+            position: absolute;
+
+            left: 50%;
+            top: 100px;
+
+            z-index: 45;
+
+            transform:
+                translateX(-50%);
+
+            display: none;
+
+            padding: 7px 12px;
+
+            border-radius: 999px;
+
+            background:
+                rgba(15,23,42,0.72);
+
+            color: white;
+
+            backdrop-filter: blur(8px);
+
+            font-size: 11px;
+
+            font-weight: 800;
+
+            pointer-events: none;
+        }
+
+
+        .three-stage:fullscreen .fullscreen-mode-label,
+        .three-stage:-webkit-full-screen .fullscreen-mode-label {
+            display: block;
+        }
+
+
+        @media (max-width: 600px) {
+
+            .fullscreen-btn {
+                top: 78px;
+                right: 10px;
+
+                padding: 7px 9px;
+            }
+
+
+            .fullscreen-btn .fullscreen-text {
+                display: none;
+            }
+
+
+            .three-stage:fullscreen .fullscreen-btn .fullscreen-text,
+            .three-stage:-webkit-full-screen .fullscreen-btn .fullscreen-text {
+                display: inline;
+            }
+
+        }
+
+
+
+        /* =====================================================
+           FULLSCREEN EXPERIMENT WORKSPACE
+           3D + CONTROLS TOGETHER
+        ====================================================== */
+
+        .lab:fullscreen,
+        .lab:-webkit-full-screen {
+            width: 100vw !important;
+            height: 100vh !important;
+
+            display: grid !important;
+
+            grid-template-columns:
+                minmax(0, 1.65fr)
+                minmax(330px, 0.35fr) !important;
+
+            gap: 14px !important;
+
+            padding: 14px !important;
+
+            margin: 0 !important;
+
+            overflow: hidden !important;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #eef2ff,
+                    #f8fafc
+                );
+        }
+
+
+        .lab:fullscreen .sim-card,
+        .lab:-webkit-full-screen .sim-card {
+            height:
+                calc(100vh - 28px);
+
+            min-height: 0;
+
+            display: flex;
+
+            flex-direction: column;
+
+            border-radius: 18px;
+        }
+
+
+        .lab:fullscreen .sim-header,
+        .lab:-webkit-full-screen .sim-header {
+            flex: 0 0 auto;
+
+            padding: 14px 18px;
+        }
+
+
+        .lab:fullscreen .sim-header h3,
+        .lab:-webkit-full-screen .sim-header h3 {
+            font-size: 18px;
+        }
+
+
+        .lab:fullscreen .three-stage,
+        .lab:-webkit-full-screen .three-stage {
+            flex: 1 1 auto;
+
+            width: 100% !important;
+
+            height: auto !important;
+
+            min-height: 0 !important;
+
+            border-radius: 0 0 18px 18px;
+        }
+
+
+        .lab:fullscreen .control-card,
+        .lab:-webkit-full-screen .control-card {
+            height:
+                calc(100vh - 28px);
+
+            overflow-y: auto;
+
+            padding: 20px;
+
+            border-radius: 18px;
+
+            scrollbar-width: thin;
+        }
+
+
+        .lab:fullscreen .control-title,
+        .lab:-webkit-full-screen .control-title {
+            font-size: 21px;
+        }
+
+
+        .lab:fullscreen .control,
+        .lab:-webkit-full-screen .control {
+            margin-top: 20px;
+        }
+
+
+        .lab:fullscreen .result-box,
+        .lab:-webkit-full-screen .result-box {
+            margin-bottom: 10px;
+        }
+
+
+        /*
+            Fullscreen button stays over the 3D scene.
+        */
+
+        .lab:fullscreen .fullscreen-btn,
+        .lab:-webkit-full-screen .fullscreen-btn {
+            position: absolute;
+
+            top: auto;
+            right: 18px;
+            bottom: 18px;
+
+            z-index: 60;
+
+            min-height: 44px;
+
+            padding: 10px 14px;
+
+            background:
+                rgba(15,23,42,0.90);
+
+            color: white;
+        }
+
+
+        /*
+            Live 3D information should remain readable.
+        */
+
+        .lab:fullscreen .scene-hud,
+        .lab:-webkit-full-screen .scene-hud {
+            top: 15px;
+            left: 15px;
+            right: 15px;
+
+            gap: 9px;
+        }
+
+
+        .lab:fullscreen .hud-item,
+        .lab:-webkit-full-screen .hud-item {
+            padding: 11px 12px;
+        }
+
+
+        .lab:fullscreen .hud-item small,
+        .lab:-webkit-full-screen .hud-item small {
+            font-size: 10px;
+        }
+
+
+        .lab:fullscreen .hud-item strong,
+        .lab:-webkit-full-screen .hud-item strong {
+            font-size: 16px;
+        }
+
+
+        .lab:fullscreen .scene-message,
+        .lab:-webkit-full-screen .scene-message {
+            bottom: 74px;
+
+            max-width: 650px;
+
+            padding: 12px 16px;
+
+            font-size: 13px;
+        }
+
+
+        /*
+            Old label can still be used.
+        */
+
+        .lab:fullscreen .fullscreen-mode-label,
+        .lab:-webkit-full-screen .fullscreen-mode-label {
+            display: block;
+
+            top: 82px;
+        }
+
+
+        /*
+            Smaller laptops:
+            retain 3D + controls side by side,
+            but slightly reduce control width.
+        */
+
+        @media (max-width: 1050px) {
+
+            .lab:fullscreen,
+            .lab:-webkit-full-screen {
+                grid-template-columns:
+                    minmax(0, 1.45fr)
+                    minmax(290px, 0.55fr)
+                    !important;
+            }
+
+        }
+
+
+        /*
+            Mobile / very narrow fullscreen:
+            scene above, controls below.
+        */
+
+        @media (max-width: 720px) {
+
+            .lab:fullscreen,
+            .lab:-webkit-full-screen {
+                grid-template-columns:
+                    1fr !important;
+
+                grid-template-rows:
+                    minmax(55vh, 1fr)
+                    auto !important;
+
+                overflow-y: auto !important;
+            }
+
+
+            .lab:fullscreen .sim-card,
+            .lab:-webkit-full-screen .sim-card {
+                height: 58vh;
+            }
+
+
+            .lab:fullscreen .control-card,
+            .lab:-webkit-full-screen .control-card {
+                height: auto;
+
+                min-height: 40vh;
+            }
+
+        }
+
+
+        /* =====================================================
+           CONTROLS
+        ====================================================== */
+
+        .control-card {
+            padding: 22px;
+        }
+
+
+        .control-title {
+            font-size: 20px;
+            font-weight: 850;
+        }
+
+
+        .control-subtitle {
+            margin-top: 5px;
+
+            color: var(--muted);
+
+            font-size: 13px;
+
+            line-height: 1.55;
+        }
+
+
+        .control {
+            margin-top: 23px;
+        }
+
+
+        .control-top {
+            display: flex;
+            justify-content: space-between;
+
+            gap: 12px;
+
+            margin-bottom: 9px;
+        }
+
+
+        .control label {
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+
+        .value {
+            color: var(--primary);
+
+            font-size: 13px;
+            font-weight: 900;
+        }
+
+
+        input[type="range"] {
+            width: 100%;
+        }
+
+
+        .toggle-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            gap: 12px;
+
+            margin-top: 22px;
+
+            padding: 14px;
+
+            border-radius: 14px;
+
+            background: #f8fafc;
+
+            border:
+                1px solid var(--border);
+        }
+
+
+        .toggle-row label {
+            font-size: 13px;
+            font-weight: 850;
+        }
+
+
+        .toggle-row small {
+            display: block;
+
+            margin-top: 3px;
+
+            color: var(--muted);
+
+            font-size: 10px;
+        }
+
+
+        .toggle-row input {
+            width: 21px;
+            height: 21px;
+        }
+
+
+        .action-btn {
+            width: 100%;
+
+            min-height: 50px;
+
+            margin-top: 22px;
+
+            border: 0;
+
+            border-radius: 14px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #4f46e5,
+                    #7c3aed
+                );
+
+            color: white;
+
+            font-weight: 900;
+        }
+
+
+        .result-box {
+            margin-top: 20px;
+
+            padding: 16px;
+
+            border-radius: 15px;
+
+            background:
+                var(--primary-soft);
+
+            border:
+                1px solid #c7d2fe;
+        }
+
+
+        .result-box > strong {
+            display: block;
+
+            margin-bottom: 7px;
+
+            color:
+                var(--primary-dark);
+        }
+
+
+        .result-box p {
+            color: #475569;
+
+            font-size: 13px;
+
+            line-height: 1.65;
+        }
+
+
+        .formula {
+            margin-top: 11px;
+
+            padding: 12px;
+
+            border-radius: 11px;
+
+            background: white;
+
+            color: var(--text);
+
+            font-size: 13px;
+
+            font-weight: 850;
+
+            line-height: 1.7;
+
+            text-align: center;
+        }
+
+
+        /* =====================================================
+           STORIES
+        ====================================================== */
+
+        .explanation {
+            display: none;
+
+            margin-top: 20px;
+
+            padding: 27px;
+
+            border:
+                1px solid var(--border);
+
+            border-radius: 23px;
+
+            background: white;
+
+            box-shadow:
+                0 10px 30px
+                rgba(15,23,42,0.04);
+        }
+
+
+        .explanation.active {
+            display: block;
+        }
+
+
+        .explanation-title {
+            display: flex;
+            align-items: center;
+
+            gap: 13px;
+        }
+
+
+        .explanation-icon {
+            width: 51px;
+            height: 51px;
+
+            display: grid;
+            place-items: center;
+
+            flex: 0 0 51px;
+
+            border-radius: 15px;
+
+            background:
+                var(--primary-soft);
+
+            font-size: 25px;
+        }
+
+
+        .explanation-title h3 {
+            font-size: 22px;
+        }
+
+
+        .explanation-title p {
+            margin-top: 4px;
+
+            color: var(--muted);
+
+            font-size: 13px;
+        }
+
+
+        .story-card {
+            margin-top: 20px;
+
+            padding: 20px;
+
+            border-radius: 17px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #f8f9ff,
+                    #eef2ff
+                );
+
+            border:
+                1px solid #dbe2ff;
+        }
+
+
+        .story-card h4 {
+            margin-bottom: 10px;
+
+            font-size: 17px;
+        }
+
+
+        .story-card p {
+            color: #475569;
+
+            font-size: 14px;
+
+            line-height: 1.8;
+        }
+
+
+        .explain-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(2,1fr);
+
+            gap: 15px;
+
+            margin-top: 15px;
+        }
+
+
+        .explain-card {
+            padding: 18px;
+
+            border:
+                1px solid var(--border);
+
+            border-radius: 16px;
+        }
+
+
+        .explain-card.blue {
+            background:
+                var(--blue-soft);
+        }
+
+
+        .explain-card.orange {
+            background:
+                var(--warning-soft);
+        }
+
+
+        .explain-card.green {
+            background:
+                var(--success-soft);
+        }
+
+
+        .label {
+            display: inline-block;
+
+            margin-bottom: 8px;
+
+            color: var(--primary);
+
+            font-size: 10px;
+
+            font-weight: 900;
+
+            text-transform: uppercase;
+        }
+
+
+        .explain-card h4 {
+            margin-bottom: 8px;
+
+            font-size: 16px;
+        }
+
+
+        .explain-card p {
+            color: #526174;
+
+            font-size: 13px;
+
+            line-height: 1.75;
+        }
+
+
+        .calculation {
+            margin-top: 11px;
+
+            padding: 13px;
+
+            border-radius: 11px;
+
+            background: white;
+
+            color:
+                var(--primary-dark);
+
+            font-size: 13px;
+
+            font-weight: 800;
+
+            line-height: 1.8;
+        }
+
+
+        .memory-box {
+            margin-top: 16px;
+
+            padding: 17px;
+
+            border-radius: 15px;
+
+            background: #f8fafc;
+
+            border:
+                1px dashed #cbd5e1;
+
+            color: #475569;
+
+            line-height: 1.7;
+        }
+
+
+        .memory-box strong {
+            color:
+                var(--primary-dark);
+        }
+
+
+        .takeaway {
+            margin-top: 16px;
+
+            padding: 17px;
+
+            border-radius: 15px;
+
+            background:
+                linear-gradient(
+                    90deg,
+                    #312e81,
+                    #4f46e5
+                );
+
+            color: white;
+
+            line-height: 1.7;
+        }
+
+
+        /* =====================================================
+           PRACTICE
+        ====================================================== */
+
+        .practice-section {
+            margin-top: 24px;
+
+            padding: 28px;
+
+            border:
+                1px solid var(--border);
+
+            border-radius: 24px;
+
+            background: white;
+
+            box-shadow:
+                0 14px 40px
+                rgba(15,23,42,0.05);
+        }
+
+
+        .practice-header {
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: flex-start;
+
+            gap: 20px;
+
+            flex-wrap: wrap;
+        }
+
+
+        .practice-badge {
+            display: inline-flex;
+
+            padding: 7px 11px;
+
+            border-radius: 999px;
+
+            background:
+                var(--primary-soft);
+
+            color:
+                var(--primary-dark);
+
+            font-size: 11px;
+
+            font-weight: 900;
+        }
+
+
+        .practice-header h3 {
+            margin-top: 10px;
+
+            font-size: 25px;
+        }
+
+
+        .practice-header p {
+            max-width: 720px;
+
+            margin-top: 7px;
+
+            color: var(--muted);
+
+            font-size: 13px;
+
+            line-height: 1.65;
+        }
+
+
+        .score-box {
+            min-width: 145px;
+
+            padding: 14px;
+
+            border:
+                1px solid var(--border);
+
+            border-radius: 16px;
+
+            background: #f8fafc;
+
+            text-align: center;
+        }
+
+
+        .score-box small {
+            color: var(--muted);
+
+            font-size: 10px;
+
+            font-weight: 850;
+        }
+
+
+        .score-box strong {
+            display: block;
+
+            margin-top: 4px;
+
+            color:
+                var(--primary-dark);
+
+            font-size: 25px;
+        }
+
+
+        .practice-progress {
+            height: 10px;
+
+            margin-top: 20px;
+
+            border-radius: 999px;
+
+            background: #e2e8f0;
+
+            overflow: hidden;
+        }
+
+
+        .practice-progress-fill {
+            width: 0%;
+
+            height: 100%;
+
+            background:
+                linear-gradient(
+                    90deg,
+                    #4f46e5,
+                    #7c3aed
+                );
+
+            transition:
+                width 0.25s ease;
+        }
+
+
+        .quiz-list {
+            display: grid;
+
+            gap: 18px;
+
+            margin-top: 22px;
+        }
+
+
+        .quiz-card {
+            padding: 21px;
+
+            border:
+                1px solid var(--border);
+
+            border-radius: 18px;
+
+            background: white;
+        }
+
+
+        .quiz-card.correct-card {
+            border-color: #bbf7d0;
+        }
+
+
+        .quiz-card.wrong-card {
+            border-color: #fecaca;
+        }
+
+
+        .quiz-top {
+            display: flex;
+
+            justify-content: space-between;
+
+            gap: 12px;
+
+            margin-bottom: 13px;
+        }
+
+
+        .quiz-number {
+            padding: 6px 10px;
+
+            border-radius: 999px;
+
+            background:
+                var(--primary-soft);
+
+            color:
+                var(--primary-dark);
+
+            font-size: 11px;
+
+            font-weight: 900;
+        }
+
+
+        .quiz-concept {
+            color: var(--muted);
+
+            font-size: 11px;
+
+            font-weight: 800;
+        }
+
+
+        .quiz-question {
+            font-size: 17px;
+
+            font-weight: 800;
+
+            line-height: 1.5;
+        }
+
+
+        .quiz-options {
+            display: grid;
+
+            grid-template-columns:
+                repeat(2,1fr);
+
+            gap: 10px;
+
+            margin-top: 16px;
+        }
+
+
+        .quiz-option {
+            min-height: 48px;
+
+            padding: 12px 14px;
+
+            border:
+                1.5px solid var(--border);
+
+            border-radius: 13px;
+
+            background: white;
+
+            color: var(--text);
+
+            text-align: left;
+
+            font-size: 13px;
+
+            font-weight: 700;
+        }
+
+
+        .quiz-option:hover:not(:disabled) {
+            border-color: #a5b4fc;
+
+            background: #fafaff;
+        }
+
+
+        .quiz-option:disabled {
+            cursor: default;
+        }
+
+
+        .option-correct {
+            border-color: #22c55e !important;
+
+            background:
+                var(--success-soft) !important;
+
+            color: #166534 !important;
+        }
+
+
+        .option-wrong {
+            border-color: #ef4444 !important;
+
+            background:
+                var(--danger-soft) !important;
+
+            color: #991b1b !important;
+        }
+
+
+        .feedback {
+            display: none;
+
+            margin-top: 15px;
+
+            padding: 15px;
+
+            border-radius: 14px;
+
+            font-size: 13px;
+
+            line-height: 1.7;
+        }
+
+
+        .feedback.correct {
+            display: block;
+
+            background:
+                var(--success-soft);
+
+            border:
+                1px solid #bbf7d0;
+
+            color: #166534;
+        }
+
+
+        .feedback.wrong {
+            display: block;
+
+            background:
+                var(--danger-soft);
+
+            border:
+                1px solid #fecaca;
+
+            color: #7f1d1d;
+        }
+
+
+        .feedback strong {
+            display: block;
+
+            margin-bottom: 5px;
+        }
+
+
+        .practice-result {
+            display: none;
+
+            margin-top: 24px;
+
+            padding: 22px;
+
+            border-radius: 19px;
+
+            background:
+                var(--primary-soft);
+
+            border:
+                1px solid #c7d2fe;
+        }
+
+
+        .practice-result.show {
+            display: block;
+        }
+
+
+        .practice-result h4 {
+            font-size: 21px;
+        }
+
+
+        .practice-result p {
+            margin-top: 7px;
+
+            color: #526174;
+
+            font-size: 13px;
+
+            line-height: 1.6;
+        }
+
+
+        .weak-tags {
+            display: flex;
+
+            flex-wrap: wrap;
+
+            gap: 8px;
+
+            margin-top: 14px;
+        }
+
+
+        .weak-tag {
+            padding: 7px 10px;
+
+            border-radius: 999px;
+
+            background:
+                var(--warning-soft);
+
+            color: #9a3412;
+
+            font-size: 11px;
+
+            font-weight: 850;
+        }
+
+
+        .retake-btn {
+            margin-top: 16px;
+
+            min-height: 44px;
+
+            padding: 10px 16px;
+
+            border: 0;
+
+            border-radius: 11px;
+
+            background:
+                var(--primary);
+
+            color: white;
+
+            font-weight: 850;
+        }
+
+
+        /* =====================================================
+           COMPLETE
+        ====================================================== */
+
+        .complete-card {
+            margin-top: 20px;
+
+            padding: 20px;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            gap: 18px;
+
+            border-radius: 20px;
+
+            background:
+                var(--success-soft);
+
+            border:
+                1px solid #bbf7d0;
+        }
+
+
+        .complete-card strong {
+            color: #166534;
+        }
+
+
+        .complete-card p {
+            margin-top: 4px;
+
+            color: #4b7d5a;
+
+            font-size: 12px;
+        }
+
+
+        .complete-btn {
+            min-height: 46px;
+
+            padding: 12px 17px;
+
+            border: 0;
+
+            border-radius: 12px;
+
+            background:
+                var(--success);
+
+            color: white;
+
+            font-weight: 850;
+        }
+
+
+        @media (max-width: 980px) {
+
+            .lab {
+                grid-template-columns: 1fr;
+            }
+
+
+            .scene-hud {
+                grid-template-columns:
+                    repeat(2,1fr);
+            }
+
+        }
+
+
+        @media (max-width: 760px) {
+
+            .tabs,
+            .explain-grid,
+            .quiz-options {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+
+        @media (max-width: 600px) {
+
+            .topbar {
+                padding: 12px 14px;
+            }
+
+
+            .topic-pill {
+                display: none;
+            }
+
+
+            .page {
+                width:
+                    calc(100% - 18px);
+
+                margin-top: 14px;
+            }
+
+
+            .hero {
+                padding: 22px;
+            }
+
+
+            .three-stage {
+                height: 430px;
+            }
+
+
+            .practice-section {
+                padding: 18px;
+            }
+
+
+            .complete-card {
+                align-items: stretch;
+
+                flex-direction: column;
+            }
+
+        }
+
+    </style>
+
+<link rel="stylesheet" href="assets/css/topic3-graphs.css?v=fullscreen-controls-2"><link rel="stylesheet" href="assets/css/physics-problems.css?v=1"><script defer src="assets/js/physics-problems-data.js?v=1"></script><script defer src="assets/js/physics-problems.js?v=1"></script><link rel="stylesheet" href="assets/css/physics-symbol-guides.css?v=1">    <link rel="stylesheet" href="assets/css/universal-learning-journey.css?v=1">
+</head>
+
+
+<body>
+
+
+<header class="topbar">
+
+    <div class="brand-wrap">
+
+        <button
+            class="back-btn"
+            onclick="goBack()"
+        >
+            ←
+        </button>
+
+
+        <div class="brand">
+
+            <h1>
+                My Campus
+            </h1>
+
+            <p>
+                3D Interactive Physics Lab
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="topic-pill">
+        Topic 3 • Forces & Newton's Laws
+    </div>
+
+</header>
+
+
+<main class="page">
+
+
+    <section class="hero">
+
+        <span class="hero-badge">
+            REAL-TIME 3D LEARNING
+        </span>
+
+
+        <h2>
+            Forces & Newton's Laws
+        </h2>
+
+
+        <p>
+            Control the Physics yourself.
+            Brake a moving vehicle, push a heavy crate,
+            and make two students push away from each other.
+            Every 3D experiment shows live force, mass,
+            acceleration, distance and time values.
+        </p>
+
+    </section>
+
+
+    <!-- =====================================================
+         TABS
+    ====================================================== -->
+
+    <section class="tabs">
+
+        <button
+            id="inertiaTab"
+            class="tab-btn active"
+            onclick="openLab('inertia')"
+        >
+            🚘 Newton's First Law
+        </button>
+
+
+        <button
+            id="forceTab"
+            class="tab-btn"
+            onclick="openLab('force')"
+        >
+            📦 Newton's Second Law
+        </button>
+
+
+        <button
+            id="reactionTab"
+            class="tab-btn"
+            onclick="openLab('reaction')"
+        >
+            🛒 Newton's Third Law
+        </button>
+
+    </section>
+
+
+    <!-- =====================================================
+         NEWTON 1
+    ====================================================== -->
+
+    <section
+        id="inertiaLab"
+        class="lab active"
+    >
+
+        <div class="sim-card">
+
+            <div class="sim-header">
+
+                <div>
+
+                    <h3>
+                        Sudden Braking & Inertia
+                    </h3>
+
+                    <p>
+                        Watch what happens to the passenger
+                        when the moving vehicle suddenly slows down.
+                    </p>
+
+                </div>
+
+
+                <div class="three-hint">
+                    🖱 Drag 3D view • Scroll to zoom
+                </div>
+
+            </div>
+
+
+            <div
+                id="inertiaStage"
+                class="three-stage"
+            >
+
+                <button
+                    type="button"
+                    class="fullscreen-btn"
+                    data-stage="inertiaStage"
+                    onclick="toggleStageFullscreen('inertiaStage')"
+                    title="Maximize Experiment simulation"
+                >
+                    <span class="fullscreen-icon">
+                        ⛶
+                    </span>
+
+                    <span class="fullscreen-text">
+                        Maximize Experiment
+                    </span>
+                </button>
+
+
+                <div class="fullscreen-mode-label">
+                    3D FULL SCREEN • Drag to rotate • Scroll to zoom • ESC to exit
+                </div>
+
+                <div class="scene-hud">
+
+                    <div class="hud-item">
+
+                        <small>
+                            Initial Speed
+                        </small>
+
+                        <strong id="inertiaHudSpeed">
+                            50 km/h
+                        </strong>
+
+                    </div>
+
+
+                    <div class="hud-item">
+
+                        <small>
+                            Braking
+                        </small>
+
+                        <strong id="inertiaHudBrake">
+                            5 m/s²
+                        </strong>
+
+                    </div>
+
+
+                    <div class="hud-item">
+
+                        <small>
+                            Stop Time
+                        </small>
+
+                        <strong id="inertiaHudTime">
+                            2.8 s
+                        </strong>
+
+                    </div>
+
+
+                    <div class="hud-item">
+
+                        <small>
+                            Stop Distance
+                        </small>
+
+                        <strong id="inertiaHudDistance">
+                            19.3 m
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <div
+                    id="inertiaSceneMessage"
+                    class="scene-message"
+                >
+                    Press “Brake the Vehicle” and watch the passenger.
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="control-card">
+
+            <div class="control-title">
+                You are inside the vehicle
+            </div>
+
+
+            <div class="control-subtitle">
+                Change the vehicle speed and braking strength.
+            </div>
+
+
+            <div class="control">
+
+                <div class="control-top">
+
+                    <label>
+                        Vehicle Speed
+                    </label>
+
+                    <span
+                        id="vehicleSpeedValue"
+                        class="value"
+                    >
+                        50 km/h
+                    </span>
+
+                </div>
+
+
+                <input
+                    id="vehicleSpeed"
+                    type="range"
+                    min="20"
+                    max="100"
+                    value="50"
+                    step="10"
+                    oninput="updateInertia()"
+                >
+
+            </div>
+
+
+            <div class="control">
+
+                <div class="control-top">
+
+                    <label>
+                        Braking Strength
+                    </label>
+
+                    <span
+                        id="brakeValue"
+                        class="value"
+                    >
+                        5 m/s²
+                    </span>
+
+                </div>
+
+
+                <input
+                    id="brakeAcceleration"
+                    type="range"
+                    min="2"
+                    max="10"
+                    value="5"
+                    step="1"
+                    oninput="updateInertia()"
+                >
+
+            </div>
+
+
+            <div class="toggle-row">
+
+                <div>
+
+                    <label>
+                        Seatbelt
+                    </label>
+
+                    <small>
+                        Compare passenger motion with and without restraint.
+                    </small>
+
+                </div>
+
+
+                <input
+                    id="seatbeltToggle"
+                    type="checkbox"
+                    checked
+                    onchange="updateInertia()"
+                >
+
+            </div>
+
+
+            <button
+                class="action-btn"
+                onclick="runInertia()"
+            >
+                🛑 Brake the Vehicle
+            </button>
+
+
+            <div class="result-box">
+
+                <strong>
+                    Prediction
+                </strong>
+
+                <p id="inertiaResult"></p>
+
+
+                <div
+                    id="inertiaFormula"
+                    class="formula"
+                ></div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- NEWTON 1 EXPLANATION -->
+
+    <section
+        id="inertiaExplanation"
+        class="explanation active"
+    >
+
+        <div class="explanation-title">
+
+            <div class="explanation-icon">
+                🚘
+            </div>
+
+
+            <div>
+
+                <h3>
+                    Understand inertia through a real journey
+                </h3>
+
+                <p>
+                    The story uses the exact speed and braking values selected above.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="story-card">
+
+            <h4>
+                🚌 Imagine travelling with your friend...
+            </h4>
+
+            <p id="inertiaStory"></p>
+
+        </div>
+
+
+        <div class="explain-grid">
+
+            <div class="explain-card">
+
+                <span class="label">
+                    What the numbers mean
+                </span>
+
+                <h4>
+                    How long does the vehicle take to stop?
+                </h4>
+
+
+                <div
+                    id="inertiaCalculation"
+                    class="calculation"
+                ></div>
+
+            </div>
+
+
+            <div class="explain-card blue">
+
+                <span class="label">
+                    What You Observe
+                </span>
+
+                <h4>
+                    Why does the passenger move forward?
+                </h4>
+
+                <p id="inertiaObservation"></p>
+
+            </div>
+
+
+            <div class="explain-card orange">
+
+                <span class="label">
+                    Newton's First Law
+                </span>
+
+                <h4>
+                    Motion tries to continue
+                </h4>
+
+                <p>
+                    An object keeps its state of rest or motion
+                    unless a net external force changes it.
+                    When the vehicle slows down,
+                    the passenger's body tends to continue moving forward.
+                </p>
+
+            </div>
+
+
+            <div class="explain-card green">
+
+                <span class="label">
+                    Real Life
+                </span>
+
+                <h4>
+                    Why seatbelts matter
+                </h4>
+
+                <p id="seatbeltStory"></p>
+
+            </div>
+
+        </div>
+
+
+        <div class="memory-box">
+
+            <strong>
+                🧠 Easy memory:
+            </strong>
+
+            If something is moving,
+            it naturally tends to keep moving
+            until a force changes its motion.
+        </div>
+
+
+        <div
+            id="inertiaTakeaway"
+            class="takeaway"
+        ></div>
+
+    </section>
+
+
+    <!-- =====================================================
+         NEWTON 2
+    ====================================================== -->
+
+    <section
+        id="forceLab"
+        class="lab"
+    >
+
+        <div class="sim-card">
+
+            <div class="sim-header">
+
+                <div>
+
+                    <h3>
+                        Push the 3D Crate
+                    </h3>
+
+                    <p>
+                        Change force and mass,
+                        then watch how acceleration changes.
+                    </p>
+
+                </div>
+
+
+                <div class="three-hint">
+                    🖱 Drag 3D view • Scroll to zoom
+                </div>
+
+            </div>
+
+
+            <div
+                id="forceStage"
+                class="three-stage"
+            >
+
+                <button
+                    type="button"
+                    class="fullscreen-btn"
+                    data-stage="forceStage"
+                    onclick="toggleStageFullscreen('forceStage')"
+                    title="Maximize Experiment simulation"
+                >
+                    <span class="fullscreen-icon">
+                        ⛶
+                    </span>
+
+                    <span class="fullscreen-text">
+                        Maximize Experiment
+                    </span>
+                </button>
+
+
+                <div class="fullscreen-mode-label">
+                    3D FULL SCREEN • Drag to rotate • Scroll to zoom • ESC to exit
+                </div>
+
+                <div class="scene-hud">
+
+                    <div class="hud-item">
+
+                        <small>
+                            Force
+                        </small>
+
+                        <strong id="forceHudForce">
+                            100 N
+                        </strong>
+
+                    </div>
+
+
+                    <div class="hud-item">
+
+                        <small>
+                            Mass
+                        </small>
+
+                        <strong id="forceHudMass">
+                            20 kg
+                        </strong>
+
+                    </div>
+
+
+                    <div class="hud-item">
+
+                        <small>
+                            Acceleration
+                        </small>
+
+                        <strong id="forceHudAcceleration">
+                            5 m/s²
+                        </strong>
+
+                    </div>
+
+
+                    <div class="hud-item">
+
+                        <small>
+                            Time to 10 m
+                        </small>
+
+                        <strong id="forceHudTime">
+                            2 s
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <div
+                    id="forceSceneMessage"
+                    class="scene-message"
+                >
+                    The crate starts from rest at 0 m.
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="control-card">
+
+            <div class="control-title">
+                Push the crate
+            </div>
+
+
+            <div class="control-subtitle">
+                Change the applied force and crate mass.
+            </div>
+
+
+            <div class="control">
+
+                <div class="control-top">
+
+                    <label>
+                        Applied Force
+                    </label>
+
+                    <span
+                        id="forceValue"
+                        class="value"
+                    >
+                        100 N
+                    </span>
+
+                </div>
+
+
+                <input
+                    id="appliedForce"
+                    type="range"
+                    min="20"
+                    max="200"
+                    value="100"
+                    step="10"
+                    oninput="updateForce()"
+                >
+
+            </div>
+
+
+            <div class="control">
+
+                <div class="control-top">
+
+                    <label>
+                        Crate Mass
+                    </label>
+
+                    <span
+                        id="massValue"
+                        class="value"
+                    >
+                        20 kg
+                    </span>
+
+                </div>
+
+
+                <input
+                    id="crateMass"
+                    type="range"
+                    min="5"
+                    max="50"
+                    value="20"
+                    step="5"
+                    oninput="updateForce()"
+                >
+
+            </div>
+
+
+            <button
+                class="action-btn"
+                onclick="runForce()"
+            >
+                📦 Push the Crate
+            </button>
+
+
+            <div class="result-box">
+
+                <strong>
+                    Live Physics
+                </strong>
+
+                <p id="forceResult"></p>
+
+
+                <div
+                    id="forceFormula"
+                    class="formula"
+                ></div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- NEWTON 2 EXPLANATION -->
+
+    <section
+        id="forceExplanation"
+        class="explanation"
+    >
+
+        <div class="explanation-title">
+
+            <div class="explanation-icon">
+                📦
+            </div>
+
+
+            <div>
+
+                <h3>
+                    Think of moving a box in your college lab
+                </h3>
+
+                <p>
+                    Force and mass selected above directly control this example.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="story-card">
+
+            <h4>
+                📦 Imagine this...
+            </h4>
+
+            <p id="forceStory"></p>
+
+        </div>
+
+
+        <div class="explain-grid">
+
+            <div class="explain-card">
+
+                <span class="label">
+                    Your Calculation
+                </span>
+
+                <h4>
+                    Find the acceleration
+                </h4>
+
+
+                <div
+                    id="forceCalculation"
+                    class="calculation"
+                ></div>
+
+            </div>
+
+
+            <div class="explain-card blue">
+
+                <span class="label">
+                    Watch the 3D Scene
+                </span>
+
+                <h4>
+                    What should you notice?
+                </h4>
+
+                <p id="forceObservation"></p>
+
+            </div>
+
+
+            <div class="explain-card orange">
+
+                <span class="label">
+                    Try This
+                </span>
+
+                <h4>
+                    Make the box heavier
+                </h4>
+
+                <p>
+                    Keep the force unchanged and increase mass.
+                    Acceleration becomes smaller.
+                    The same push has a smaller effect on a heavier object.
+                </p>
+
+            </div>
+
+
+            <div class="explain-card green">
+
+                <span class="label">
+                    Real Life
+                </span>
+
+                <h4>
+                    Empty trolley vs loaded trolley
+                </h4>
+
+                <p>
+                    An empty shopping trolley accelerates easily.
+                    Fill the same trolley with heavy items
+                    and the same push produces less acceleration.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="memory-box">
+
+            <strong>
+                🧠 Easy memory:
+            </strong>
+
+            More Force → More Acceleration.
+            <br>
+            More Mass → Less Acceleration
+            for the same force.
+        </div>
+
+
+        <div
+            id="forceTakeaway"
+            class="takeaway"
+        ></div>
+
+    </section>
+
+
+    <!-- =====================================================
+         NEWTON 3
+    ====================================================== -->
+
+    <section
+        id="reactionLab"
+        class="lab"
+    >
+
+        <div class="sim-card">
+
+            <div class="sim-header">
+
+                <div>
+
+                    <h3>
+                        Two Students Push Each Other
+                    </h3>
+
+                    <p>
+                        Equal and opposite forces,
+                        but possibly different accelerations.
+                    </p>
+
+                </div>
+
+
+                <div class="three-hint">
+                    🖱 Drag 3D view • Scroll to zoom
+                </div>
+
+            </div>
+
+
+            <div
+                id="reactionStage"
+                class="three-stage"
+            >
+
+                <button
+                    type="button"
+                    class="fullscreen-btn"
+                    data-stage="reactionStage"
+                    onclick="toggleStageFullscreen('reactionStage')"
+                    title="Maximize Experiment simulation"
+                >
+                    <span class="fullscreen-icon">
+                        ⛶
+                    </span>
+
+                    <span class="fullscreen-text">
+                        Maximize Experiment
+                    </span>
+                </button>
+
+
+                <div class="fullscreen-mode-label">
+                    3D FULL SCREEN • Drag to rotate • Scroll to zoom • ESC to exit
+                </div>
+
+                <div class="scene-hud">
+
+                    <div class="hud-item">
+
+                        <small>
+                            Interaction Force
+                        </small>
+
+                        <strong id="reactionHudForce">
+                            80 N each
+                        </strong>
+
+                    </div>
+
+
+                    <div class="hud-item">
+
+                        <small>
+                            Student A
+                        </small>
+
+                        <strong id="reactionHudA">
+                            2 m/s²
+                        </strong>
+
+                    </div>
+
+
+                    <div class="hud-item">
+
+                        <small>
+                            Student B
+                        </small>
+
+                        <strong id="reactionHudB">
+                            1.3 m/s²
+                        </strong>
+
+                    </div>
+
+
+                    <div class="hud-item">
+
+                        <small>
+                            Push Time
+                        </small>
+
+                        <strong id="reactionHudTime">
+                            1 s
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <div
+                    id="reactionSceneMessage"
+                    class="scene-message"
+                >
+                    Both students experience equal force,
+                    but mass controls their acceleration.
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="control-card">
+
+            <div class="control-title">
+                Wheeled-chair experiment
+            </div>
+
+
+            <div class="control-subtitle">
+                Change the masses and interaction force.
+            </div>
+
+
+            <div class="control">
+
+                <div class="control-top">
+
+                    <label>
+                        Push Force
+                    </label>
+
+                    <span
+                        id="reactionForceValue"
+                        class="value"
+                    >
+                        80 N
+                    </span>
+
+                </div>
+
+
+                <input
+                    id="reactionForce"
+                    type="range"
+                    min="20"
+                    max="150"
+                    value="80"
+                    step="10"
+                    oninput="updateReaction()"
+                >
+
+            </div>
+
+
+            <div class="control">
+
+                <div class="control-top">
+
+                    <label>
+                        Your Mass
+                    </label>
+
+                    <span
+                        id="massAValue"
+                        class="value"
+                    >
+                        40 kg
+                    </span>
+
+                </div>
+
+
+                <input
+                    id="massA"
+                    type="range"
+                    min="30"
+                    max="90"
+                    value="40"
+                    step="5"
+                    oninput="updateReaction()"
+                >
+
+            </div>
+
+
+            <div class="control">
+
+                <div class="control-top">
+
+                    <label>
+                        Friend's Mass
+                    </label>
+
+                    <span
+                        id="massBValue"
+                        class="value"
+                    >
+                        60 kg
+                    </span>
+
+                </div>
+
+
+                <input
+                    id="massB"
+                    type="range"
+                    min="30"
+                    max="90"
+                    value="60"
+                    step="5"
+                    oninput="updateReaction()"
+                >
+
+            </div>
+
+
+            <div class="control">
+
+                <div class="control-top">
+
+                    <label>
+                        Push Duration
+                    </label>
+
+                    <span
+                        id="reactionTimeValue"
+                        class="value"
+                    >
+                        1.0 s
+                    </span>
+
+                </div>
+
+
+                <input
+                    id="reactionTime"
+                    type="range"
+                    min="5"
+                    max="20"
+                    value="10"
+                    step="1"
+                    oninput="updateReaction()"
+                >
+
+            </div>
+
+
+            <button
+                class="action-btn"
+                onclick="runReaction()"
+            >
+                🛒 Push Each Other
+            </button>
+
+
+            <div class="result-box">
+
+                <strong>
+                    Live Physics
+                </strong>
+
+                <p id="reactionResult"></p>
+
+
+                <div
+                    id="reactionFormula"
+                    class="formula"
+                ></div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- NEWTON 3 EXPLANATION -->
+
+    <section
+        id="reactionExplanation"
+        class="explanation"
+    >
+
+        <div class="explanation-title">
+
+            <div class="explanation-icon">
+                🛒
+            </div>
+
+
+            <div>
+
+                <h3>
+                    Imagine you and your friend on wheeled chairs
+                </h3>
+
+                <p>
+                    This story uses the masses and force selected above.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="story-card">
+
+            <h4>
+                🧑‍🤝‍🧑 Imagine this...
+            </h4>
+
+            <p id="reactionStory"></p>
+
+        </div>
+
+
+        <div class="explain-grid">
+
+            <div class="explain-card">
+
+                <span class="label">
+                    Equal Forces
+                </span>
+
+                <h4>
+                    Action and reaction
+                </h4>
+
+
+                <div
+                    id="reactionCalculation"
+                    class="calculation"
+                ></div>
+
+            </div>
+
+
+            <div class="explain-card blue">
+
+                <span class="label">
+                    What You Observe
+                </span>
+
+                <h4>
+                    Why can one student move more?
+                </h4>
+
+                <p id="reactionObservation"></p>
+
+            </div>
+
+
+            <div class="explain-card orange">
+
+                <span class="label">
+                    Important
+                </span>
+
+                <h4>
+                    Equal force does not mean equal acceleration
+                </h4>
+
+                <p>
+                    Newton's Third Law says the interaction forces
+                    are equal and opposite.
+                    Newton's Second Law tells us acceleration
+                    also depends on mass.
+                </p>
+
+            </div>
+
+
+            <div class="explain-card green">
+
+                <span class="label">
+                    Real Life
+                </span>
+
+                <h4>
+                    Two people on skateboards
+                </h4>
+
+                <p>
+                    If two people on skateboards push each other,
+                    both move apart.
+                    The lighter person usually accelerates more,
+                    even though the interaction forces are equal.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="memory-box">
+
+            <strong>
+                🧠 Easy memory:
+            </strong>
+
+            You push your friend.
+            Your friend pushes you back
+            with an equal force in the opposite direction.
+        </div>
+
+
+        <div
+            id="reactionTakeaway"
+            class="takeaway"
+        ></div>
+
+    </section>
+
+
+    <!-- =====================================================
+         PRACTICE MCQ
+    ====================================================== -->
+
+    <section class="practice-section">
+
+        <div class="practice-header">
+
+            <div>
+
+                <span class="practice-badge">
+                    PRACTICE CHECK
+                </span>
+
+
+                <h3>
+                    Test what you understood from the 3D experiments
+                </h3>
+
+
+                <p>
+                    8 questions.
+                    Every answer gives immediate feedback.
+                    Wrong answer selected?
+                    The correct answer and reason will appear below that question.
+                </p>
+
+            </div>
+
+
+            <div class="score-box">
+
+                <small>
+                    LIVE SCORE
+                </small>
+
+                <strong id="practiceScore">
+                    0 / 8
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <div class="practice-progress">
+
+            <div
+                id="practiceProgress"
+                class="practice-progress-fill"
+            ></div>
+
+        </div>
+
+
+        <div
+            id="quizList"
+            class="quiz-list"
+        ></div>
+
+
+        <div
+            id="practiceResult"
+            class="practice-result"
+        >
+
+            <h4 id="practiceResultTitle">
+                Practice Complete
+            </h4>
+
+            <p id="practiceResultMessage"></p>
+
+
+            <div
+                id="weakTags"
+                class="weak-tags"
+            ></div>
+
+
+            <button
+                class="retake-btn"
+                onclick="resetPractice()"
+            >
+                ↻ Retake Practice
+            </button>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         COMPLETE
+    ====================================================== -->
+
+    <section class="complete-card">
+
+        <div>
+
+            <strong>
+                ✅ Topic 3 — Forces & Newton's Laws
+            </strong>
+
+            <p>
+                Explore all 3D experiments and complete the practice questions.
+            </p>
+
+        </div>
+
+
+        <button
+            class="complete-btn"
+            onclick="markCompleted()"
+        >
+            Mark Interactive Completed
+        </button>
+
+    </section>
+
+
+</main>
+
+
+<script>
+
+    const TOPIC_ID = 3;
+
+    const scenes = {};
+
+    let inertiaRunId = 0;
+    let forceRunId = 0;
+    let reactionRunId = 0;
+
+
+    /* =====================================================
+       3D FULLSCREEN / MAXIMIZE
+    ====================================================== */
+
+    function getCurrentFullscreenElement() {
+
+        return (
+            document.fullscreenElement ||
+            document.webkitFullscreenElement ||
+            null
+        );
+
+    }
+
+
+    function getStageLab(
+        stageId
+    ) {
+
+        const stage =
+            document.getElementById(
+                stageId
+            );
+
+
+        if (!stage) {
+            return null;
+        }
+
+
+        return stage.closest(
+            ".lab"
+        );
+
+    }
+
+
+    async function toggleStageFullscreen(
+        stageId
+    ) {
+
+        const stage =
+            document.getElementById(
+                stageId
+            );
+
+
+        const lab =
+            getStageLab(
+                stageId
+            );
+
+
+        if (
+            !stage ||
+            !lab
+        ) {
+
+            console.error(
+                "Experiment workspace not found:",
+                stageId
+            );
+
+            return;
+        }
+
+
+        const current =
+            getCurrentFullscreenElement();
+
+
+        try {
+
+            /*
+                If this experiment is already fullscreen:
+                exit.
+            */
+
+            if (
+                current === lab
+            ) {
+
+                if (
+                    document.exitFullscreen
+                ) {
+
+                    await document.exitFullscreen();
+
+                } else if (
+                    document.webkitExitFullscreen
+                ) {
+
+                    document.webkitExitFullscreen();
+
+                }
+
+
+                return;
+            }
+
+
+            /*
+                Exit some other fullscreen item first.
+            */
+
+            if (current) {
+
+                if (
+                    document.exitFullscreen
+                ) {
+
+                    await document.exitFullscreen();
+
+                } else if (
+                    document.webkitExitFullscreen
+                ) {
+
+                    document.webkitExitFullscreen();
+
+                }
+
+            }
+
+
+            /*
+                IMPORTANT:
+                Fullscreen the WHOLE experiment lab,
+                not only the 3D canvas.
+
+                This includes:
+                - 3D simulation
+                - sliders
+                - inputs
+                - buttons
+                - result/calculation
+            */
+
+            if (
+                lab.requestFullscreen
+            ) {
+
+                await lab.requestFullscreen();
+
+            } else if (
+                lab.webkitRequestFullscreen
+            ) {
+
+                lab.webkitRequestFullscreen();
+
+            } else {
+
+                alert(
+                    "Fullscreen is not supported by this browser."
+                );
+
+            }
+
+        } catch (error) {
+
+            console.error(
+                "Fullscreen error:",
+                error
+            );
+
+        }
+
+    }
+
+
+    function updateFullscreenButtons() {
+
+        const fullscreenElement =
+            getCurrentFullscreenElement();
+
+
+        document
+            .querySelectorAll(
+                ".fullscreen-btn"
+            )
+            .forEach(
+                button => {
+
+                    const stageId =
+                        button.dataset.stage;
+
+
+                    const lab =
+                        getStageLab(
+                            stageId
+                        );
+
+
+                    const icon =
+                        button.querySelector(
+                            ".fullscreen-icon"
+                        );
+
+
+                    const text =
+                        button.querySelector(
+                            ".fullscreen-text"
+                        );
+
+
+                    if (
+                        lab &&
+                        fullscreenElement ===
+                        lab
+                    ) {
+
+                        if (icon) {
+                            icon.textContent =
+                                "✕";
+                        }
+
+
+                        if (text) {
+                            text.textContent =
+                                "Exit Full Screen";
+                        }
+
+
+                        button.title =
+                            "Exit experiment full screen";
+
+                    } else {
+
+                        if (icon) {
+                            icon.textContent =
+                                "⛶";
+                        }
+
+
+                        if (text) {
+                            text.textContent =
+                                "Maximize Experiment";
+                        }
+
+
+                        button.title =
+                            "Maximize experiment";
+
+                    }
+
+                }
+            );
+
+
+        /*
+            Force Three.js ResizeObserver to
+            receive the new dimensions.
+        */
+
+        window.dispatchEvent(
+            new Event(
+                "resize"
+            )
+        );
+
+
+        setTimeout(
+            () => {
+
+                window.dispatchEvent(
+                    new Event(
+                        "resize"
+                    )
+                );
+
+            },
+            100
+        );
+
+
+        setTimeout(
+            () => {
+
+                window.dispatchEvent(
+                    new Event(
+                        "resize"
+                    )
+                );
+
+            },
+            350
+        );
+
+    }
+
+
+    document.addEventListener(
+        "fullscreenchange",
+        updateFullscreenButtons
+    );
+
+
+    document.addEventListener(
+        "webkitfullscreenchange",
+        updateFullscreenButtons
+    );
+
+
+
+
+
+    /* =====================================================
+       BASIC HELPERS
+    ====================================================== */
+
+    function clamp(value, min, max) {
+
+        return Math.min(
+            max,
+            Math.max(
+                min,
+                value
+            )
+        );
+
+    }
+
+
+    function lerp(
+        start,
+        end,
+        amount
+    ) {
+
+        return (
+            start +
+            (
+                end -
+                start
+            ) *
+            amount
+        );
+
+    }
+
+
+    /* =====================================================
+       COMMON 3D SETUP
+    ====================================================== */
+
+    function createWorld(
+        containerId,
+        target = new THREE.Vector3(0,1,0)
+    ) {
+
+        const container =
+            document.getElementById(
+                containerId
+            );
+
+
+        const scene =
+            new THREE.Scene();
+
+
+        scene.background =
+            new THREE.Color(
+                0xdbeafe
+            );
+
+
+        scene.fog =
+            new THREE.Fog(
+                0xdbeafe,
+                18,
+                34
+            );
+
+
+        const width =
+            container.clientWidth ||
+            800;
+
+
+        const height =
+            container.clientHeight ||
+            510;
+
+
+        const camera =
+            new THREE.PerspectiveCamera(
+                44,
+                width /
+                height,
+                0.1,
+                100
+            );
+
+
+        const renderer =
+            new THREE.WebGLRenderer({
+                antialias: true
+            });
+
+
+        renderer.setPixelRatio(
+            Math.min(
+                window.devicePixelRatio,
+                2
+            )
+        );
+
+
+        renderer.setSize(
+            width,
+            height
+        );
+
+
+        renderer.shadowMap.enabled =
+            true;
+
+
+        renderer.shadowMap.type =
+            THREE.PCFSoftShadowMap;
+
+
+        renderer.outputColorSpace =
+            THREE.SRGBColorSpace;
+
+
+        renderer.domElement.style.position =
+            "absolute";
+
+
+        renderer.domElement.style.inset =
+            "0";
+
+
+        renderer.domElement.style.zIndex =
+            "1";
+
+
+        container.prepend(
+            renderer.domElement
+        );
+
+
+        const hemi =
+            new THREE.HemisphereLight(
+                0xffffff,
+                0x64748b,
+                2.1
+            );
+
+
+        scene.add(
+            hemi
+        );
+
+
+        const sun =
+            new THREE.DirectionalLight(
+                0xffffff,
+                3
+            );
+
+
+        sun.position.set(
+            -5,
+            10,
+            8
+        );
+
+
+        sun.castShadow =
+            true;
+
+
+        sun.shadow.mapSize.width =
+            2048;
+
+
+        sun.shadow.mapSize.height =
+            2048;
+
+
+        sun.shadow.camera.left =
+            -15;
+
+
+        sun.shadow.camera.right =
+            15;
+
+
+        sun.shadow.camera.top =
+            15;
+
+
+        sun.shadow.camera.bottom =
+            -15;
+
+
+        scene.add(
+            sun
+        );
+
+
+        const fill =
+            new THREE.DirectionalLight(
+                0xa5b4fc,
+                1
+            );
+
+
+        fill.position.set(
+            6,
+            5,
+            -6
+        );
+
+
+        scene.add(
+            fill
+        );
+
+
+        const ground =
+            new THREE.Mesh(
+                new THREE.PlaneGeometry(
+                    30,
+                    22
+                ),
+                new THREE.MeshStandardMaterial({
+                    color: 0x94a3b8,
+                    roughness: 0.92,
+                    metalness: 0.03
+                })
+            );
+
+
+        ground.rotation.x =
+            -Math.PI /
+            2;
+
+
+        ground.receiveShadow =
+            true;
+
+
+        scene.add(
+            ground
+        );
+
+
+        /*
+            Camera orbit
+        */
+
+        let radius = 13;
+        let theta = 0.75;
+        let phi = 1.08;
+
+        let dragging = false;
+        let previousX = 0;
+        let previousY = 0;
+
+
+        function updateCamera() {
+
+            camera.position.x =
+                target.x +
+                radius *
+                Math.sin(phi) *
+                Math.cos(theta);
+
+
+            camera.position.z =
+                target.z +
+                radius *
+                Math.sin(phi) *
+                Math.sin(theta);
+
+
+            camera.position.y =
+                target.y +
+                radius *
+                Math.cos(phi);
+
+
+            camera.lookAt(
+                target
+            );
+
+        }
+
+
+        updateCamera();
+
+
+        renderer.domElement.addEventListener(
+            "pointerdown",
+            event => {
+
+                dragging = true;
+
+                previousX =
+                    event.clientX;
+
+                previousY =
+                    event.clientY;
+
+
+                renderer.domElement
+                    .setPointerCapture(
+                        event.pointerId
+                    );
+
+            }
+        );
+
+
+        renderer.domElement.addEventListener(
+            "pointermove",
+            event => {
+
+                if (!dragging) {
+                    return;
+                }
+
+
+                const dx =
+                    event.clientX -
+                    previousX;
+
+
+                const dy =
+                    event.clientY -
+                    previousY;
+
+
+                previousX =
+                    event.clientX;
+
+
+                previousY =
+                    event.clientY;
+
+
+                theta -=
+                    dx *
+                    0.006;
+
+
+                phi +=
+                    dy *
+                    0.006;
+
+
+                phi =
+                    clamp(
+                        phi,
+                        0.45,
+                        1.45
+                    );
+
+
+                updateCamera();
+
+            }
+        );
+
+
+        renderer.domElement.addEventListener(
+            "pointerup",
+            () => {
+
+                dragging = false;
+
+            }
+        );
+
+
+        renderer.domElement.addEventListener(
+            "wheel",
+            event => {
+
+                event.preventDefault();
+
+
+                radius +=
+                    event.deltaY *
+                    0.01;
+
+
+                radius =
+                    clamp(
+                        radius,
+                        7,
+                        23
+                    );
+
+
+                updateCamera();
+
+            },
+            {
+                passive: false
+            }
+        );
+
+
+        const observer =
+            new ResizeObserver(
+                () => {
+
+                    const newWidth =
+                        container.clientWidth;
+
+
+                    const newHeight =
+                        container.clientHeight;
+
+
+                    if (
+                        newWidth <= 0 ||
+                        newHeight <= 0
+                    ) {
+                        return;
+                    }
+
+
+                    camera.aspect =
+                        newWidth /
+                        newHeight;
+
+
+                    camera.updateProjectionMatrix();
+
+
+                    renderer.setSize(
+                        newWidth,
+                        newHeight
+                    );
+
+                }
+            );
+
+
+        observer.observe(
+            container
+        );
+
+
+        let running =
+            true;
+
+
+        function render() {
+
+            if (!running) {
+                return;
+            }
+
+
+            requestAnimationFrame(
+                render
+            );
+
+
+            if (!document.hidden && container.getClientRects().length) renderer.render(scene, camera);
+
+        }
+
+
+        render();
+
+
+        return {
+            scene,
+            camera,
+            renderer,
+            target
+        };
+
+    }
+
+
+    function makeBox(
+        width,
+        height,
+        depth,
+        color
+    ) {
+
+        const mesh =
+            new THREE.Mesh(
+                new THREE.BoxGeometry(
+                    width,
+                    height,
+                    depth
+                ),
+                new THREE.MeshStandardMaterial({
+                    color,
+                    roughness: 0.55,
+                    metalness: 0.08
+                })
+            );
+
+
+        mesh.castShadow =
+            true;
+
+
+        mesh.receiveShadow =
+            true;
+
+
+        return mesh;
+
+    }
+
+
+    function makeWheel(
+        radius = 0.35,
+        width = 0.18
+    ) {
+
+        const wheel =
+            new THREE.Mesh(
+                new THREE.CylinderGeometry(
+                    radius,
+                    radius,
+                    width,
+                    24
+                ),
+                new THREE.MeshStandardMaterial({
+                    color: 0x111827,
+                    roughness: 0.8
+                })
+            );
+
+
+        wheel.rotation.x =
+            Math.PI /
+            2;
+
+
+        wheel.castShadow =
+            true;
+
+
+        return wheel;
+
+    }
+
+
+    function createArrow(
+        color
+    ) {
+
+        return new THREE.ArrowHelper(
+            new THREE.Vector3(
+                1,
+                0,
+                0
+            ),
+            new THREE.Vector3(),
+            2,
+            color,
+            0.45,
+            0.22
+        );
+
+    }
+
+
+    /* =====================================================
+       LAB SWITCHING
+    ====================================================== */
+
+    function openLab(name) {
+
+        [
+            "inertia",
+            "force",
+            "reaction"
+        ].forEach(
+            item => {
+
+                document
+                    .getElementById(
+                        `${item}Lab`
+                    )
+                    .classList
+                    .remove(
+                        "active"
+                    );
+
+
+                document
+                    .getElementById(
+                        `${item}Tab`
+                    )
+                    .classList
+                    .remove(
+                        "active"
+                    );
+
+
+                document
+                    .getElementById(
+                        `${item}Explanation`
+                    )
+                    .classList
+                    .remove(
+                        "active"
+                    );
+
+            }
+        );
+
+
+        document
+            .getElementById(
+                `${name}Lab`
+            )
+            .classList
+            .add(
+                "active"
+            );
+
+
+        document
+            .getElementById(
+                `${name}Tab`
+            )
+            .classList
+            .add(
+                "active"
+            );
+
+
+        document
+            .getElementById(
+                `${name}Explanation`
+            )
+            .classList
+            .add(
+                "active"
+            );
+
+
+        setTimeout(
+            () => {
+
+                ensureScene(
+                    name
+                );
+
+            },
+            30
+        );
+
+    }
+
+
+    function ensureScene(name) {
+
+        if (
+            scenes[name]
+        ) {
+
+            return;
+        }
+
+
+        if (
+            name ===
+            "inertia"
+        ) {
+
+            initInertiaScene();
+
+            updateInertia();
+
+        }
+
+
+        if (
+            name ===
+            "force"
+        ) {
+
+            initForceScene();
+
+            updateForce();
+
+        }
+
+
+        if (
+            name ===
+            "reaction"
+        ) {
+
+            initReactionScene();
+
+            updateReaction();
+
+        }
+
+    }
+
+
+    /* =====================================================
+       NEWTON 1 — 3D CAR
+    ====================================================== */
+
+    function initInertiaScene() {
+
+        const world =
+            createWorld(
+                "inertiaStage",
+                new THREE.Vector3(
+                    0,
+                    1,
+                    0
+                )
+            );
+
+
+        const scene =
+            world.scene;
+
+
+        /*
+            Road
+        */
+
+        const road =
+            new THREE.Mesh(
+                new THREE.BoxGeometry(
+                    24,
+                    0.12,
+                    5
+                ),
+                new THREE.MeshStandardMaterial({
+                    color: 0x374151,
+                    roughness: 0.92
+                })
+            );
+
+
+        road.position.y =
+            0.06;
+
+
+        road.receiveShadow =
+            true;
+
+
+        scene.add(
+            road
+        );
+
+
+        /*
+            Road lines
+        */
+
+        for (
+            let x = -10;
+            x <= 10;
+            x += 2.5
+        ) {
+
+            const line =
+                makeBox(
+                    1.3,
+                    0.03,
+                    0.08,
+                    0xffffff
+                );
+
+
+            line.position.set(
+                x,
+                0.13,
+                0
+            );
+
+
+            scene.add(
+                line
+            );
+
+        }
+
+
+        /*
+            Vehicle group
+        */
+
+        const car =
+            new THREE.Group();
+
+
+        const chassis =
+            makeBox(
+                4,
+                0.65,
+                2.05,
+                0x2563eb
+            );
+
+
+        chassis.position.y =
+            0.75;
+
+
+        car.add(
+            chassis
+        );
+
+
+        const cabin =
+            makeBox(
+                2.4,
+                0.95,
+                1.75,
+                0x60a5fa
+            );
+
+
+        cabin.position.set(
+            -0.15,
+            1.48,
+            0
+        );
+
+
+        car.add(
+            cabin
+        );
+
+
+        /*
+            Windscreen
+        */
+
+        const windscreen =
+            makeBox(
+                0.08,
+                0.63,
+                1.45,
+                0xcffafe
+            );
+
+
+        windscreen.position.set(
+            1.05,
+            1.53,
+            0
+        );
+
+
+        car.add(
+            windscreen
+        );
+
+
+        const wheelPositions = [
+            [-1.35,0.48,-1],
+            [1.35,0.48,-1],
+            [-1.35,0.48,1],
+            [1.35,0.48,1]
+        ];
+
+
+        wheelPositions.forEach(
+            position => {
+
+                const wheel =
+                    makeWheel();
+
+
+                wheel.position.set(
+                    ...position
+                );
+
+
+                car.add(
+                    wheel
+                );
+
+            }
+        );
+
+
+        /*
+            Seat
+        */
+
+        const seat =
+            makeBox(
+                0.65,
+                0.9,
+                0.75,
+                0x1f2937
+            );
+
+
+        seat.position.set(
+            -0.4,
+            1.45,
+            0
+        );
+
+
+        car.add(
+            seat
+        );
+
+
+        /*
+            Passenger
+        */
+
+        const passenger =
+            new THREE.Group();
+
+
+        const torso =
+            makeBox(
+                0.42,
+                0.75,
+                0.42,
+                0xf97316
+            );
+
+
+        torso.position.y =
+            0.15;
+
+
+        passenger.add(
+            torso
+        );
+
+
+        const head =
+            new THREE.Mesh(
+                new THREE.SphereGeometry(
+                    0.25,
+                    24,
+                    24
+                ),
+                new THREE.MeshStandardMaterial({
+                    color: 0xf1c7a5
+                })
+            );
+
+
+        head.position.y =
+            0.78;
+
+
+        head.castShadow =
+            true;
+
+
+        passenger.add(
+            head
+        );
+
+
+        passenger.position.set(
+            -0.38,
+            1.55,
+            0
+        );
+
+
+        car.add(
+            passenger
+        );
+
+
+        car.position.x =
+            -4.5;
+
+
+        scene.add(
+            car
+        );
+
+
+        /*
+            Velocity arrow
+        */
+
+        const velocityArrow =
+            createArrow(
+                0x16a34a
+            );
+
+
+        velocityArrow.position.set(
+            -2,
+            3.2,
+            0
+        );
+
+
+        scene.add(
+            velocityArrow
+        );
+
+
+        /*
+            Braking arrow left
+        */
+
+        const brakeArrow =
+            new THREE.ArrowHelper(
+                new THREE.Vector3(
+                    -1,
+                    0,
+                    0
+                ),
+                new THREE.Vector3(),
+                2,
+                0xef4444,
+                0.45,
+                0.22
+            );
+
+
+        brakeArrow.position.set(
+            1,
+            2.65,
+            0
+        );
+
+
+        scene.add(
+            brakeArrow
+        );
+
+
+        scenes.inertia = {
+            ...world,
+            car,
+            passenger,
+            velocityArrow,
+            brakeArrow
+        };
+
+    }
+
+
+    function getInertiaValues() {
+
+        const speedKmh =
+            Number(
+                document.getElementById(
+                    "vehicleSpeed"
+                ).value
+            );
+
+
+        const braking =
+            Number(
+                document.getElementById(
+                    "brakeAcceleration"
+                ).value
+            );
+
+
+        const seatbelt =
+            document.getElementById(
+                "seatbeltToggle"
+            ).checked;
+
+
+        const speedMs =
+            speedKmh /
+            3.6;
+
+
+        const stopTime =
+            speedMs /
+            braking;
+
+
+        const stopDistance =
+            (
+                speedMs *
+                speedMs
+            ) /
+            (
+                2 *
+                braking
+            );
+
+
+        return {
+            speedKmh,
+            speedMs,
+            braking,
+            stopTime,
+            stopDistance,
+            seatbelt
+        };
+
+    }
+
+
+    function updateInertia() {
+
+        inertiaRunId++;
+
+
+        const values =
+            getInertiaValues();
+
+
+        document.getElementById(
+            "vehicleSpeedValue"
+        ).textContent =
+            `${values.speedKmh} km/h`;
+
+
+        document.getElementById(
+            "brakeValue"
+        ).textContent =
+            `${values.braking} m/s²`;
+
+
+        document.getElementById(
+            "inertiaHudSpeed"
+        ).textContent =
+            `${values.speedKmh} km/h`;
+
+
+        document.getElementById(
+            "inertiaHudBrake"
+        ).textContent =
+            `${values.braking} m/s²`;
+
+
+        document.getElementById(
+            "inertiaHudTime"
+        ).textContent =
+            `${values.stopTime.toFixed(1)} s`;
+
+
+        document.getElementById(
+            "inertiaHudDistance"
+        ).textContent =
+            `${values.stopDistance.toFixed(1)} m`;
+
+
+        document.getElementById(
+            "inertiaResult"
+        ).textContent =
+            values.seatbelt
+                ? "When the vehicle brakes, the passenger tends to continue forward. The seatbelt provides the force needed to slow the passenger with the vehicle."
+                : "When the vehicle brakes, the passenger's body tends to keep moving forward because of inertia. Without the seatbelt, the forward motion is much larger.";
+
+
+        document.getElementById(
+            "inertiaFormula"
+        ).innerHTML =
+            `
+            Speed =
+            ${values.speedMs.toFixed(1)} m/s
+            <br>
+
+            Stopping time =
+            v ÷ a =
+            ${values.speedMs.toFixed(1)}
+            ÷
+            ${values.braking}
+            =
+            <b>${values.stopTime.toFixed(1)} s</b>
+            <br>
+
+            Stopping distance ≈
+            <b>${values.stopDistance.toFixed(1)} m</b>
+            `;
+
+
+        if (
+            scenes.inertia
+        ) {
+
+            scenes.inertia.velocityArrow
+                .setLength(
+                    clamp(
+                        1.3 +
+                        values.speedKmh /
+                        35,
+                        1.5,
+                        4.5
+                    ),
+                    0.55,
+                    0.28
+                );
+
+
+            scenes.inertia.brakeArrow
+                .setLength(
+                    1.2 +
+                    values.braking /
+                    3,
+                    0.55,
+                    0.28
+                );
+
+
+            scenes.inertia.passenger.position.x =
+                -0.38;
+
+        }
+
+
+        updateInertiaStory(
+            values
+        );
+
+    }
+
+
+    function runInertia() {
+
+        ensureScene(
+            "inertia"
+        );
+
+
+        const runId =
+            ++inertiaRunId;
+
+
+        const values =
+            getInertiaValues();
+
+
+        const data =
+            scenes.inertia;
+
+
+        data.car.position.x =
+            -4.5;
+
+
+        data.passenger.position.x =
+            -0.38;
+
+
+        document.getElementById(
+            "inertiaSceneMessage"
+        ).textContent =
+            "Vehicle moving...";
+
+
+        const duration =
+            2400;
+
+
+        const start =
+            performance.now();
+
+
+        function frame(now) {
+
+            if (
+                runId !==
+                inertiaRunId
+            ) {
+                return;
+            }
+
+
+            const t =
+                clamp(
+                    (
+                        now -
+                        start
+                    ) /
+                    duration,
+                    0,
+                    1
+                );
+
+
+            /*
+                Decelerating position visually
+            */
+
+            const moveProgress =
+                1 -
+                Math.pow(
+                    1 -
+                    t,
+                    2
+                );
+
+
+            data.car.position.x =
+                -4.5 +
+                moveProgress *
+                8;
+
+
+            /*
+                Passenger shifts forward
+                relative to vehicle during braking.
+            */
+
+            const forwardShift =
+                values.seatbelt
+                    ? 0.18
+                    : clamp(
+                        values.speedKmh /
+                        80 +
+                        values.braking /
+                        15,
+                        0.5,
+                        1.5
+                    );
+
+
+            const passengerProgress =
+                Math.sin(
+                    Math.PI *
+                    t
+                );
+
+
+            data.passenger.position.x =
+                -0.38 +
+                forwardShift *
+                passengerProgress;
+
+
+            if (
+                t <
+                1
+            ) {
+
+                requestAnimationFrame(
+                    frame
+                );
+
+            } else {
+
+                data.passenger.position.x =
+                    -0.38;
+
+
+                document.getElementById(
+                    "inertiaSceneMessage"
+                ).textContent =
+                    values.seatbelt
+                        ? `Stopped after about ${values.stopDistance.toFixed(1)} m. Seatbelt restrained the passenger.`
+                        : `Stopped after about ${values.stopDistance.toFixed(1)} m. Passenger moved strongly forward due to inertia.`;
+
+            }
+
+        }
+
+
+        requestAnimationFrame(
+            frame
+        );
+
+    }
+
+
+    function updateInertiaStory(values) {
+
+        document.getElementById(
+            "inertiaStory"
+        ).innerHTML =
+            `
+            Imagine you are sitting in a car with your friend.
+
+            The car is travelling at
+            <b>${values.speedKmh} km/h</b>.
+
+            Suddenly your friend brakes at about
+            <b>${values.braking} m/s²</b>.
+
+            <br><br>
+
+            The car starts slowing down,
+            but your body was already moving forward
+            with the vehicle.
+            Your body therefore tends to continue forward.
+            `;
+
+
+        document.getElementById(
+            "inertiaCalculation"
+        ).innerHTML =
+            `
+            Initial speed =
+            ${values.speedKmh} km/h
+            =
+            ${values.speedMs.toFixed(1)} m/s
+
+            <br><br>
+
+            Stop time =
+            ${values.speedMs.toFixed(1)}
+            ÷
+            ${values.braking}
+            =
+            <b>${values.stopTime.toFixed(1)} s</b>
+
+            <br><br>
+
+            Approx. stopping distance =
+            <b>${values.stopDistance.toFixed(1)} m</b>
+            `;
+
+
+        document.getElementById(
+            "inertiaObservation"
+        ).innerHTML =
+            values.seatbelt
+                ? `The passenger starts to move forward, but the seatbelt holds the body back and provides a force that changes the passenger's motion.`
+                : `Without a seatbelt, the passenger continues moving forward much more noticeably even while the vehicle itself is slowing down.`;
+
+
+        document.getElementById(
+            "seatbeltStory"
+        ).innerHTML =
+            values.seatbelt
+                ? `Seatbelt is ON ✅. It applies a restraining force to the passenger, helping the passenger slow down together with the vehicle.`
+                : `Seatbelt is OFF ❌. The passenger has no immediate restraining force from the belt, so the forward motion is much larger.`;
+
+
+        document.getElementById(
+            "inertiaTakeaway"
+        ).innerHTML =
+            `
+            <b>⭐ Your experiment:</b>
+            A vehicle moving at
+            ${values.speedKmh} km/h
+            was brought to rest.
+
+            The vehicle slowed because of braking force.
+            The passenger tended to continue moving forward —
+            that tendency is inertia.
+            `;
+
+    }
+
+
+    /* =====================================================
+       NEWTON 2 — CRATE
+    ====================================================== */
+
+    function initForceScene() {
+
+        const world =
+            createWorld(
+                "forceStage",
+                new THREE.Vector3(
+                    0,
+                    1,
+                    0
+                )
+            );
+
+
+        const scene =
+            world.scene;
+
+
+        /*
+            Track
+        */
+
+        const track =
+            makeBox(
+                13,
+                0.12,
+                3.5,
+                0xd1d5db
+            );
+
+
+        track.position.y =
+            0.08;
+
+
+        scene.add(
+            track
+        );
+
+
+        /*
+            0 to 10 m markers
+        */
+
+        for (
+            let i = 0;
+            i <= 10;
+            i += 2
+        ) {
+
+            const marker =
+                makeBox(
+                    0.05,
+                    0.04,
+                    3.2,
+                    i === 10
+                        ? 0xf59e0b
+                        : 0xffffff
+                );
+
+
+            marker.position.set(
+                -5 +
+                i,
+                0.18,
+                0
+            );
+
+
+            scene.add(
+                marker
+            );
+
+        }
+
+
+        const crate =
+            new THREE.Group();
+
+
+        const body =
+            makeBox(
+                1.7,
+                1.7,
+                1.7,
+                0xb45309
+            );
+
+
+        body.position.y =
+            1;
+
+
+        crate.add(
+            body
+        );
+
+
+        /*
+            Wooden-looking slats
+        */
+
+        [
+            -0.58,
+            0,
+            0.58
+        ].forEach(
+            y => {
+
+                const slat =
+                    makeBox(
+                        1.78,
+                        0.10,
+                        1.78,
+                        0xf59e0b
+                    );
+
+
+                slat.position.y =
+                    0.45 +
+                    y;
+
+
+                crate.add(
+                    slat
+                );
+
+            }
+        );
+
+
+        crate.position.x =
+            -5;
+
+
+        scene.add(
+            crate
+        );
+
+
+        const forceArrow =
+            createArrow(
+                0x16a34a
+            );
+
+
+        forceArrow.position.set(
+            -4.9,
+            2.8,
+            0
+        );
+
+
+        scene.add(
+            forceArrow
+        );
+
+
+        const accelerationArrow =
+            createArrow(
+                0x2563eb
+            );
+
+
+        accelerationArrow.position.set(
+            -4.9,
+            3.5,
+            0
+        );
+
+
+        scene.add(
+            accelerationArrow
+        );
+
+
+        scenes.force = {
+            ...world,
+            crate,
+            forceArrow,
+            accelerationArrow
+        };
+
+    }
+
+
+    function getForceValues() {
+
+        const force =
+            Number(
+                document.getElementById(
+                    "appliedForce"
+                ).value
+            );
+
+
+        const mass =
+            Number(
+                document.getElementById(
+                    "crateMass"
+                ).value
+            );
+
+
+        const acceleration =
+            force /
+            mass;
+
+
+        const distance =
+            10;
+
+
+        const time =
+            Math.sqrt(
+                (
+                    2 *
+                    distance
+                ) /
+                acceleration
+            );
+
+
+        return {
+            force,
+            mass,
+            acceleration,
+            distance,
+            time
+        };
+
+    }
+
+
+    function updateForce() {
+
+        forceRunId++;
+
+
+        const values =
+            getForceValues();
+
+
+        document.getElementById(
+            "forceValue"
+        ).textContent =
+            `${values.force} N`;
+
+
+        document.getElementById(
+            "massValue"
+        ).textContent =
+            `${values.mass} kg`;
+
+
+        document.getElementById(
+            "forceHudForce"
+        ).textContent =
+            `${values.force} N`;
+
+
+        document.getElementById(
+            "forceHudMass"
+        ).textContent =
+            `${values.mass} kg`;
+
+
+        document.getElementById(
+            "forceHudAcceleration"
+        ).textContent =
+            `${values.acceleration.toFixed(1)} m/s²`;
+
+
+        document.getElementById(
+            "forceHudTime"
+        ).textContent =
+            `${values.time.toFixed(1)} s`;
+
+
+        document.getElementById(
+            "forceResult"
+        ).textContent =
+            `A ${values.force} N force acting on a ${values.mass} kg crate produces ${values.acceleration.toFixed(1)} m/s² acceleration.`;
+
+
+        document.getElementById(
+            "forceFormula"
+        ).innerHTML =
+            `
+            F = ma
+            <br>
+
+            a = F ÷ m
+            =
+            ${values.force}
+            ÷
+            ${values.mass}
+            =
+            <b>${values.acceleration.toFixed(1)} m/s²</b>
+            `;
+
+
+        if (
+            scenes.force
+        ) {
+
+            scenes.force.crate.position.x =
+                -5;
+
+
+            scenes.force.forceArrow.setLength(
+                clamp(
+                    1.2 +
+                    values.force /
+                    70,
+                    1.4,
+                    4.2
+                ),
+                0.5,
+                0.24
+            );
+
+
+            scenes.force.accelerationArrow.setLength(
+                clamp(
+                    1 +
+                    values.acceleration /
+                    4,
+                    1.2,
+                    4
+                ),
+                0.5,
+                0.24
+            );
+
+        }
+
+
+        updateForceStory(
+            values
+        );
+
+    }
+
+
+    function runForce() {
+
+        ensureScene(
+            "force"
+        );
+
+
+        const runId =
+            ++forceRunId;
+
+
+        const values =
+            getForceValues();
+
+
+        const crate =
+            scenes.force.crate;
+
+
+        crate.position.x =
+            -5;
+
+
+        const duration =
+            clamp(
+                1100 +
+                values.time *
+                220,
+                1400,
+                3000
+            );
+
+
+        const start =
+            performance.now();
+
+
+        document.getElementById(
+            "forceSceneMessage"
+        ).textContent =
+            "Crate moving from 0 m toward the 10 m marker...";
+
+
+        function frame(now) {
+
+            if (
+                runId !==
+                forceRunId
+            ) {
+                return;
+            }
+
+
+            const progress =
+                clamp(
+                    (
+                        now -
+                        start
+                    ) /
+                    duration,
+                    0,
+                    1
+                );
+
+
+            /*
+                Constant acceleration:
+                position proportional to t².
+            */
+
+            const physicsProgress =
+                progress *
+                progress;
+
+
+            crate.position.x =
+                -5 +
+                physicsProgress *
+                10;
+
+
+            const currentDistance =
+                physicsProgress *
+                10;
+
+
+            const currentTime =
+                progress *
+                values.time;
+
+
+            document.getElementById(
+                "forceSceneMessage"
+            ).textContent =
+                `Distance: ${currentDistance.toFixed(1)} m • Time: ${currentTime.toFixed(1)} s • Acceleration: ${values.acceleration.toFixed(1)} m/s²`;
+
+
+            if (
+                progress <
+                1
+            ) {
+
+                requestAnimationFrame(
+                    frame
+                );
+
+            } else {
+
+                document.getElementById(
+                    "forceSceneMessage"
+                ).textContent =
+                    `✅ Crate reached 10 m in about ${values.time.toFixed(1)} s.`;
+
+            }
+
+        }
+
+
+        requestAnimationFrame(
+            frame
+        );
+
+    }
+
+
+    function updateForceStory(values) {
+
+        document.getElementById(
+            "forceStory"
+        ).innerHTML =
+            `
+            Imagine there is a
+            <b>${values.mass} kg</b>
+            equipment box in your college lab.
+
+            You push it horizontally with
+            <b>${values.force} N</b>
+            of force.
+
+            <br><br>
+
+            The question is:
+            <b>How quickly will the box accelerate?</b>
+            `;
+
+
+        document.getElementById(
+            "forceCalculation"
+        ).innerHTML =
+            `
+            Force = ${values.force} N
+            <br>
+
+            Mass = ${values.mass} kg
+
+            <br><br>
+
+            a = F ÷ m
+
+            <br>
+
+            = ${values.force}
+            ÷
+            ${values.mass}
+
+            <br>
+
+            = <b>${values.acceleration.toFixed(1)} m/s²</b>
+
+            <br><br>
+
+            From rest,
+            it reaches 10 m in about
+            <b>${values.time.toFixed(1)} s</b>.
+            `;
+
+
+        document.getElementById(
+            "forceObservation"
+        ).innerHTML =
+            `
+            In the 3D scene,
+            the crate begins slowly and then covers distance faster
+            because its velocity increases while it accelerates.
+
+            With your current settings,
+            acceleration is
+            <b>${values.acceleration.toFixed(1)} m/s²</b>.
+            `;
+
+
+        document.getElementById(
+            "forceTakeaway"
+        ).innerHTML =
+            `
+            <b>⭐ Your experiment:</b>
+
+            ${values.force} N acting on
+            ${values.mass} kg produced
+            <b>${values.acceleration.toFixed(1)} m/s²</b>.
+
+            Increase force → acceleration increases.
+            Increase mass → acceleration decreases.
+            `;
+
+    }
+
+
+    /* =====================================================
+       NEWTON 3 — TWO STUDENTS
+    ====================================================== */
+
+    function createStudentCart(
+        shirtColor
+    ) {
+
+        const group =
+            new THREE.Group();
+
+
+        const base =
+            makeBox(
+                1.9,
+                0.26,
+                1.2,
+                0x334155
+            );
+
+
+        base.position.y =
+            0.43;
+
+
+        group.add(
+            base
+        );
+
+
+        [
+            [-0.65,0.28,-0.55],
+            [0.65,0.28,-0.55],
+            [-0.65,0.28,0.55],
+            [0.65,0.28,0.55]
+        ].forEach(
+            position => {
+
+                const wheel =
+                    makeWheel(
+                        0.20,
+                        0.15
+                    );
+
+
+                wheel.position.set(
+                    ...position
+                );
+
+
+                group.add(
+                    wheel
+                );
+
+            }
+        );
+
+
+        const body =
+            makeBox(
+                0.48,
+                1.0,
+                0.48,
+                shirtColor
+            );
+
+
+        body.position.y =
+            1.18;
+
+
+        group.add(
+            body
+        );
+
+
+        const head =
+            new THREE.Mesh(
+                new THREE.SphereGeometry(
+                    0.30,
+                    24,
+                    24
+                ),
+                new THREE.MeshStandardMaterial({
+                    color: 0xf1c7a5
+                })
+            );
+
+
+        head.position.y =
+            1.98;
+
+
+        head.castShadow =
+            true;
+
+
+        group.add(
+            head
+        );
+
+
+        return group;
+
+    }
+
+
+    function initReactionScene() {
+
+        const world =
+            createWorld(
+                "reactionStage",
+                new THREE.Vector3(
+                    0,
+                    1,
+                    0
+                )
+            );
+
+
+        const scene =
+            world.scene;
+
+
+        const floor =
+            makeBox(
+                15,
+                0.12,
+                5,
+                0xd1d5db
+            );
+
+
+        floor.position.y =
+            0.06;
+
+
+        scene.add(
+            floor
+        );
+
+
+        const centerLine =
+            makeBox(
+                0.06,
+                0.05,
+                4.5,
+                0xffffff
+            );
+
+
+        centerLine.position.y =
+            0.14;
+
+
+        scene.add(
+            centerLine
+        );
+
+
+        const studentA =
+            createStudentCart(
+                0x4f46e5
+            );
+
+
+        studentA.position.x =
+            -1.05;
+
+
+        scene.add(
+            studentA
+        );
+
+
+        const studentB =
+            createStudentCart(
+                0x16a34a
+            );
+
+
+        studentB.position.x =
+            1.05;
+
+
+        scene.add(
+            studentB
+        );
+
+
+        /*
+            Force on A points left
+        */
+
+        const arrowA =
+            new THREE.ArrowHelper(
+                new THREE.Vector3(
+                    -1,
+                    0,
+                    0
+                ),
+                new THREE.Vector3(
+                    -0.7,
+                    2.8,
+                    0
+                ),
+                2,
+                0xef4444,
+                0.5,
+                0.25
+            );
+
+
+        scene.add(
+            arrowA
+        );
+
+
+        /*
+            Force on B points right
+        */
+
+        const arrowB =
+            new THREE.ArrowHelper(
+                new THREE.Vector3(
+                    1,
+                    0,
+                    0
+                ),
+                new THREE.Vector3(
+                    0.7,
+                    2.8,
+                    0
+                ),
+                2,
+                0x16a34a,
+                0.5,
+                0.25
+            );
+
+
+        scene.add(
+            arrowB
+        );
+
+
+        scenes.reaction = {
+            ...world,
+            studentA,
+            studentB,
+            arrowA,
+            arrowB
+        };
+
+    }
+
+
+    function getReactionValues() {
+
+        const force =
+            Number(
+                document.getElementById(
+                    "reactionForce"
+                ).value
+            );
+
+
+        const massA =
+            Number(
+                document.getElementById(
+                    "massA"
+                ).value
+            );
+
+
+        const massB =
+            Number(
+                document.getElementById(
+                    "massB"
+                ).value
+            );
+
+
+        const time =
+            Number(
+                document.getElementById(
+                    "reactionTime"
+                ).value
+            ) /
+            10;
+
+
+        const accelerationA =
+            force /
+            massA;
+
+
+        const accelerationB =
+            force /
+            massB;
+
+
+        const velocityA =
+            accelerationA *
+            time;
+
+
+        const velocityB =
+            accelerationB *
+            time;
+
+
+        const distanceA =
+            0.5 *
+            accelerationA *
+            time *
+            time;
+
+
+        const distanceB =
+            0.5 *
+            accelerationB *
+            time *
+            time;
+
+
+        return {
+            force,
+            massA,
+            massB,
+            time,
+            accelerationA,
+            accelerationB,
+            velocityA,
+            velocityB,
+            distanceA,
+            distanceB
+        };
+
+    }
+
+
+    function updateReaction() {
+
+        reactionRunId++;
+
+
+        const values =
+            getReactionValues();
+
+
+        document.getElementById(
+            "reactionForceValue"
+        ).textContent =
+            `${values.force} N`;
+
+
+        document.getElementById(
+            "massAValue"
+        ).textContent =
+            `${values.massA} kg`;
+
+
+        document.getElementById(
+            "massBValue"
+        ).textContent =
+            `${values.massB} kg`;
+
+
+        document.getElementById(
+            "reactionTimeValue"
+        ).textContent =
+            `${values.time.toFixed(1)} s`;
+
+
+        document.getElementById(
+            "reactionHudForce"
+        ).textContent =
+            `${values.force} N each`;
+
+
+        document.getElementById(
+            "reactionHudA"
+        ).textContent =
+            `${values.accelerationA.toFixed(2)} m/s²`;
+
+
+        document.getElementById(
+            "reactionHudB"
+        ).textContent =
+            `${values.accelerationB.toFixed(2)} m/s²`;
+
+
+        document.getElementById(
+            "reactionHudTime"
+        ).textContent =
+            `${values.time.toFixed(1)} s`;
+
+
+        document.getElementById(
+            "reactionResult"
+        ).textContent =
+            `Both students experience ${values.force} N in opposite directions. Student A accelerates at ${values.accelerationA.toFixed(2)} m/s² and Student B at ${values.accelerationB.toFixed(2)} m/s².`;
+
+
+        document.getElementById(
+            "reactionFormula"
+        ).innerHTML =
+            `
+            Force on A =
+            <b>${values.force} N ←</b>
+            <br>
+
+            Force on B =
+            <b>${values.force} N →</b>
+
+            <br><br>
+
+            aA =
+            ${values.force} ÷ ${values.massA}
+            =
+            ${values.accelerationA.toFixed(2)} m/s²
+
+            <br>
+
+            aB =
+            ${values.force} ÷ ${values.massB}
+            =
+            ${values.accelerationB.toFixed(2)} m/s²
+            `;
+
+
+        if (
+            scenes.reaction
+        ) {
+
+            scenes.reaction.studentA.position.x =
+                -1.05;
+
+
+            scenes.reaction.studentB.position.x =
+                1.05;
+
+
+            const arrowLength =
+                clamp(
+                    1.3 +
+                    values.force /
+                    60,
+                    1.5,
+                    4
+                );
+
+
+            scenes.reaction.arrowA.setLength(
+                arrowLength,
+                0.5,
+                0.25
+            );
+
+
+            scenes.reaction.arrowB.setLength(
+                arrowLength,
+                0.5,
+                0.25
+            );
+
+        }
+
+
+        updateReactionStory(
+            values
+        );
+
+    }
+
+
+    function runReaction() {
+
+        ensureScene(
+            "reaction"
+        );
+
+
+        const runId =
+            ++reactionRunId;
+
+
+        const values =
+            getReactionValues();
+
+
+        const data =
+            scenes.reaction;
+
+
+        data.studentA.position.x =
+            -1.05;
+
+
+        data.studentB.position.x =
+            1.05;
+
+
+        const maxDistance =
+            Math.max(
+                values.distanceA,
+                values.distanceB,
+                0.1
+            );
+
+
+        /*
+            Visual scaling:
+            preserve relative distance while
+            keeping carts visible on screen.
+        */
+
+        const scale =
+            4 /
+            maxDistance;
+
+
+        const visualA =
+            clamp(
+                values.distanceA *
+                scale,
+                0.7,
+                4.5
+            );
+
+
+        const visualB =
+            clamp(
+                values.distanceB *
+                scale,
+                0.7,
+                4.5
+            );
+
+
+        const start =
+            performance.now();
+
+
+        const duration =
+            2000;
+
+
+        function frame(now) {
+
+            if (
+                runId !==
+                reactionRunId
+            ) {
+                return;
+            }
+
+
+            const progress =
+                clamp(
+                    (
+                        now -
+                        start
+                    ) /
+                    duration,
+                    0,
+                    1
+                );
+
+
+            const physicsProgress =
+                progress *
+                progress;
+
+
+            data.studentA.position.x =
+                -1.05 -
+                visualA *
+                physicsProgress;
+
+
+            data.studentB.position.x =
+                1.05 +
+                visualB *
+                physicsProgress;
+
+
+            const currentA =
+                values.distanceA *
+                physicsProgress;
+
+
+            const currentB =
+                values.distanceB *
+                physicsProgress;
+
+
+            document.getElementById(
+                "reactionSceneMessage"
+            ).textContent =
+                `A moved ${currentA.toFixed(2)} m ← • B moved ${currentB.toFixed(2)} m → • Forces remain ${values.force} N each`;
+
+
+            if (
+                progress <
+                1
+            ) {
+
+                requestAnimationFrame(
+                    frame
+                );
+
+            } else {
+
+                document.getElementById(
+                    "reactionSceneMessage"
+                ).textContent =
+                    `✅ Equal ${values.force} N forces • A: ${values.distanceA.toFixed(2)} m • B: ${values.distanceB.toFixed(2)} m`;
+
+            }
+
+        }
+
+
+        requestAnimationFrame(
+            frame
+        );
+
+    }
+
+
+    function updateReactionStory(values) {
+
+        let lighterText;
+
+
+        if (
+            values.massA <
+            values.massB
+        ) {
+
+            lighterText =
+                `You are lighter, so you accelerate more than your friend.`;
+
+        } else if (
+            values.massB <
+            values.massA
+        ) {
+
+            lighterText =
+                `Your friend is lighter, so your friend accelerates more.`;
+
+        } else {
+
+            lighterText =
+                `Both masses are equal, so their acceleration magnitudes are also equal.`;
+
+        }
+
+
+        document.getElementById(
+            "reactionStory"
+        ).innerHTML =
+            `
+            You sit on a wheeled chair with mass
+            <b>${values.massA} kg</b>.
+
+            Your friend sits on another wheeled chair
+            with mass
+            <b>${values.massB} kg</b>.
+
+            <br><br>
+
+            You push against each other.
+
+            The interaction force is
+            <b>${values.force} N</b>
+            for
+            <b>${values.time.toFixed(1)} s</b>.
+
+            Both of you roll away in opposite directions.
+            `;
+
+
+        document.getElementById(
+            "reactionCalculation"
+        ).innerHTML =
+            `
+            Force on you =
+            ${values.force} N ←
+            <br>
+
+            Force on friend =
+            ${values.force} N →
+
+            <br><br>
+
+            Your acceleration =
+            <b>${values.accelerationA.toFixed(2)} m/s²</b>
+
+            <br>
+
+            Friend's acceleration =
+            <b>${values.accelerationB.toFixed(2)} m/s²</b>
+
+            <br><br>
+
+            During the push:
+
+            <br>
+
+            You move ≈
+            <b>${values.distanceA.toFixed(2)} m</b>
+
+            <br>
+
+            Friend moves ≈
+            <b>${values.distanceB.toFixed(2)} m</b>
+            `;
+
+
+        document.getElementById(
+            "reactionObservation"
+        ).innerHTML =
+            `
+            ${lighterText}
+
+            The forces are still equal and opposite.
+            The different movement happens because
+            acceleration also depends on mass.
+            `;
+
+
+        document.getElementById(
+            "reactionTakeaway"
+        ).innerHTML =
+            `
+            <b>⭐ Your experiment:</b>
+
+            The two interaction forces were exactly
+            <b>${values.force} N</b>
+            in opposite directions.
+
+            But the accelerations were
+            <b>${values.accelerationA.toFixed(2)} m/s²</b>
+            and
+            <b>${values.accelerationB.toFixed(2)} m/s²</b>
+            because the masses were different.
+            `;
+
+    }
+
+
+    /* =====================================================
+       PRACTICE MCQ
+    ====================================================== */
+
+    const QUESTIONS = [
+
+        {
+            id: 1,
+
+            concept:
+                "Balanced Forces",
+
+            question:
+                "A book is resting on a table. Gravity pulls downward and the table pushes upward with equal force. What is the net force on the book?",
+
+            options: [
+                "0 N",
+                "Equal to its weight downward",
+                "Equal to table force upward",
+                "Infinite"
+            ],
+
+            correct: 0,
+
+            explanation:
+                "The upward normal force balances the downward gravitational force. Equal opposite forces cancel, so the net force is 0 N."
+        },
+
+
+        {
+            id: 2,
+
+            concept:
+                "Newton's First Law",
+
+            question:
+                "Why does a passenger tend to move forward when a moving vehicle suddenly stops?",
+
+            options: [
+                "Gravity pulls the passenger forward",
+                "The passenger's body tends to continue its motion due to inertia",
+                "The seat pushes the passenger forward",
+                "Air pressure increases"
+            ],
+
+            correct: 1,
+
+            explanation:
+                "Before braking, the passenger is moving with the vehicle. When the vehicle slows, the passenger's body tends to continue its previous motion. This tendency is inertia."
+        },
+
+
+        {
+            id: 3,
+
+            concept:
+                "Newton's Second Law",
+
+            question:
+                "A net force of 12 N acts on a 4 kg object. What is its acceleration?",
+
+            options: [
+                "48 m/s²",
+                "16 m/s²",
+                "3 m/s²",
+                "0.33 m/s²"
+            ],
+
+            correct: 2,
+
+            explanation:
+                "Using F = ma, acceleration a = F ÷ m = 12 ÷ 4 = 3 m/s²."
+        },
+
+
+        {
+            id: 4,
+
+            concept:
+                "Force and Mass",
+
+            question:
+                "The same force is applied to two boxes. Box B has twice the mass of Box A. Compared with Box A, Box B's acceleration will be:",
+
+            options: [
+                "Twice as large",
+                "Half as large",
+                "Exactly the same",
+                "Zero"
+            ],
+
+            correct: 1,
+
+            explanation:
+                "For the same force, a = F ÷ m. Doubling the mass makes the acceleration half as large."
+        },
+
+
+        {
+            id: 5,
+
+            concept:
+                "Newton's Third Law",
+
+            question:
+                "Which statement correctly describes an action-reaction pair?",
+
+            options: [
+                "The forces are equal and opposite and act on different objects",
+                "One force is always larger",
+                "Both forces act on the same object",
+                "The reaction happens several seconds later"
+            ],
+
+            correct: 0,
+
+            explanation:
+                "Newton's Third Law says interaction forces are equal in magnitude and opposite in direction. They act on different objects."
+        },
+
+
+        {
+            id: 6,
+
+            concept:
+                "Third Law + Mass",
+
+            question:
+                "A 40 kg student and an 80 kg student push each other with equal force while sitting on wheeled chairs. Who has the greater acceleration?",
+
+            options: [
+                "The 80 kg student",
+                "The 40 kg student",
+                "Both must have zero acceleration",
+                "Both always have identical acceleration"
+            ],
+
+            correct: 1,
+
+            explanation:
+                "The interaction forces are equal, but a = F ÷ m. The 40 kg student has less mass, so the same force produces greater acceleration."
+        },
+
+
+        {
+            id: 7,
+
+            concept:
+                "Inertia & Seatbelt",
+
+            question:
+                "During sudden braking, what does a seatbelt mainly do?",
+
+            options: [
+                "It increases the passenger's speed",
+                "It removes the passenger's mass",
+                "It provides a force that helps slow the passenger with the vehicle",
+                "It removes inertia completely"
+            ],
+
+            correct: 2,
+
+            explanation:
+                "The passenger tends to keep moving forward. The seatbelt provides an external restraining force that changes the passenger's motion and helps slow the passenger with the vehicle."
+        },
+
+
+        {
+            id: 8,
+
+            concept:
+                "Newton's Second Law",
+
+            question:
+                "A 100 N force acts on a 20 kg crate. What acceleration should the crate have?",
+
+            options: [
+                "2 m/s²",
+                "5 m/s²",
+                "20 m/s²",
+                "2000 m/s²"
+            ],
+
+            correct: 1,
+
+            explanation:
+                "a = F ÷ m = 100 ÷ 20 = 5 m/s²."
+        }
+
+    ];
+
+
+    let practiceAnswers = {};
+
+
+    function renderPractice() {
+
+        const list =
+            document.getElementById(
+                "quizList"
+            );
+
+
+        list.innerHTML =
+            "";
+
+
+        QUESTIONS.forEach(
+            (
+                question,
+                index
+            ) => {
+
+                const card =
+                    document.createElement(
+                        "article"
+                    );
+
+
+                card.className =
+                    "quiz-card";
+
+
+                card.id =
+                    `quiz-${question.id}`;
+
+
+                card.innerHTML =
+                    `
+                    <div class="quiz-top">
+
+                        <span class="quiz-number">
+                            Question ${index + 1}
+                        </span>
+
+                        <span class="quiz-concept">
+                            ${question.concept}
+                        </span>
+
+                    </div>
+
+                    <div class="quiz-question">
+                        ${question.question}
+                    </div>
+                    `;
+
+
+                const options =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                options.className =
+                    "quiz-options";
+
+
+                question.options.forEach(
+                    (
+                        option,
+                        optionIndex
+                    ) => {
+
+                        const button =
+                            document.createElement(
+                                "button"
+                            );
+
+
+                        button.className =
+                            "quiz-option";
+
+
+                        button.textContent =
+                            option;
+
+
+                        button.onclick =
+                            () => {
+
+                                answerQuestion(
+                                    question.id,
+                                    optionIndex
+                                );
+
+                            };
+
+
+                        options.appendChild(
+                            button
+                        );
+
+                    }
+                );
+
+
+                const feedback =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                feedback.className =
+                    "feedback";
+
+
+                feedback.id =
+                    `feedback-${question.id}`;
+
+
+                card.appendChild(
+                    options
+                );
+
+
+                card.appendChild(
+                    feedback
+                );
+
+
+                list.appendChild(
+                    card
+                );
+
+            }
+        );
+
+
+        updatePractice();
+
+    }
+
+
+    function answerQuestion(
+        questionId,
+        selected
+    ) {
+
+        if (
+            practiceAnswers[
+                questionId
+            ] !== undefined
+        ) {
+
+            return;
+        }
+
+
+        const question =
+            QUESTIONS.find(
+                item =>
+                    item.id ===
+                    questionId
+            );
+
+
+        const correct =
+            selected ===
+            question.correct;
+
+
+        practiceAnswers[
+            questionId
+        ] = {
+            correct,
+            concept:
+                question.concept
+        };
+
+
+        const card =
+            document.getElementById(
+                `quiz-${questionId}`
+            );
+
+
+        const buttons =
+            card.querySelectorAll(
+                ".quiz-option"
+            );
+
+
+        buttons.forEach(
+            (
+                button,
+                index
+            ) => {
+
+                button.disabled =
+                    true;
+
+
+                if (
+                    index ===
+                    question.correct
+                ) {
+
+                    button.classList.add(
+                        "option-correct"
+                    );
+
+                }
+
+
+                if (
+                    index ===
+                    selected &&
+                    !correct
+                ) {
+
+                    button.classList.add(
+                        "option-wrong"
+                    );
+
+                }
+
+            }
+        );
+
+
+        const feedback =
+            document.getElementById(
+                `feedback-${questionId}`
+            );
+
+
+        if (correct) {
+
+            card.classList.add(
+                "correct-card"
+            );
+
+
+            feedback.className =
+                "feedback correct";
+
+
+            feedback.innerHTML =
+                `
+                <strong>
+                    ✅ Correct!
+                </strong>
+
+                ${question.explanation}
+                `;
+
+        } else {
+
+            card.classList.add(
+                "wrong-card"
+            );
+
+
+            feedback.className =
+                "feedback wrong";
+
+
+            feedback.innerHTML =
+                `
+                <strong>
+                    ❌ Not quite.
+                </strong>
+
+                Your answer:
+                <b>${question.options[selected]}</b>
+
+                <br><br>
+
+                ✅ Correct answer:
+                <b>${question.options[question.correct]}</b>
+
+                <br><br>
+
+                <b>Why?</b>
+                ${question.explanation}
+                `;
+
+        }
+
+
+        updatePractice();
+
+    }
+
+
+    function updatePractice() {
+
+        const values =
+            Object.values(
+                practiceAnswers
+            );
+
+
+        const answered =
+            values.length;
+
+
+        const correct =
+            values.filter(
+                item =>
+                    item.correct
+            ).length;
+
+
+        document.getElementById(
+            "practiceScore"
+        ).textContent =
+            `${correct} / ${QUESTIONS.length}`;
+
+
+        document.getElementById(
+            "practiceProgress"
+        ).style.width =
+            `${(
+                answered /
+                QUESTIONS.length
+            ) *
+            100}%`;
+
+
+        if (
+            answered ===
+            QUESTIONS.length
+        ) {
+
+            showPracticeResult();
+
+        }
+
+    }
+
+
+    function showPracticeResult() {
+
+        const values =
+            Object.values(
+                practiceAnswers
+            );
+
+
+        const correct =
+            values.filter(
+                item =>
+                    item.correct
+            ).length;
+
+
+        const percentage =
+            Math.round(
+                correct /
+                QUESTIONS.length *
+                100
+            );
+
+
+        const title =
+            document.getElementById(
+                "practiceResultTitle"
+            );
+
+
+        const message =
+            document.getElementById(
+                "practiceResultMessage"
+            );
+
+
+        if (
+            percentage ===
+            100
+        ) {
+
+            title.textContent =
+                `8/8 — 100% — Excellent 🎉`;
+
+
+            message.textContent =
+                "You correctly applied all three Newton's Laws.";
+
+        } else if (
+            percentage >=
+            75
+        ) {
+
+            title.textContent =
+                `${correct}/8 — ${percentage}% — Good understanding ✅`;
+
+
+            message.textContent =
+                "Most concepts are clear. Review the weak areas below and try again.";
+
+        } else {
+
+            title.textContent =
+                `${correct}/8 — ${percentage}% — Review and retry 💡`;
+
+
+            message.textContent =
+                "Use the 3D simulations again for the concepts you missed, then retake the practice.";
+
+        }
+
+
+        const wrong =
+            values.filter(
+                item =>
+                    !item.correct
+            );
+
+
+        const weak =
+            [
+                ...new Set(
+                    wrong.map(
+                        item =>
+                            item.concept
+                    )
+                )
+            ];
+
+
+        const tags =
+            document.getElementById(
+                "weakTags"
+            );
+
+
+        tags.innerHTML =
+            "";
+
+
+        if (
+            weak.length ===
+            0
+        ) {
+
+            tags.innerHTML =
+                `
+                <span
+                    style="
+                        color:#166534;
+                        font-weight:800;
+                    "
+                >
+                    ✅ No weak concepts detected.
+                </span>
+                `;
+
+        } else {
+
+            weak.forEach(
+                concept => {
+
+                    const tag =
+                        document.createElement(
+                            "span"
+                        );
+
+
+                    tag.className =
+                        "weak-tag";
+
+
+                    tag.textContent =
+                        `Review: ${concept}`;
+
+
+                    tags.appendChild(
+                        tag
+                    );
+
+                }
+            );
+
+        }
+
+
+        localStorage.setItem(
+            "myCampus_topic_3_practice_score",
+            String(
+                correct
+            )
+        );
+
+
+        localStorage.setItem(
+            "myCampus_topic_3_weak_concepts",
+            JSON.stringify(
+                weak
+            )
+        );
+
+
+        document.getElementById(
+            "practiceResult"
+        ).classList.add(
+            "show"
+        );
+
+    }
+
+
+    function resetPractice() {
+
+        practiceAnswers =
+            {};
+
+
+        document.getElementById(
+            "practiceResult"
+        ).classList.remove(
+            "show"
+        );
+
+
+        renderPractice();
+
+
+        document.querySelector(
+            ".practice-section"
+        ).scrollIntoView({
+            behavior:
+                "smooth"
+        });
+
+    }
+
+
+    /* =====================================================
+       COMPLETE
+    ====================================================== */
+
+    function markCompleted() {
+
+        localStorage.setItem(
+            `myCampus_interactive_completed_${TOPIC_ID}`,
+            "true"
+        );
+
+
+        alert(
+            "Topic 3 Interactive Exploration completed ✅"
+        );
+
+    }
+
+
+    function goBack() {
+
+        window.location.href =
+            "student.html";
+
+    }
+
+
+    /* =====================================================
+       START
+    ====================================================== */
+
+    ensureScene(
+        "inertia"
+    );
+
+
+    updateInertia();
+
+    updateForce();
+
+    updateReaction();
+
+    renderPractice();
+
+</script>
+
+
+<script src="assets/js/physics-3d-graph.js"></script><script src="assets/js/topic3-graphs.js?v=controls-first-1"></script><script src="assets/js/physics-symbol-guides.js?v=controls-first-1"></script><script src="assets/js/topic3-symbol-guides.js?v=1"></script>    <script src="assets/js/universal-learning-journey.js?v=1"></script>
+</body>
+</html>
+
+
+
+

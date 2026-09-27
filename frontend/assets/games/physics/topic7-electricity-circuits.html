@@ -1,0 +1,4357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+<title>My Campus - Campus Power Grid Rescue</title>
+
+<style>
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0
+}
+
+html,body{
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    background:#06121c;
+    font-family:Segoe UI,Arial,sans-serif
+}
+
+#game{
+    position:fixed;
+    inset:0
+}
+
+canvas{
+    display:block
+}
+
+.hud{
+    position:fixed;
+    inset:0;
+    z-index:10;
+    color:#fff;
+    pointer-events:none
+}
+
+.glass{
+    background:linear-gradient(
+        135deg,
+        rgba(5,20,32,.95),
+        rgba(7,29,44,.82)
+    );
+
+    border:1px solid rgba(255,255,255,.13);
+    border-radius:15px;
+
+    box-shadow:0 14px 40px rgba(0,0,0,.28);
+    backdrop-filter:blur(13px)
+}
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.title{
+    position:absolute;
+    top:18px;
+    left:18px;
+
+    width:360px;
+    padding:14px 17px
+}
+
+.eyebrow{
+    color:#65e4ff;
+    font-size:10px;
+    font-weight:900;
+    letter-spacing:1.6px
+}
+
+.title h1{
+    margin-top:4px;
+    font-size:20px
+}
+
+.title p{
+    margin-top:5px;
+    color:#afc1cc;
+    font-size:11px;
+    line-height:1.4
+}
+
+/* =========================================================
+   STAGE
+========================================================= */
+
+.stage{
+    position:absolute;
+    top:18px;
+    left:50%;
+
+    transform:translateX(-50%);
+
+    width:440px;
+    padding:12px;
+    text-align:center
+}
+
+.stage small{
+    color:#96aaba;
+    font-size:9px;
+    font-weight:900
+}
+
+.stage strong{
+    display:block;
+    margin-top:3px;
+
+    color:#68e4ff;
+    font-size:18px
+}
+
+.stage p{
+    margin-top:3px;
+    color:#b9c8d1;
+    font-size:9px
+}
+
+/* =========================================================
+   SCORE
+========================================================= */
+
+.score{
+    position:absolute;
+    top:18px;
+    right:18px;
+
+    width:165px;
+    padding:12px;
+    text-align:center
+}
+
+.score small{
+    color:#98adbc;
+    font-size:9px;
+    font-weight:900
+}
+
+.score strong{
+    display:block;
+    margin-top:2px;
+
+    color:#ffe16a;
+    font-size:28px
+}
+
+/* =========================================================
+   CONTROL PANEL
+========================================================= */
+
+.controls{
+    position:absolute;
+    top:150px;
+    left:18px;
+
+    width:315px;
+    padding:14px;
+
+    pointer-events:auto
+}
+
+.panel-title{
+    color:#69e5ff;
+    font-size:10px;
+    font-weight:950;
+    letter-spacing:1px
+}
+
+.control-label{
+    margin-top:11px;
+
+    color:#a9bac6;
+    font-size:9px;
+    font-weight:900
+}
+
+.option-row{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+
+    gap:6px;
+    margin-top:5px
+}
+
+.option-row button{
+    padding:9px 4px;
+
+    border:1px solid rgba(255,255,255,.14);
+    border-radius:8px;
+
+    background:rgba(255,255,255,.06);
+    color:#fff;
+
+    font-size:9px;
+    font-weight:900;
+
+    cursor:pointer
+}
+
+.option-row button.active{
+    background:#63e1ff;
+    color:#03131c
+}
+
+.switch-row{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:7px;
+    margin-top:6px
+}
+
+.switch-row button{
+    padding:10px;
+
+    border:1px solid rgba(255,255,255,.14);
+    border-radius:8px;
+
+    background:rgba(255,255,255,.06);
+    color:white;
+
+    font-weight:900;
+    cursor:pointer
+}
+
+.switch-row button.active{
+    background:#63e1ff;
+    color:#03131c
+}
+
+.mode-row{
+    display:none
+}
+
+.fault-row{
+    display:none
+}
+
+.test-button{
+    width:100%;
+
+    margin-top:13px;
+    padding:11px;
+
+    border:0;
+    border-radius:9px;
+
+    background:#63e1ff;
+    color:#03131c;
+
+    font-weight:950;
+    cursor:pointer
+}
+
+.control-help{
+    margin-top:8px;
+
+    color:#95aab8;
+    font-size:9px;
+    line-height:1.4
+}
+
+/* =========================================================
+   LIVE VALUES
+========================================================= */
+
+.values{
+    position:absolute;
+    right:18px;
+    bottom:18px;
+
+    width:350px;
+    padding:15px
+}
+
+.value-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:7px
+}
+
+.value{
+    padding:9px;
+
+    border-radius:9px;
+
+    background:rgba(255,255,255,.05)
+}
+
+.value label{
+    display:block;
+
+    color:#92a7b5;
+    font-size:8px;
+    font-weight:900
+}
+
+.value strong{
+    display:block;
+    margin-top:2px;
+
+    font-size:14px
+}
+
+.value strong.highlight{
+    color:#69e4ff
+}
+
+.current-title{
+    display:flex;
+    justify-content:space-between;
+
+    margin-top:10px;
+
+    color:#9cafbc;
+    font-size:8px;
+    font-weight:900
+}
+
+.current-bar{
+    height:7px;
+
+    margin-top:4px;
+
+    overflow:hidden;
+
+    border-radius:20px;
+
+    background:rgba(255,255,255,.08)
+}
+
+#currentFill{
+    width:0%;
+    height:100%;
+
+    background:linear-gradient(
+        90deg,
+        #53dcff,
+        #6dff99,
+        #ffe16b
+    )
+}
+
+.equation{
+    margin-top:10px;
+    padding:10px;
+
+    border:1px solid rgba(83,220,255,.17);
+    border-radius:10px;
+
+    background:rgba(71,216,255,.07);
+
+    font-size:10px;
+    line-height:1.5
+}
+
+.equation b{
+    color:#69e4ff
+}
+
+/* =========================================================
+   COACH
+========================================================= */
+
+.coach{
+    position:absolute;
+    left:50%;
+    bottom:15px;
+
+    transform:translateX(-50%);
+
+    width:min(670px,41vw);
+    padding:12px 16px;
+
+    text-align:center
+}
+
+#coachTitle{
+    color:#66e3ff;
+
+    font-size:10px;
+    font-weight:950;
+    letter-spacing:1px
+}
+
+#coachText{
+    margin-top:4px;
+
+    color:#e2ecf2;
+    font-size:11px;
+    line-height:1.45
+}
+
+#coachFormula{
+    margin-top:4px;
+
+    color:#93a9b7;
+    font-size:10px
+}
+
+/* =========================================================
+   START
+========================================================= */
+
+.start-screen{
+    position:fixed;
+    inset:0;
+
+    z-index:40;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    background:rgba(2,8,14,.76);
+    backdrop-filter:blur(8px);
+
+    color:#fff;
+    pointer-events:auto
+}
+
+.start-box{
+    width:min(670px,92vw);
+
+    padding:27px;
+    text-align:center
+}
+
+.start-box h2{
+    font-size:31px
+}
+
+.start-box p{
+    margin-top:10px;
+
+    color:#b7c8d3;
+    font-size:12px;
+    line-height:1.6
+}
+
+.start-box button{
+    margin-top:18px;
+    padding:12px 26px;
+
+    border:0;
+    border-radius:10px;
+
+    background:#61e1ff;
+    color:#03131c;
+
+    font-weight:950;
+    cursor:pointer
+}
+
+/* =========================================================
+   RESULT
+========================================================= */
+
+.result{
+    position:fixed;
+
+    top:78px;
+    left:50%;
+
+    transform:translateX(-50%);
+
+    z-index:70;
+
+    width:min(760px,92vw);
+    max-height:calc(100vh - 98px);
+
+    display:none;
+    flex-direction:column;
+
+    padding:18px;
+
+    overflow:hidden;
+
+    color:#fff;
+    pointer-events:auto
+}
+
+.result.show{
+    display:flex
+}
+
+.result-scroll{
+    min-height:0;
+    overflow-y:auto;
+    padding-right:6px
+}
+
+.result-badge{
+    color:#ffe16b;
+
+    font-size:10px;
+    font-weight:950;
+    letter-spacing:1.1px
+}
+
+.result h3{
+    margin-top:5px;
+    font-size:20px
+}
+
+.result-text{
+    margin-top:8px;
+    padding:11px;
+
+    border-radius:9px;
+
+    background:rgba(255,255,255,.05);
+
+    color:#dce8ef;
+
+    font-size:11px;
+    line-height:1.55
+}
+
+.question-label{
+    margin-top:12px;
+
+    color:#68e3ff;
+
+    font-size:10px;
+    font-weight:950
+}
+
+#question{
+    margin-top:5px;
+    font-size:16px
+}
+
+#questionHint{
+    margin-top:4px;
+
+    color:#a2b5c2;
+    font-size:10px
+}
+
+.answers{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+
+    gap:8px;
+    margin-top:10px
+}
+
+.answer{
+    padding:10px;
+
+    border:1px solid rgba(255,255,255,.14);
+    border-radius:9px;
+
+    background:rgba(255,255,255,.07);
+    color:#fff;
+
+    font-weight:900;
+    cursor:pointer
+}
+
+.answer:disabled{
+    opacity:.6
+}
+
+#feedback{
+    display:none;
+
+    max-height:135px;
+    overflow-y:auto;
+
+    margin-top:10px;
+    padding:11px;
+
+    border:1px solid rgba(80,218,255,.17);
+    border-radius:10px;
+
+    background:rgba(69,214,255,.08);
+
+    font-size:11px;
+    line-height:1.55
+}
+
+#feedback b{
+    color:#6de4ff
+}
+
+.result-footer{
+    flex:0 0 auto;
+    padding-top:11px
+}
+
+.next-button{
+    display:none;
+
+    width:min(310px,90%);
+
+    margin:0 auto;
+
+    padding:12px;
+
+    border:0;
+    border-radius:9px;
+
+    background:#61e1ff;
+    color:#03131c;
+
+    font-weight:950;
+    cursor:pointer
+}
+
+/* =========================================================
+   FINISH
+========================================================= */
+
+.finish{
+    position:fixed;
+    inset:0;
+
+    z-index:90;
+
+    display:none;
+
+    align-items:center;
+    justify-content:center;
+
+    background:rgba(1,7,13,.86);
+    backdrop-filter:blur(11px);
+
+    color:#fff;
+
+    pointer-events:auto
+}
+
+.finish.show{
+    display:flex
+}
+
+.finish-box{
+    width:min(830px,94vw);
+
+    max-height:93vh;
+    overflow:auto;
+
+    padding:27px
+}
+
+.finish-box h2{
+    text-align:center;
+    font-size:32px
+}
+
+.finish-sub{
+    margin-top:5px;
+
+    text-align:center;
+
+    color:#aabcc8;
+    font-size:11px
+}
+
+.final-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+
+    gap:8px;
+    margin-top:15px
+}
+
+.final-card{
+    padding:12px;
+
+    border-radius:10px;
+
+    background:rgba(255,255,255,.055);
+
+    text-align:center
+}
+
+.final-card strong{
+    display:block;
+
+    color:#69e4ff;
+    font-size:18px
+}
+
+.final-card span{
+    color:#92a7b5;
+    font-size:8px
+}
+
+.final-explanation{
+    margin-top:15px;
+    padding:16px;
+
+    border:1px solid rgba(89,220,255,.18);
+    border-radius:11px;
+
+    background:rgba(68,212,255,.075);
+
+    font-size:11px;
+    line-height:1.65
+}
+
+.final-explanation b{
+    color:#6ee5ff
+}
+
+.restart{
+    display:block;
+
+    margin:16px auto 0;
+    padding:11px 25px;
+
+    border:0;
+    border-radius:9px;
+
+    background:#61e1ff;
+    color:#03131c;
+
+    font-weight:900;
+    cursor:pointer
+}
+</style>
+</head>
+
+<body>
+
+<div id="game"></div>
+
+<div class="hud">
+
+<div class="title glass">
+
+    <div class="eyebrow">
+        MY CAMPUS - PHYSICS GAME
+    </div>
+
+    <h1>
+        Campus Power Grid Rescue
+    </h1>
+
+    <p id="studentText"></p>
+
+</div>
+
+<div class="stage glass">
+
+    <small>
+        CURRENT CIRCUIT MISSION
+    </small>
+
+    <strong id="stageName">
+        Voltage Control
+    </strong>
+
+    <p id="stageObjective">
+        Restore power to the laboratory bulb.
+    </p>
+
+</div>
+
+<div class="score glass">
+
+    <small>
+        PHYSICS SCORE
+    </small>
+
+    <strong id="score">
+        0
+    </strong>
+
+</div>
+
+<div class="controls glass">
+
+    <div class="panel-title">
+        CIRCUIT CONTROL PANEL
+    </div>
+
+    <div class="control-label">
+        BATTERY VOLTAGE
+    </div>
+
+    <div
+        id="voltageButtons"
+        class="option-row">
+
+        <button data-voltage="6">
+            6 V
+        </button>
+
+        <button
+            data-voltage="12"
+            class="active">
+
+            12 V
+
+        </button>
+
+        <button data-voltage="18">
+            18 V
+        </button>
+
+    </div>
+
+    <div class="control-label">
+        RESISTANCE
+    </div>
+
+    <div
+        id="resistanceButtons"
+        class="option-row">
+
+        <button data-resistance="3">
+            3 ohm
+        </button>
+
+        <button
+            data-resistance="6"
+            class="active">
+
+            6 ohm
+
+        </button>
+
+        <button data-resistance="9">
+            9 ohm
+        </button>
+
+    </div>
+
+    <div class="control-label">
+        SWITCH
+    </div>
+
+    <div
+        id="switchButtons"
+        class="switch-row">
+
+        <button
+            data-switch="off">
+
+            OFF
+
+        </button>
+
+        <button
+            data-switch="on"
+            class="active">
+
+            ON
+
+        </button>
+
+    </div>
+
+    <div
+        id="modeArea"
+        class="mode-row">
+
+        <div class="control-label">
+            CIRCUIT TYPE
+        </div>
+
+        <div
+            id="modeButtons"
+            class="switch-row">
+
+            <button
+                data-mode="series"
+                class="active">
+
+                SERIES
+
+            </button>
+
+            <button data-mode="parallel">
+                PARALLEL
+            </button>
+
+        </div>
+
+    </div>
+
+    <div
+        id="faultArea"
+        class="fault-row">
+
+        <div class="control-label">
+            DIAGNOSE FAULT
+        </div>
+
+        <div
+            id="faultButtons"
+            class="option-row">
+
+            <button data-fault="switch">
+                OPEN SWITCH
+            </button>
+
+            <button data-fault="wire">
+                BROKEN WIRE
+            </button>
+
+            <button data-fault="resistance">
+                HIGH R
+            </button>
+
+        </div>
+
+    </div>
+
+    <button
+        id="testButton"
+        class="test-button">
+
+        TEST CIRCUIT
+
+    </button>
+
+    <div
+        id="controlHelp"
+        class="control-help">
+
+        Adjust circuit values and press TEST CIRCUIT.
+
+    </div>
+
+</div>
+
+<div class="values glass">
+
+    <div class="value-grid">
+
+        <div class="value">
+
+            <label>
+                VOLTAGE
+            </label>
+
+            <strong class="highlight">
+
+                <span id="voltageValue">
+                    12
+                </span>
+
+                V
+
+            </strong>
+
+        </div>
+
+        <div class="value">
+
+            <label>
+                TOTAL RESISTANCE
+            </label>
+
+            <strong>
+
+                <span id="resistanceValue">
+                    6.00
+                </span>
+
+                ohm
+
+            </strong>
+
+        </div>
+
+        <div class="value">
+
+            <label>
+                CURRENT
+            </label>
+
+            <strong class="highlight">
+
+                <span id="currentValue">
+                    2.00
+                </span>
+
+                A
+
+            </strong>
+
+        </div>
+
+        <div class="value">
+
+            <label>
+                ELECTRICAL POWER
+            </label>
+
+            <strong>
+
+                <span id="powerValue">
+                    24.0
+                </span>
+
+                W
+
+            </strong>
+
+        </div>
+
+        <div class="value">
+
+            <label>
+                TARGET CURRENT
+            </label>
+
+            <strong>
+
+                <span id="targetCurrent">
+                    --
+                </span>
+
+                A
+
+            </strong>
+
+        </div>
+
+        <div class="value">
+
+            <label>
+                CIRCUIT STATUS
+            </label>
+
+            <strong id="statusValue">
+                CLOSED
+            </strong>
+
+        </div>
+
+    </div>
+
+    <div class="current-title">
+
+        <span>
+            CURRENT FLOW
+        </span>
+
+        <span id="currentPercent">
+            40%
+        </span>
+
+    </div>
+
+    <div class="current-bar">
+        <div id="currentFill"></div>
+    </div>
+
+    <div
+        id="equation"
+        class="equation">
+
+        <b>Ohm's Law</b><br>
+
+        V = IR<br>
+
+        I = V / R<br>
+
+        I = 12 / 6 = 2.00 A
+
+    </div>
+
+</div>
+
+<div class="coach glass">
+
+    <div id="coachTitle">
+        ELECTRIC CURRENT
+    </div>
+
+    <div id="coachText">
+        A closed circuit allows electric current to flow through the components.
+    </div>
+
+    <div id="coachFormula">
+        Ohm's Law: V = IR
+    </div>
+
+</div>
+
+</div>
+
+<!-- ======================================================
+     START
+====================================================== -->
+
+<div
+    id="startScreen"
+    class="start-screen">
+
+    <div class="start-box glass">
+
+        <h2>
+            Campus Power Failure!
+        </h2>
+
+        <p>
+            The Physics laboratory has lost electrical power.
+            Repair six circuit systems by controlling voltage,
+            resistance and current, building series and parallel circuits,
+            and diagnosing electrical faults.
+        </p>
+
+        <button id="startButton">
+            Start Power Grid Rescue
+        </button>
+
+    </div>
+
+</div>
+
+<!-- ======================================================
+     RESULT
+====================================================== -->
+
+<div
+    id="resultBox"
+    class="result glass">
+
+    <div class="result-scroll">
+
+        <div class="result-badge">
+            CIRCUIT TEST RESULT
+        </div>
+
+        <h3 id="resultTitle"></h3>
+
+        <div
+            id="resultText"
+            class="result-text">
+        </div>
+
+        <div class="question-label">
+            PHYSICS CHECK
+        </div>
+
+        <div id="question"></div>
+
+        <div id="questionHint"></div>
+
+        <div
+            id="answers"
+            class="answers">
+        </div>
+
+        <div id="feedback"></div>
+
+    </div>
+
+    <div class="result-footer">
+
+        <button
+            id="nextButton"
+            class="next-button">
+
+            NEXT CIRCUIT
+
+        </button>
+
+    </div>
+
+</div>
+
+<!-- ======================================================
+     FINAL
+====================================================== -->
+
+<div
+    id="finish"
+    class="finish">
+
+    <div class="finish-box glass">
+
+        <h2>
+            Campus Power Restored!
+        </h2>
+
+        <div class="finish-sub">
+            Your circuit repairs now explain Voltage, Current, Resistance and Ohm's Law.
+        </div>
+
+        <div class="final-grid">
+
+            <div class="final-card">
+
+                <strong id="finalVoltage">
+                    -
+                </strong>
+
+                <span>
+                    FINAL VOLTAGE
+                </span>
+
+            </div>
+
+            <div class="final-card">
+
+                <strong id="finalCurrent">
+                    -
+                </strong>
+
+                <span>
+                    FINAL CURRENT
+                </span>
+
+            </div>
+
+            <div class="final-card">
+
+                <strong id="finalPower">
+                    -
+                </strong>
+
+                <span>
+                    ELECTRICAL POWER
+                </span>
+
+            </div>
+
+            <div class="final-card">
+
+                <strong id="finalScore">
+                    -
+                </strong>
+
+                <span>
+                    PHYSICS SCORE
+                </span>
+
+            </div>
+
+        </div>
+
+        <div
+            id="finalExplanation"
+            class="final-explanation">
+        </div>
+
+        <button
+            class="restart"
+            onclick="location.reload()">
+
+            Run New Circuit Mission
+
+        </button>
+
+    </div>
+
+</div>
+
+<script src="../../vendor/three-0.160.1.min.js"></script>
+
+<script>
+
+(() => {
+
+"use strict";
+
+/* =========================================================
+   USER
+========================================================= */
+
+const studentName =
+    localStorage.getItem("student_name") ||
+    sessionStorage.getItem("student_name") ||
+    "Student";
+
+document.getElementById(
+    "studentText"
+).textContent =
+    studentName +
+    " - rebuild the campus power system using real circuit relationships.";
+
+/* =========================================================
+   THREE
+========================================================= */
+
+const scene =
+    new THREE.Scene();
+
+scene.background =
+    new THREE.Color(
+        0x81c7e8
+    );
+
+scene.fog =
+    new THREE.Fog(
+        0x81c7e8,
+        90,
+        230
+    );
+
+const camera =
+    new THREE.PerspectiveCamera(
+        58,
+        innerWidth/innerHeight,
+        .1,
+        350
+    );
+
+const renderer =
+    new THREE.WebGLRenderer({
+        antialias:true,
+        powerPreference:"high-performance"
+    });
+
+renderer.setSize(
+    innerWidth,
+    innerHeight
+);
+
+renderer.setPixelRatio(
+    Math.min(
+        devicePixelRatio,
+        2
+    )
+);
+
+renderer.shadowMap.enabled =
+    true;
+
+renderer.outputColorSpace =
+    THREE.SRGBColorSpace;
+
+renderer.toneMapping =
+    THREE.ACESFilmicToneMapping;
+
+renderer.toneMappingExposure =
+    1.08;
+
+document.getElementById(
+    "game"
+).appendChild(
+    renderer.domElement
+);
+
+/* =========================================================
+   LIGHT
+========================================================= */
+
+scene.add(
+    new THREE.HemisphereLight(
+        0xdaf4ff,
+        0x486c43,
+        2.6
+    )
+);
+
+const sun =
+    new THREE.DirectionalLight(
+        0xffefd0,
+        4
+    );
+
+sun.position.set(
+    -30,
+    70,
+    -35
+);
+
+sun.castShadow =
+    true;
+
+sun.shadow.mapSize.set(
+    2048,
+    2048
+);
+
+scene.add(
+    sun
+);
+
+/* =========================================================
+   MATERIALS
+========================================================= */
+
+const MAT = {
+
+    floor:
+    new THREE.MeshStandardMaterial({
+        color:0x343e45,
+        roughness:.9
+    }),
+
+    board:
+    new THREE.MeshStandardMaterial({
+        color:0x0e563f,
+        roughness:.8
+    }),
+
+    dark:
+    new THREE.MeshStandardMaterial({
+        color:0x151a20,
+        roughness:.55,
+        metalness:.3
+    }),
+
+    metal:
+    new THREE.MeshStandardMaterial({
+        color:0xa9b5bd,
+        roughness:.35,
+        metalness:.7
+    }),
+
+    battery:
+    new THREE.MeshStandardMaterial({
+        color:0x2c73d4,
+        roughness:.55
+    }),
+
+    resistor:
+    new THREE.MeshStandardMaterial({
+        color:0xc69755,
+        roughness:.7
+    }),
+
+    switch:
+    new THREE.MeshStandardMaterial({
+        color:0xdf5a58,
+        roughness:.6
+    }),
+
+    bulb:
+    new THREE.MeshStandardMaterial({
+        color:0xffd85c,
+        emissive:0x000000,
+        emissiveIntensity:0
+    })
+};
+
+function box(
+    width,
+    height,
+    depth,
+    material,
+    x,
+    y,
+    z,
+    parent=scene
+){
+
+    const mesh =
+        new THREE.Mesh(
+            new THREE.BoxGeometry(
+                width,
+                height,
+                depth
+            ),
+            material
+        );
+
+    mesh.position.set(
+        x,
+        y,
+        z
+    );
+
+    mesh.castShadow =
+        true;
+
+    mesh.receiveShadow =
+        true;
+
+    parent.add(
+        mesh
+    );
+
+    return mesh;
+}
+
+/* =========================================================
+   LAB WORLD
+========================================================= */
+
+box(
+    52,
+    .25,
+    70,
+    MAT.floor,
+    0,
+    -.15,
+    18
+);
+
+box(
+    26,
+    .7,
+    34,
+    MAT.board,
+    0,
+    .2,
+    18
+);
+
+/* =========================================================
+   BATTERY
+========================================================= */
+
+const battery =
+    new THREE.Group();
+
+scene.add(
+    battery
+);
+
+battery.position.set(
+    -8,
+    .5,
+    6
+);
+
+box(
+    5,
+    3,
+    4,
+    MAT.battery,
+    0,
+    1.5,
+    0,
+    battery
+);
+
+box(
+    .7,
+    .6,
+    .7,
+    MAT.metal,
+    -1.2,
+    3.3,
+    0,
+    battery
+);
+
+box(
+    .7,
+    .9,
+    .7,
+    MAT.metal,
+    1.2,
+    3.45,
+    0,
+    battery
+);
+
+/* =========================================================
+   RESISTOR
+========================================================= */
+
+const resistor =
+    new THREE.Group();
+
+scene.add(
+    resistor
+);
+
+resistor.position.set(
+    0,
+    1,
+    28
+);
+
+const resistorBody =
+    new THREE.Mesh(
+        new THREE.CylinderGeometry(
+            .8,
+            .8,
+            5,
+            18
+        ),
+        MAT.resistor
+    );
+
+resistorBody.rotation.z =
+    Math.PI/2;
+
+resistor.add(
+    resistorBody
+);
+
+/* resistor color bands */
+
+[-1.3,-.45,.45,1.3]
+.forEach(
+    (x,index)=>{
+
+        const band =
+            new THREE.Mesh(
+                new THREE.TorusGeometry(
+                    .83,
+                    .09,
+                    8,
+                    24
+                ),
+                index%2===0
+                ?
+                MAT.dark
+                :
+                MAT.battery
+            );
+
+        band.rotation.y =
+            Math.PI/2;
+
+        band.position.x =
+            x;
+
+        resistor.add(
+            band
+        );
+    }
+);
+
+/* =========================================================
+   SWITCH
+========================================================= */
+
+const switchGroup =
+    new THREE.Group();
+
+scene.add(
+    switchGroup
+);
+
+switchGroup.position.set(
+    8,
+    .8,
+    17
+);
+
+box(
+    4,
+    .6,
+    3,
+    MAT.dark,
+    0,
+    .3,
+    0,
+    switchGroup
+);
+
+const switchLever =
+    box(
+        3.2,
+        .25,
+        .45,
+        MAT.switch,
+        0,
+        1.1,
+        0,
+        switchGroup
+    );
+
+/* =========================================================
+   BULB
+========================================================= */
+
+const bulbGroup =
+    new THREE.Group();
+
+scene.add(
+    bulbGroup
+);
+
+bulbGroup.position.set(
+    0,
+    .6,
+    8
+);
+
+box(
+    2.6,
+    .9,
+    2.6,
+    MAT.metal,
+    0,
+    .45,
+    0,
+    bulbGroup
+);
+
+const bulb =
+    new THREE.Mesh(
+        new THREE.SphereGeometry(
+            1.6,
+            24,
+            18
+        ),
+        MAT.bulb
+    );
+
+bulb.position.y =
+    2.3;
+
+bulb.castShadow =
+    true;
+
+bulbGroup.add(
+    bulb
+);
+
+/* =========================================================
+   SECOND BULB FOR SERIES/PARALLEL
+========================================================= */
+
+const bulb2Group =
+    bulbGroup.clone();
+
+bulb2Group.position.set(
+    5,
+    .6,
+    28
+);
+
+scene.add(
+    bulb2Group
+);
+
+bulb2Group.visible =
+    false;
+
+const bulb2 =
+    bulb2Group.children.find(
+        child=>
+        child.geometry &&
+        child.geometry.type===
+        "SphereGeometry"
+    );
+
+/* =========================================================
+   WIRES
+========================================================= */
+
+const wireMaterial =
+    new THREE.LineBasicMaterial({
+        color:0x23282c
+    });
+
+function makeWire(
+    points
+){
+
+    const geometry =
+        new THREE.BufferGeometry()
+        .setFromPoints(
+            points
+        );
+
+    const line =
+        new THREE.Line(
+            geometry,
+            wireMaterial
+        );
+
+    scene.add(
+        line
+    );
+
+    return line;
+}
+
+const wirePoints = [
+
+    new THREE.Vector3(
+        -8,1.1,6
+    ),
+
+    new THREE.Vector3(
+        -8,1.1,18
+    ),
+
+    new THREE.Vector3(
+        -5,1.1,28
+    ),
+
+    new THREE.Vector3(
+        0,1.1,28
+    ),
+
+    new THREE.Vector3(
+        8,1.1,28
+    ),
+
+    new THREE.Vector3(
+        8,1.1,17
+    ),
+
+    new THREE.Vector3(
+        8,1.1,8
+    ),
+
+    new THREE.Vector3(
+        0,1.1,8
+    ),
+
+    new THREE.Vector3(
+        -8,1.1,8
+    ),
+
+    new THREE.Vector3(
+        -8,1.1,6
+    )
+];
+
+makeWire(
+    wirePoints
+);
+
+/* =========================================================
+   CURRENT PARTICLES
+========================================================= */
+
+const currentParticles = [];
+
+const PARTICLE_COUNT =
+    34;
+
+for(
+    let i=0;
+    i<PARTICLE_COUNT;
+    i++
+){
+
+    const particle =
+        new THREE.Mesh(
+            new THREE.SphereGeometry(
+                .16,
+                8,
+                6
+            ),
+
+            new THREE.MeshBasicMaterial({
+                color:0x58e8ff
+            })
+        );
+
+    scene.add(
+        particle
+    );
+
+    currentParticles.push({
+        mesh:particle,
+        t:i/PARTICLE_COUNT
+    });
+}
+
+/* =========================================================
+   PATH HELPERS
+========================================================= */
+
+const segmentLengths = [];
+let totalPathLength = 0;
+
+for(
+    let i=0;
+    i<wirePoints.length-1;
+    i++
+){
+
+    const len =
+        wirePoints[i]
+        .distanceTo(
+            wirePoints[i+1]
+        );
+
+    segmentLengths.push(
+        len
+    );
+
+    totalPathLength +=
+        len;
+}
+
+function pointOnWire(
+    t
+){
+
+    let distance =
+        t*
+        totalPathLength;
+
+    for(
+        let i=0;
+        i<segmentLengths.length;
+        i++
+    ){
+
+        if(
+            distance<=
+            segmentLengths[i]
+        ){
+
+            const ratio =
+                distance/
+                segmentLengths[i];
+
+            return wirePoints[i]
+                .clone()
+                .lerp(
+                    wirePoints[i+1],
+                    ratio
+                );
+        }
+
+        distance -=
+            segmentLengths[i];
+    }
+
+    return wirePoints[
+        wirePoints.length-1
+    ].clone();
+}
+
+/* =========================================================
+   STATE
+========================================================= */
+
+let started =
+    false;
+
+let stage =
+    1;
+
+let selectedVoltage =
+    12;
+
+let selectedResistance =
+    6;
+
+let switchOn =
+    true;
+
+let circuitMode =
+    "series";
+
+let score =
+    0;
+
+let time =
+    0;
+
+let targetVoltage =
+    12;
+
+let targetResistance =
+    6;
+
+let targetCurrent =
+    2;
+
+let faultType =
+    "";
+
+let selectedFault =
+    "";
+
+let finalTargets =
+    [];
+
+let finalIndex =
+    0;
+
+let stageComplete =
+    false;
+
+/* =========================================================
+   BUTTONS
+========================================================= */
+
+const voltageButtons =
+    [
+        ...document.querySelectorAll(
+            "#voltageButtons button"
+        )
+    ];
+
+const resistanceButtons =
+    [
+        ...document.querySelectorAll(
+            "#resistanceButtons button"
+        )
+    ];
+
+const switchButtons =
+    [
+        ...document.querySelectorAll(
+            "#switchButtons button"
+        )
+    ];
+
+const modeButtons =
+    [
+        ...document.querySelectorAll(
+            "#modeButtons button"
+        )
+    ];
+
+const faultButtons =
+    [
+        ...document.querySelectorAll(
+            "#faultButtons button"
+        )
+    ];
+
+function activateButton(
+    buttons,
+    datasetName,
+    value
+){
+
+    buttons.forEach(
+        button=>{
+
+            const candidate =
+                button.dataset[
+                    datasetName
+                ];
+
+            button.classList.toggle(
+                "active",
+                String(value)===
+                String(candidate)
+            );
+        }
+    );
+}
+
+voltageButtons.forEach(
+    button=>{
+
+        button.onclick =
+            ()=>{
+
+                selectedVoltage =
+                    Number(
+                        button.dataset.voltage
+                    );
+
+                activateButton(
+                    voltageButtons,
+                    "voltage",
+                    selectedVoltage
+                );
+
+                updateCircuit();
+            };
+    }
+);
+
+resistanceButtons.forEach(
+    button=>{
+
+        button.onclick =
+            ()=>{
+
+                selectedResistance =
+                    Number(
+                        button.dataset.resistance
+                    );
+
+                activateButton(
+                    resistanceButtons,
+                    "resistance",
+                    selectedResistance
+                );
+
+                updateCircuit();
+            };
+    }
+);
+
+switchButtons.forEach(
+    button=>{
+
+        button.onclick =
+            ()=>{
+
+                switchOn =
+                    button.dataset.switch===
+                    "on";
+
+                activateButton(
+                    switchButtons,
+                    "switch",
+                    switchOn
+                    ?
+                    "on"
+                    :
+                    "off"
+                );
+
+                updateCircuit();
+            };
+    }
+);
+
+modeButtons.forEach(
+    button=>{
+
+        button.onclick =
+            ()=>{
+
+                circuitMode =
+                    button.dataset.mode;
+
+                activateButton(
+                    modeButtons,
+                    "mode",
+                    circuitMode
+                );
+
+                updateCircuit();
+            };
+    }
+);
+
+faultButtons.forEach(
+    button=>{
+
+        button.onclick =
+            ()=>{
+
+                selectedFault =
+                    button.dataset.fault;
+
+                activateButton(
+                    faultButtons,
+                    "fault",
+                    selectedFault
+                );
+            };
+    }
+);
+
+/* =========================================================
+   START
+========================================================= */
+
+document
+.getElementById(
+    "startButton"
+)
+.onclick =
+()=>{
+
+    started =
+        true;
+
+    document
+    .getElementById(
+        "startScreen"
+    )
+    .style.display =
+        "none";
+
+    prepareStage();
+};
+
+/* =========================================================
+   TEST
+========================================================= */
+
+document
+.getElementById(
+    "testButton"
+)
+.onclick =
+()=>{
+
+    if(
+        !started ||
+        stageComplete
+    ){
+
+        return;
+    }
+
+    evaluateStage();
+};
+
+/* =========================================================
+   CIRCUIT CALCULATIONS
+========================================================= */
+
+function totalResistance(){
+
+    if(
+        stage===4 ||
+        stage===5 ||
+        stage===6 ||
+        stage===7
+    ){
+
+        if(
+            circuitMode===
+            "series"
+        ){
+
+            return selectedResistance*
+                   2;
+        }
+
+        /*
+           Two identical resistors in parallel:
+
+           Req = R / 2
+        */
+
+        return selectedResistance/
+               2;
+    }
+
+    return selectedResistance;
+}
+
+function circuitCurrent(){
+
+    if(
+        !switchOn
+    ){
+
+        return 0;
+    }
+
+    if(
+        stage===6 &&
+        faultType===
+        "wire"
+    ){
+
+        return 0;
+    }
+
+    if(
+        stage===6 &&
+        faultType===
+        "switch"
+    ){
+
+        return 0;
+    }
+
+    let resistance =
+        totalResistance();
+
+    if(
+        stage===6 &&
+        faultType===
+        "resistance"
+    ){
+
+        resistance *=
+            4;
+    }
+
+    return selectedVoltage/
+           resistance;
+}
+
+function electricalPower(){
+
+    const current =
+        circuitCurrent();
+
+    return selectedVoltage*
+           current;
+}
+
+/* =========================================================
+   STAGE PREP
+========================================================= */
+
+function randomItem(
+    array
+){
+
+    return array[
+        Math.floor(
+            Math.random()*
+            array.length
+        )
+    ];
+}
+
+function prepareStage(){
+
+    stageComplete =
+        false;
+
+    document
+    .getElementById(
+        "testButton"
+    )
+    .disabled =
+        false;
+
+    document
+    .getElementById(
+        "modeArea"
+    )
+    .style.display =
+        (
+            stage>=4 &&
+            stage!==6
+        )
+        ?
+        "block"
+        :
+        "none";
+
+    document
+    .getElementById(
+        "faultArea"
+    )
+    .style.display =
+        stage===6
+        ?
+        "block"
+        :
+        "none";
+
+    bulb2Group.visible =
+        stage>=4 &&
+        stage!==6;
+
+    switchOn =
+        true;
+
+    activateButton(
+        switchButtons,
+        "switch",
+        "on"
+    );
+
+    if(
+        stage===1
+    ){
+
+        targetVoltage =
+            randomItem([
+                6,12,18
+            ]);
+
+        selectedResistance =
+            6;
+
+        document
+        .getElementById(
+            "stageName"
+        )
+        .textContent =
+            "Stage 1 - Voltage Control";
+
+        document
+        .getElementById(
+            "stageObjective"
+        )
+        .textContent =
+            `Supply exactly ${targetVoltage} V to the lab bulb.`;
+
+        document
+        .getElementById(
+            "coachTitle"
+        )
+        .textContent =
+            "VOLTAGE";
+
+        document
+        .getElementById(
+            "coachText"
+        )
+        .textContent =
+            "Voltage provides the electrical potential difference that drives current through a closed circuit.";
+
+        document
+        .getElementById(
+            "coachFormula"
+        )
+        .textContent =
+            "Higher V can produce more current when resistance stays constant.";
+    }
+
+    else if(
+        stage===2
+    ){
+
+        selectedVoltage =
+            12;
+
+        targetResistance =
+            randomItem([
+                3,6,9
+            ]);
+
+        document
+        .getElementById(
+            "stageName"
+        )
+        .textContent =
+            "Stage 2 - Resistance Control";
+
+        document
+        .getElementById(
+            "stageObjective"
+        )
+        .textContent =
+            `Set circuit resistance to ${targetResistance} ohm.`;
+
+        document
+        .getElementById(
+            "coachTitle"
+        )
+        .textContent =
+            "RESISTANCE";
+
+        document
+        .getElementById(
+            "coachText"
+        )
+        .textContent =
+            "Resistance opposes current. At fixed voltage, larger resistance produces smaller current.";
+
+        document
+        .getElementById(
+            "coachFormula"
+        )
+        .textContent =
+            "I = V / R";
+    }
+
+    else if(
+        stage===3
+    ){
+
+        const combinations = [
+
+            [6,3,2],
+            [12,6,2],
+            [18,9,2],
+
+            [12,3,4],
+            [18,6,3]
+        ];
+
+        const target =
+            randomItem(
+                combinations
+            );
+
+        targetCurrent =
+            target[2];
+
+        document
+        .getElementById(
+            "stageName"
+        )
+        .textContent =
+            "Stage 3 - Ohm's Law Challenge";
+
+        document
+        .getElementById(
+            "stageObjective"
+        )
+        .textContent =
+            `Create exactly ${targetCurrent.toFixed(1)} A current using V and R controls.`;
+
+        document
+        .getElementById(
+            "coachTitle"
+        )
+        .textContent =
+            "OHM'S LAW";
+
+        document
+        .getElementById(
+            "coachText"
+        )
+        .textContent =
+            "Choose a voltage and resistance combination that creates the requested current.";
+
+        document
+        .getElementById(
+            "coachFormula"
+        )
+        .textContent =
+            "V = IR  ->  I = V / R";
+    }
+
+    else if(
+        stage===4
+    ){
+
+        circuitMode =
+            "series";
+
+        document
+        .getElementById(
+            "stageName"
+        )
+        .textContent =
+            "Stage 4 - Series Circuit";
+
+        document
+        .getElementById(
+            "stageObjective"
+        )
+        .textContent =
+            "Build a SERIES circuit and observe the total resistance.";
+
+        document
+        .getElementById(
+            "coachTitle"
+        )
+        .textContent =
+            "SERIES CONNECTION";
+
+        document
+        .getElementById(
+            "coachText"
+        )
+        .textContent =
+            "In series, components share one path. Their resistances add together.";
+
+        document
+        .getElementById(
+            "coachFormula"
+        )
+        .textContent =
+            "Rtotal = R1 + R2";
+    }
+
+    else if(
+        stage===5
+    ){
+
+        circuitMode =
+            "parallel";
+
+        document
+        .getElementById(
+            "stageName"
+        )
+        .textContent =
+            "Stage 5 - Parallel Circuit";
+
+        document
+        .getElementById(
+            "stageObjective"
+        )
+        .textContent =
+            "Build a PARALLEL circuit and compare its current with series.";
+
+        document
+        .getElementById(
+            "coachTitle"
+        )
+        .textContent =
+            "PARALLEL CONNECTION";
+
+        document
+        .getElementById(
+            "coachText"
+        )
+        .textContent =
+            "Parallel branches provide multiple current paths. Equivalent resistance becomes smaller.";
+
+        document
+        .getElementById(
+            "coachFormula"
+        )
+        .textContent =
+            "For two equal resistors: Req = R / 2";
+    }
+
+    else if(
+        stage===6
+    ){
+
+        selectedFault =
+            "";
+
+        faultType =
+            randomItem([
+                "switch",
+                "wire",
+                "resistance"
+            ]);
+
+        document
+        .getElementById(
+            "stageName"
+        )
+        .textContent =
+            "Stage 6 - Fault Diagnosis";
+
+        document
+        .getElementById(
+            "stageObjective"
+        )
+        .textContent =
+            "The bulb failed. Diagnose the circuit fault.";
+
+        document
+        .getElementById(
+            "coachTitle"
+        )
+        .textContent =
+            "CIRCUIT TROUBLESHOOTING";
+
+        document
+        .getElementById(
+            "coachText"
+        )
+        .textContent =
+            "Observe the current flow and identify why the bulb is not operating normally.";
+
+        document
+        .getElementById(
+            "coachFormula"
+        )
+        .textContent =
+            "No closed path -> no current";
+    }
+
+    else{
+
+        finalTargets = [];
+
+        const combos = [
+
+            {v:6,r:3,i:2},
+            {v:12,r:6,i:2},
+            {v:18,r:9,i:2},
+            {v:12,r:3,i:4},
+            {v:18,r:6,i:3}
+        ];
+
+        while(
+            finalTargets.length<3
+        ){
+
+            const candidate =
+                randomItem(
+                    combos
+                );
+
+            if(
+                !finalTargets
+                .includes(
+                    candidate
+                )
+            ){
+
+                finalTargets.push(
+                    candidate
+                );
+            }
+        }
+
+        finalIndex =
+            0;
+
+        circuitMode =
+            "series";
+
+        document
+        .getElementById(
+            "stageName"
+        )
+        .textContent =
+            "Final - Power Grid Lock";
+
+        document
+        .getElementById(
+            "stageObjective"
+        )
+        .textContent =
+            `Circuit 1/3: create ${finalTargets[0].i} A current.`;
+
+        document
+        .getElementById(
+            "coachTitle"
+        )
+        .textContent =
+            "FINAL POWER GRID";
+
+        document
+        .getElementById(
+            "coachText"
+        )
+        .textContent =
+            "Restore three campus circuits by selecting voltage and resistance values that produce the required current.";
+
+        document
+        .getElementById(
+            "coachFormula"
+        )
+        .textContent =
+            "I = V / R";
+    }
+
+    activateButton(
+        voltageButtons,
+        "voltage",
+        selectedVoltage
+    );
+
+    activateButton(
+        resistanceButtons,
+        "resistance",
+        selectedResistance
+    );
+
+    activateButton(
+        modeButtons,
+        "mode",
+        circuitMode
+    );
+
+    updateCircuit();
+}
+
+/* =========================================================
+   EVALUATE
+========================================================= */
+
+function evaluateStage(){
+
+    let success =
+        false;
+
+    let title =
+        "";
+
+    let explanation =
+        "";
+
+    const current =
+        circuitCurrent();
+
+    if(
+        stage===1
+    ){
+
+        success =
+            selectedVoltage===
+            targetVoltage;
+
+        title =
+            success
+            ?
+            "VOLTAGE RESTORED!"
+            :
+            "WRONG VOLTAGE";
+
+        explanation =
+        `
+        Required battery voltage =
+        <b>${targetVoltage} V</b>.<br>
+
+        Your selected voltage =
+        <b>${selectedVoltage} V</b>.<br><br>
+
+        Voltage is the electrical potential difference
+        that provides energy to move charge through the circuit.
+        `;
+    }
+
+    else if(
+        stage===2
+    ){
+
+        success =
+            selectedResistance===
+            targetResistance;
+
+        title =
+            success
+            ?
+            "RESISTANCE CALIBRATED!"
+            :
+            "RESISTANCE DOES NOT MATCH";
+
+        explanation =
+        `
+        Required resistance =
+        <b>${targetResistance} ohm</b>.<br>
+
+        Selected resistance =
+        <b>${selectedResistance} ohm</b>.<br><br>
+
+        At the fixed 12 V supply:<br>
+
+        I = V / R<br>
+
+        =
+        12 /
+        ${selectedResistance}<br>
+
+        =
+        <b>
+        ${(12/selectedResistance).toFixed(2)} A
+        </b>.
+        `;
+    }
+
+    else if(
+        stage===3
+    ){
+
+        success =
+            Math.abs(
+                current-
+                targetCurrent
+            ) < .01;
+
+        title =
+            success
+            ?
+            "OHM'S LAW TARGET HIT!"
+            :
+            "CURRENT DOES NOT MATCH";
+
+        explanation =
+        `
+        Target current =
+        <b>${targetCurrent.toFixed(2)} A</b>.<br><br>
+
+        Your values:<br>
+
+        V =
+        ${selectedVoltage} V<br>
+
+        R =
+        ${selectedResistance} ohm<br><br>
+
+        I = V / R<br>
+
+        =
+        ${selectedVoltage} /
+        ${selectedResistance}<br>
+
+        =
+        <b>${current.toFixed(2)} A</b>.
+        `;
+    }
+
+    else if(
+        stage===4
+    ){
+
+        success =
+            circuitMode===
+            "series";
+
+        title =
+            success
+            ?
+            "SERIES CIRCUIT COMPLETE!"
+            :
+            "THIS IS NOT A SERIES CIRCUIT";
+
+        explanation =
+        `
+        Two identical
+        ${selectedResistance} ohm
+        resistive loads in series:<br><br>
+
+        Rtotal =
+        R1 + R2<br>
+
+        =
+        ${selectedResistance}
+        +
+        ${selectedResistance}<br>
+
+        =
+        <b>${totalResistance().toFixed(2)} ohm</b>.<br><br>
+
+        Current =
+        V / Rtotal<br>
+
+        =
+        ${selectedVoltage} /
+        ${totalResistance().toFixed(2)}<br>
+
+        =
+        <b>${current.toFixed(2)} A</b>.
+        `;
+    }
+
+    else if(
+        stage===5
+    ){
+
+        success =
+            circuitMode===
+            "parallel";
+
+        title =
+            success
+            ?
+            "PARALLEL CIRCUIT COMPLETE!"
+            :
+            "SELECT PARALLEL CONNECTION";
+
+        explanation =
+        `
+        Two identical
+        ${selectedResistance} ohm
+        loads in parallel have equivalent resistance:<br><br>
+
+        Req = R / 2<br>
+
+        =
+        ${selectedResistance} / 2<br>
+
+        =
+        <b>${totalResistance().toFixed(2)} ohm</b>.<br><br>
+
+        Total current =
+        ${selectedVoltage} /
+        ${totalResistance().toFixed(2)}<br>
+
+        =
+        <b>${current.toFixed(2)} A</b>.<br><br>
+
+        Parallel equivalent resistance is lower,
+        so total source current is greater than for the same loads in series.
+        `;
+    }
+
+    else if(
+        stage===6
+    ){
+
+        success =
+            selectedFault===
+            faultType;
+
+        title =
+            success
+            ?
+            "FAULT FOUND!"
+            :
+            "INCORRECT DIAGNOSIS";
+
+        const descriptions = {
+
+            switch:
+            `
+            The switch is open.
+
+            The circuit path is incomplete,
+            so current cannot circulate.
+            `,
+
+            wire:
+            `
+            A wire is broken.
+
+            Even with the switch ON,
+            the electrical path is incomplete.
+            Therefore current becomes zero.
+            `,
+
+            resistance:
+            `
+            Resistance is abnormally high.
+
+            The circuit is technically closed,
+            but current falls sharply because
+            I = V / R.
+            `
+        };
+
+        explanation =
+        `
+        Actual fault:<br>
+
+        <b>
+        ${
+            faultType===
+            "switch"
+            ?
+            "OPEN SWITCH"
+            :
+            faultType===
+            "wire"
+            ?
+            "BROKEN WIRE"
+            :
+            "EXCESSIVE RESISTANCE"
+        }
+        </b><br><br>
+
+        ${descriptions[faultType]}
+        `;
+    }
+
+    else{
+
+        const target =
+            finalTargets[
+                finalIndex
+            ];
+
+        success =
+            Math.abs(
+                current-
+                target.i
+            ) < .01;
+
+        if(
+            success
+        ){
+
+            score +=
+                100;
+
+            finalIndex++;
+
+            if(
+                finalIndex<3
+            ){
+
+                document
+                .getElementById(
+                    "stageObjective"
+                )
+                .textContent =
+                `Circuit ${finalIndex+1}/3: create ${finalTargets[finalIndex].i} A current.`;
+
+                document
+                .getElementById(
+                    "score"
+                )
+                .textContent =
+                    score;
+
+                return;
+            }
+
+            stageComplete =
+                true;
+
+            finishGame();
+
+            return;
+        }
+
+        title =
+            "POWER GRID CURRENT INCORRECT";
+
+        explanation =
+        `
+        Required current =
+        <b>${target.i.toFixed(2)} A</b>.<br>
+
+        Your circuit produced =
+        <b>${current.toFixed(2)} A</b>.<br><br>
+
+        Use I = V / R and try another voltage/resistance combination.
+        `;
+
+        showRetry(
+            title,
+            explanation
+        );
+
+        return;
+    }
+
+    if(
+        success
+    ){
+
+        score +=
+            100;
+
+        stageComplete =
+            true;
+
+        document
+        .getElementById(
+            "testButton"
+        )
+        .disabled =
+            true;
+
+        showStageResult(
+            title,
+            explanation
+        );
+    }
+
+    else{
+
+        showRetry(
+            title,
+            explanation
+        );
+    }
+
+    document
+    .getElementById(
+        "score"
+    )
+    .textContent =
+        score;
+}
+
+/* =========================================================
+   RETRY
+========================================================= */
+
+function showRetry(
+    title,
+    explanation
+){
+
+    const box =
+        document.getElementById(
+            "resultBox"
+        );
+
+    document
+    .getElementById(
+        "resultTitle"
+    )
+    .textContent =
+        title;
+
+    document
+    .getElementById(
+        "resultText"
+    )
+    .innerHTML =
+        explanation;
+
+    document
+    .getElementById(
+        "question"
+    )
+    .textContent =
+        "Adjust the circuit controls and test again.";
+
+    document
+    .getElementById(
+        "questionHint"
+    )
+    .textContent =
+        "";
+
+    document
+    .getElementById(
+        "answers"
+    )
+    .innerHTML =
+        "";
+
+    document
+    .getElementById(
+        "feedback"
+    )
+    .style.display =
+        "none";
+
+    const next =
+        document.getElementById(
+            "nextButton"
+        );
+
+    next.style.display =
+        "block";
+
+    next.textContent =
+        "TRY AGAIN";
+
+    next.onclick =
+        ()=>{
+
+            box.classList.remove(
+                "show"
+            );
+        };
+
+    box.classList.add(
+        "show"
+    );
+}
+
+/* =========================================================
+   QUESTION HELPERS
+========================================================= */
+
+function shuffle(
+    array
+){
+
+    const copy =
+        [...array];
+
+    for(
+        let i=copy.length-1;
+        i>0;
+        i--
+    ){
+
+        const j =
+            Math.floor(
+                Math.random()*
+                (i+1)
+            );
+
+        [
+            copy[i],
+            copy[j]
+        ]=[
+            copy[j],
+            copy[i]
+        ];
+    }
+
+    return copy;
+}
+
+function optionSet(
+    correct,
+    wrong1,
+    wrong2
+){
+
+    const values =
+        shuffle([
+            correct,
+            wrong1,
+            wrong2
+        ]);
+
+    return {
+
+        values,
+
+        correct:
+            values.indexOf(
+                correct
+            )
+    };
+}
+
+/* =========================================================
+   OHM QUESTION
+========================================================= */
+
+function makeOhmQuestion(){
+
+    const voltage =
+        randomItem([
+            6,12,18
+        ]);
+
+    const resistance =
+        randomItem([
+            3,6,9
+        ]);
+
+    const current =
+        voltage/
+        resistance;
+
+    const answer =
+        current.toFixed(2)+
+        " A";
+
+    const options =
+        optionSet(
+            answer,
+
+            (
+                current/2
+            ).toFixed(2)+
+            " A",
+
+            (
+                current*2
+            ).toFixed(2)+
+            " A"
+        );
+
+    return {
+
+        q:
+        `A ${voltage} V battery is connected across ${resistance} ohm resistance. Find current.`,
+
+        hint:
+        "I = V / R",
+
+        answers:
+            options.values,
+
+        correct:
+            options.correct,
+
+        explanation:
+        `
+        <b>Ohm's Law</b><br>
+
+        I = V / R<br><br>
+
+        =
+        ${voltage} /
+        ${resistance}<br><br>
+
+        =
+        <b>
+        ${current.toFixed(2)} A
+        </b>.
+        `
+    };
+}
+
+/* =========================================================
+   POWER QUESTION
+========================================================= */
+
+function makePowerQuestion(){
+
+    const voltage =
+        randomItem([
+            6,12,18
+        ]);
+
+    const current =
+        randomItem([
+            1,2,3
+        ]);
+
+    const power =
+        voltage*
+        current;
+
+    const answer =
+        power+
+        " W";
+
+    const options =
+        optionSet(
+            answer,
+
+            power/2+
+            " W",
+
+            power*2+
+            " W"
+        );
+
+    return {
+
+        q:
+        `A circuit operates at ${voltage} V and ${current} A. Find electrical power.`,
+
+        hint:
+        "P = VI",
+
+        answers:
+            options.values,
+
+        correct:
+            options.correct,
+
+        explanation:
+        `
+        <b>Formula</b><br>
+
+        P = VI<br><br>
+
+        =
+        ${voltage}
+        x
+        ${current}<br><br>
+
+        =
+        <b>
+        ${power} W
+        </b>.
+        `
+    };
+}
+
+/* =========================================================
+   SERIES QUESTION
+========================================================= */
+
+function makeSeriesQuestion(){
+
+    const r =
+        randomItem([
+            3,6,9
+        ]);
+
+    return {
+
+        q:
+        `Two ${r} ohm resistors are connected in series. What is total resistance?`,
+
+        hint:
+        "Series resistances add.",
+
+        answers:[
+            (r*2)+" ohm",
+            (r/2)+" ohm",
+            r+" ohm"
+        ],
+
+        correct:0,
+
+        explanation:
+        `
+        In series:<br><br>
+
+        Rtotal =
+        R1 + R2<br><br>
+
+        =
+        ${r} +
+        ${r}<br><br>
+
+        =
+        <b>
+        ${r*2} ohm
+        </b>.
+        `
+    };
+}
+
+/* =========================================================
+   PARALLEL QUESTION
+========================================================= */
+
+function makeParallelQuestion(){
+
+    const r =
+        randomItem([
+            4,6,8
+        ]);
+
+    return {
+
+        q:
+        `Two identical ${r} ohm resistors are connected in parallel. Find equivalent resistance.`,
+
+        hint:
+        "For two identical parallel resistors: Req = R / 2",
+
+        answers:[
+            (r/2)+" ohm",
+            (r*2)+" ohm",
+            r+" ohm"
+        ],
+
+        correct:0,
+
+        explanation:
+        `
+        For two equal resistors in parallel:<br><br>
+
+        Req =
+        R / 2<br><br>
+
+        =
+        ${r} / 2<br><br>
+
+        =
+        <b>
+        ${r/2} ohm
+        </b>.
+        `
+    };
+}
+
+/* =========================================================
+   CIRCUIT QUESTION
+========================================================= */
+
+function makeCircuitQuestion(){
+
+    return {
+
+        q:
+        "What happens to current when a switch opens in a simple single-loop circuit?",
+
+        hint:
+        "An open switch breaks the path.",
+
+        answers:[
+            "Current becomes zero",
+            "Current doubles",
+            "Resistance becomes zero"
+        ],
+
+        correct:0,
+
+        explanation:
+        `
+        An open switch breaks the conducting path.
+
+        Since there is no complete circuit,
+        continuous current cannot flow.
+        `
+    };
+}
+
+function questionForStage(){
+
+    if(
+        stage<=3
+    ){
+
+        return makeOhmQuestion();
+    }
+
+    if(
+        stage===4
+    ){
+
+        return makeSeriesQuestion();
+    }
+
+    if(
+        stage===5
+    ){
+
+        return makeParallelQuestion();
+    }
+
+    return randomItem([
+        makeCircuitQuestion,
+        makeOhmQuestion,
+        makePowerQuestion
+    ])();
+}
+
+/* =========================================================
+   RESULT + QUESTION
+========================================================= */
+
+function showStageResult(
+    title,
+    explanation
+){
+
+    const resultBox =
+        document.getElementById(
+            "resultBox"
+        );
+
+    document
+    .getElementById(
+        "resultTitle"
+    )
+    .textContent =
+        title;
+
+    document
+    .getElementById(
+        "resultText"
+    )
+    .innerHTML =
+        explanation;
+
+    const question =
+        questionForStage();
+
+    document
+    .getElementById(
+        "question"
+    )
+    .textContent =
+        question.q;
+
+    document
+    .getElementById(
+        "questionHint"
+    )
+    .textContent =
+        question.hint;
+
+    const answers =
+        document.getElementById(
+            "answers"
+        );
+
+    const feedback =
+        document.getElementById(
+            "feedback"
+        );
+
+    const next =
+        document.getElementById(
+            "nextButton"
+        );
+
+    answers.innerHTML =
+        "";
+
+    feedback.style.display =
+        "none";
+
+    next.style.display =
+        "none";
+
+    question.answers.forEach(
+        (answer,index)=>{
+
+            const button =
+                document.createElement(
+                    "button"
+                );
+
+            button.className =
+                "answer";
+
+            button.textContent =
+                answer;
+
+            button.onclick =
+                ()=>{
+
+                    answers
+                    .querySelectorAll(
+                        "button"
+                    )
+                    .forEach(
+                        item=>
+                        item.disabled=true
+                    );
+
+                    feedback.style.display =
+                        "block";
+
+                    if(
+                        index===
+                        question.correct
+                    ){
+
+                        score +=
+                            50;
+
+                        feedback.innerHTML =
+                        `
+                        <b>CORRECT</b><br><br>
+
+                        ${question.explanation}
+                        `;
+                    }
+
+                    else{
+
+                        feedback.innerHTML =
+                        `
+                        <b>NOT CORRECT - CHECK THE METHOD</b><br><br>
+
+                        ${question.explanation}
+                        `;
+                    }
+
+                    document
+                    .getElementById(
+                        "score"
+                    )
+                    .textContent =
+                        score;
+
+                    next.style.display =
+                        "block";
+                };
+
+            answers.appendChild(
+                button
+            );
+        }
+    );
+
+    next.textContent =
+        stage<6
+        ?
+        "NEXT CIRCUIT"
+        :
+        "START FINAL POWER GRID";
+
+    next.onclick =
+        ()=>{
+
+            resultBox
+            .classList
+            .remove(
+                "show"
+            );
+
+            stage++;
+
+            prepareStage();
+        };
+
+    resultBox
+    .classList
+    .add(
+        "show"
+    );
+}
+
+/* =========================================================
+   UPDATE CIRCUIT
+========================================================= */
+
+function updateCircuit(){
+
+    const resistance =
+        totalResistance();
+
+    const current =
+        circuitCurrent();
+
+    const power =
+        electricalPower();
+
+    document
+    .getElementById(
+        "voltageValue"
+    )
+    .textContent =
+        selectedVoltage;
+
+    document
+    .getElementById(
+        "resistanceValue"
+    )
+    .textContent =
+        resistance.toFixed(2);
+
+    document
+    .getElementById(
+        "currentValue"
+    )
+    .textContent =
+        current.toFixed(2);
+
+    document
+    .getElementById(
+        "powerValue"
+    )
+    .textContent =
+        power.toFixed(1);
+
+    document
+    .getElementById(
+        "statusValue"
+    )
+    .textContent =
+        current>0
+        ?
+        "CLOSED"
+        :
+        "OPEN";
+
+    document
+    .getElementById(
+        "targetCurrent"
+    )
+    .textContent =
+        stage===3
+        ?
+        targetCurrent.toFixed(2)
+        :
+        stage===7 &&
+        finalTargets[finalIndex]
+        ?
+        finalTargets[
+            finalIndex
+        ].i.toFixed(2)
+        :
+        "--";
+
+    const currentPercent =
+        Math.min(
+            100,
+            current/6*
+            100
+        );
+
+    document
+    .getElementById(
+        "currentFill"
+    )
+    .style.width =
+        currentPercent+
+        "%";
+
+    document
+    .getElementById(
+        "currentPercent"
+    )
+    .textContent =
+        currentPercent.toFixed(0)+
+        "%";
+
+    document
+    .getElementById(
+        "equation"
+    )
+    .innerHTML =
+    `
+    <b>Ohm's Law</b><br>
+
+    V = IR<br><br>
+
+    I = V / R<br>
+
+    =
+    ${selectedVoltage} /
+    ${resistance.toFixed(2)}<br>
+
+    =
+    <b>
+    ${current.toFixed(2)} A
+    </b><br><br>
+
+    Power =
+    VI =
+    ${power.toFixed(1)} W
+    `;
+
+    updateBulbs(
+        current
+    );
+
+    updateSwitchVisual();
+
+    updateCoach(
+        current,
+        resistance
+    );
+}
+
+/* =========================================================
+   BULB BRIGHTNESS
+========================================================= */
+
+function updateBulbs(
+    current
+){
+
+    const brightness =
+        THREE.MathUtils.clamp(
+            current/4,
+            0,
+            1
+        );
+
+    MAT.bulb.emissive.setHex(
+        brightness>0
+        ?
+        0xffa600
+        :
+        0x000000
+    );
+
+    MAT.bulb.emissiveIntensity =
+        brightness*
+        4;
+
+    bulb.scale.setScalar(
+        1+
+        brightness*.06
+    );
+
+    if(
+        bulb2
+    ){
+
+        bulb2.material =
+            MAT.bulb;
+    }
+}
+
+/* =========================================================
+   SWITCH VISUAL
+========================================================= */
+
+function updateSwitchVisual(){
+
+    switchLever.rotation.z =
+        switchOn
+        ?
+        0
+        :
+        -.55;
+}
+
+/* =========================================================
+   LIVE COACH
+========================================================= */
+
+function updateCoach(
+    current,
+    resistance
+){
+
+    if(
+        stage<=3
+    ){
+
+        document
+        .getElementById(
+            "coachText"
+        )
+        .textContent =
+        `Voltage = ${selectedVoltage} V, resistance = ${resistance.toFixed(2)} ohm, therefore current = ${current.toFixed(2)} A.`;
+
+        return;
+    }
+
+    if(
+        stage===4
+    ){
+
+        document
+        .getElementById(
+            "coachText"
+        )
+        .textContent =
+        `Series connection gives one path. Total resistance is ${resistance.toFixed(2)} ohm and current is ${current.toFixed(2)} A.`;
+    }
+
+    else if(
+        stage===5
+    ){
+
+        document
+        .getElementById(
+            "coachText"
+        )
+        .textContent =
+        `Parallel connection creates multiple branches. Equivalent resistance is ${resistance.toFixed(2)} ohm and source current is ${current.toFixed(2)} A.`;
+    }
+
+    else if(
+        stage===6
+    ){
+
+        document
+        .getElementById(
+            "coachText"
+        )
+        .textContent =
+        current===0
+        ?
+        "No current is flowing. Look for an open circuit."
+        :
+        "Current is unusually small. Excessive resistance may be limiting the circuit.";
+    }
+}
+
+/* =========================================================
+   PARTICLES
+========================================================= */
+
+function updateCurrentParticles(
+    dt
+){
+
+    const current =
+        circuitCurrent();
+
+    const flowing =
+        current>.01;
+
+    currentParticles.forEach(
+        particle=>{
+
+            particle.mesh.visible =
+                flowing;
+
+            if(
+                !flowing
+            ){
+
+                return;
+            }
+
+            particle.t +=
+                dt*
+                (
+                    .05+
+                    current*.045
+                );
+
+            if(
+                particle.t>1
+            ){
+
+                particle.t -=
+                    1;
+            }
+
+            const point =
+                pointOnWire(
+                    particle.t
+                );
+
+            particle.mesh.position.copy(
+                point
+            );
+        }
+    );
+}
+
+/* =========================================================
+   CAMERA
+========================================================= */
+
+function updateCamera(){
+
+    camera.position.set(
+        19,
+        18,
+        -18
+    );
+
+    camera.lookAt(
+        0,
+        1,
+        18
+    );
+}
+
+/* =========================================================
+   FINAL REPORT
+========================================================= */
+
+function finishGame(){
+
+    const current =
+        circuitCurrent();
+
+    const resistance =
+        totalResistance();
+
+    const power =
+        electricalPower();
+
+    document
+    .getElementById(
+        "finalVoltage"
+    )
+    .textContent =
+        selectedVoltage+
+        " V";
+
+    document
+    .getElementById(
+        "finalCurrent"
+    )
+    .textContent =
+        current.toFixed(2)+
+        " A";
+
+    document
+    .getElementById(
+        "finalPower"
+    )
+    .textContent =
+        power.toFixed(1)+
+        " W";
+
+    document
+    .getElementById(
+        "finalScore"
+    )
+    .textContent =
+        score;
+
+    document
+    .getElementById(
+        "finalExplanation"
+    )
+    .innerHTML =
+    `
+    <b>1. ELECTRIC CIRCUIT</b><br><br>
+
+    Electric current requires a complete conducting path.
+
+    When the switch was ON,
+    the current particles travelled continuously around the circuit.
+
+    When the switch was OFF or the wire was broken,
+    the path became open and current stopped.<br><br>
+
+
+    <b>2. VOLTAGE</b><br><br>
+
+    Voltage is electrical potential difference.
+
+    In the game,
+    selecting a larger battery voltage increased the driving potential
+    across the circuit.<br><br>
+
+    For a fixed resistance,
+    increasing voltage increased current.<br><br>
+
+
+    <b>3. CURRENT</b><br><br>
+
+    Current represents the rate of electric charge flow.
+
+    The moving blue particles visualized this flow.
+
+    Larger calculated current caused the particles to move faster
+    and increased bulb brightness.<br><br>
+
+
+    <b>4. RESISTANCE</b><br><br>
+
+    Resistance opposes current.
+
+    At the same voltage:<br><br>
+
+    larger R →
+    smaller I.<br><br>
+
+    This follows directly from:<br><br>
+
+    <b>
+    I = V / R
+    </b>.<br><br>
+
+
+    <b>5. OHM'S LAW</b><br><br>
+
+    Ohm's Law connects voltage, current and resistance:<br><br>
+
+    <b>
+    V = IR
+    </b><br><br>
+
+    For your final circuit:<br><br>
+
+    V =
+    ${selectedVoltage} V<br>
+
+    R =
+    ${resistance.toFixed(2)} ohm<br><br>
+
+    I =
+    V / R<br>
+
+    =
+    ${selectedVoltage}
+    /
+    ${resistance.toFixed(2)}<br>
+
+    =
+    <b>
+    ${current.toFixed(2)} A
+    </b>.<br><br>
+
+
+    <b>6. SERIES CIRCUIT</b><br><br>
+
+    In a series circuit,
+    components are connected along one path.
+
+    Their resistances add:<br><br>
+
+    <b>
+    Rtotal =
+    R1 + R2 + ...
+    </b><br><br>
+
+    A larger total resistance means smaller source current
+    for the same battery voltage.<br><br>
+
+
+    <b>7. PARALLEL CIRCUIT</b><br><br>
+
+    Parallel circuits create multiple current paths.
+
+    For two identical resistors of resistance R:<br><br>
+
+    <b>
+    Req = R / 2
+    </b><br><br>
+
+    This equivalent resistance is lower than either individual resistor,
+    so the total current drawn from the source can increase.<br><br>
+
+
+    <b>8. ELECTRICAL POWER</b><br><br>
+
+    Power is the rate at which electrical energy is transferred:<br><br>
+
+    <b>
+    P = VI
+    </b><br><br>
+
+    Your final circuit power was:<br><br>
+
+    P =
+    ${selectedVoltage}
+    ×
+    ${current.toFixed(2)}<br>
+
+    =
+    <b>
+    ${power.toFixed(1)} W
+    </b>.<br><br>
+
+
+    <b>9. TROUBLESHOOTING</b><br><br>
+
+    OPEN SWITCH →
+    incomplete path →
+    zero current.<br>
+
+    BROKEN WIRE →
+    incomplete path →
+    zero current.<br>
+
+    HIGH RESISTANCE →
+    circuit remains closed,
+    but current becomes much smaller.<br><br>
+
+
+    <b>FINAL CONNECTION</b><br>
+
+    Voltage drives charge.<br>
+
+    Current is charge flow.<br>
+
+    Resistance opposes current.<br>
+
+    Ohm's Law connects V, I and R.<br>
+
+    Series components share one path.<br>
+
+    Parallel circuits provide multiple paths.<br>
+
+    Electrical power tells how quickly electrical energy is transferred.<br><br>
+
+    You used all of these relationships to restore the campus power grid.
+    `;
+
+    document
+    .getElementById(
+        "finish"
+    )
+    .classList.add(
+        "show"
+    );
+}
+
+/* =========================================================
+   LOOP
+========================================================= */
+
+let lastTime =
+    performance.now();
+
+function animate(
+    now
+){
+
+    requestAnimationFrame(
+        animate
+    );
+
+    const dt =
+        Math.min(
+            (
+                now-
+                lastTime
+            )/1000,
+            .035
+        );
+
+    lastTime =
+        now;
+
+    if(
+        started
+    ){
+
+        time +=
+            dt;
+
+        updateCurrentParticles(
+            dt
+        );
+    }
+
+    updateCamera();
+
+    renderer.render(
+        scene,
+        camera
+    );
+}
+
+/* =========================================================
+   INITIAL
+========================================================= */
+
+updateCircuit();
+
+updateCamera();
+
+requestAnimationFrame(
+    animate
+);
+
+/* =========================================================
+   RESIZE
+========================================================= */
+
+addEventListener(
+    "resize",
+    ()=>{
+
+        camera.aspect =
+            innerWidth/
+            innerHeight;
+
+        camera.updateProjectionMatrix();
+
+        renderer.setSize(
+            innerWidth,
+            innerHeight
+        );
+    }
+);
+
+})();
+
+</script>
+
+</body>
+</html>

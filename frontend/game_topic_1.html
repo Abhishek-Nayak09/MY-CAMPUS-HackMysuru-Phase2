@@ -1,0 +1,2611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Day Powered by Physics | My Campus</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --panel: rgba(7, 16, 29, 0.90);
+            --panel2: rgba(13, 28, 46, 0.94);
+            --line: rgba(255,255,255,0.12);
+            --text: #f4f8ff;
+            --muted: #9eb1c9;
+            --cyan: #38dcff;
+            --green: #55e8a9;
+            --yellow: #ffd96f;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #050b13;
+            color: var(--text);
+            font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+
+        button {
+            font: inherit;
+        }
+
+        #game {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        #scene {
+            position: absolute;
+            inset: 0;
+        }
+
+        #scene canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* ---------- HUD ---------- */
+
+        .top-hud {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            right: 16px;
+            z-index: 15;
+            display: flex;
+            justify-content: space-between;
+            gap: 14px;
+            pointer-events: none;
+        }
+
+        .story-card,
+        .learn-card {
+            border: 1px solid var(--line);
+            background: var(--panel);
+            backdrop-filter: blur(14px);
+            border-radius: 18px;
+            box-shadow: 0 18px 50px rgba(0,0,0,.26);
+        }
+
+        .story-card {
+            width: min(500px, 53vw);
+            padding: 15px 18px;
+        }
+
+        .eyebrow {
+            color: var(--cyan);
+            font-size: 11px;
+            font-weight: 900;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .story-card h1 {
+            margin-top: 5px;
+            font-size: 20px;
+        }
+
+        .story-card p {
+            margin-top: 7px;
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .learn-card {
+            width: 320px;
+            padding: 14px;
+        }
+
+        .learn-card h3 {
+            font-size: 14px;
+            margin-bottom: 9px;
+        }
+
+        .learn-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 7px;
+            padding: 8px 9px;
+            border-radius: 10px;
+            background: rgba(255,255,255,.035);
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .learn-item.done {
+            color: #dffff0;
+            background: rgba(85,232,169,.09);
+            border: 1px solid rgba(85,232,169,.18);
+        }
+
+        /* ---------- OBJECTIVE ---------- */
+
+        .objective-wrap {
+            position: absolute;
+            left: 50%;
+            top: 20px;
+            transform: translateX(-50%);
+            z-index: 16;
+            width: min(390px, 36vw);
+            pointer-events: none;
+        }
+
+        .objective-title {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: rgba(255,255,255,.85);
+            margin-bottom: 6px;
+        }
+
+        .progress {
+            height: 8px;
+            border-radius: 99px;
+            background: rgba(255,255,255,.10);
+            overflow: hidden;
+        }
+
+        #progressBar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--cyan), var(--green));
+            transition: width .35s ease;
+        }
+
+        /* ---------- CONTROLS ---------- */
+
+        .controls {
+            position: absolute;
+            left: 16px;
+            bottom: 16px;
+            z-index: 15;
+            width: 285px;
+            padding: 13px;
+            border: 1px solid var(--line);
+            background: var(--panel);
+            backdrop-filter: blur(14px);
+            border-radius: 16px;
+            pointer-events: none;
+        }
+
+        .controls strong {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+
+        .control-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 6px;
+        }
+
+        .control {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+            padding: 7px 8px;
+            border-radius: 9px;
+            background: rgba(255,255,255,.035);
+            color: var(--muted);
+            font-size: 11px;
+        }
+
+        .control b {
+            color: white;
+        }
+
+        /* ---------- INTERACTION ---------- */
+
+        #interactionPrompt {
+            position: absolute;
+            left: 50%;
+            bottom: 120px;
+            transform: translateX(-50%);
+            z-index: 20;
+            min-width: 300px;
+            padding: 11px 16px;
+            border-radius: 13px;
+            border: 1px solid rgba(56,220,255,.3);
+            background: rgba(4,13,23,.91);
+            text-align: center;
+            opacity: 0;
+            transition: opacity .18s ease;
+            pointer-events: none;
+        }
+
+        #interactionPrompt.show {
+            opacity: 1;
+        }
+
+        #interactionPrompt kbd {
+            display: inline-block;
+            padding: 4px 8px;
+            margin-right: 8px;
+            border-radius: 7px;
+            background: var(--cyan);
+            color: #031018;
+            font-weight: 900;
+        }
+
+        /* ---------- STORY SUBTITLE ---------- */
+
+        #subtitle {
+            position: absolute;
+            left: 50%;
+            bottom: 45px;
+            transform: translateX(-50%);
+            z-index: 21;
+            width: min(760px, 80%);
+            padding: 13px 18px;
+            border-radius: 14px;
+            background: rgba(3,10,18,.86);
+            border: 1px solid var(--line);
+            text-align: center;
+            font-size: 14px;
+            line-height: 1.5;
+            opacity: 0;
+            transition: opacity .2s ease;
+            pointer-events: none;
+        }
+
+        #subtitle.show {
+            opacity: 1;
+        }
+
+        #subtitle strong {
+            color: var(--cyan);
+        }
+
+        /* ---------- CONCEPT REVEAL ---------- */
+
+        #conceptReveal {
+            position: absolute;
+            right: 18px;
+            top: 50%;
+            transform: translateY(-50%) translateX(120%);
+            z-index: 25;
+            width: 365px;
+            padding: 18px;
+            border-radius: 20px;
+            border: 1px solid rgba(85,232,169,.26);
+            background: var(--panel2);
+            box-shadow: 0 24px 70px rgba(0,0,0,.35);
+            transition: transform .3s ease;
+            pointer-events: none;
+        }
+
+        #conceptReveal.show {
+            transform: translateY(-50%) translateX(0);
+        }
+
+        #conceptReveal h2 {
+            margin-top: 6px;
+            font-size: 21px;
+        }
+
+        #conceptReveal p {
+            margin-top: 8px;
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .formula {
+            margin-top: 12px;
+            padding: 10px 12px;
+            border-radius: 11px;
+            background: rgba(56,220,255,.07);
+            border: 1px solid rgba(56,220,255,.14);
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        /* ---------- START ---------- */
+
+        #startScreen {
+            position: absolute;
+            inset: 0;
+            z-index: 50;
+            display: grid;
+            place-items: center;
+            background:
+                radial-gradient(circle at center, rgba(24,57,89,.58), rgba(3,8,14,.97));
+        }
+
+        .start-card {
+            width: min(760px, 92%);
+            padding: 34px;
+            border-radius: 28px;
+            background: linear-gradient(145deg, rgba(12,30,49,.97), rgba(6,15,26,.97));
+            border: 1px solid rgba(255,255,255,.14);
+            text-align: center;
+            box-shadow: 0 30px 100px rgba(0,0,0,.45);
+        }
+
+        .character-icon {
+            font-size: 72px;
+        }
+
+        .start-card h2 {
+            margin-top: 10px;
+            font-size: clamp(32px, 5vw, 55px);
+        }
+
+        .start-card h2 span {
+            color: var(--cyan);
+        }
+
+        .start-card p {
+            width: min(620px, 100%);
+            margin: 14px auto 0;
+            color: var(--muted);
+            line-height: 1.7;
+        }
+
+        .story-line {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 15px;
+            background: rgba(255,255,255,.04);
+            color: #dce8f7;
+            line-height: 1.6;
+        }
+
+        .start-btn {
+            margin-top: 22px;
+            padding: 14px 25px;
+            border: none;
+            border-radius: 14px;
+            background: linear-gradient(135deg, var(--cyan), #82efff);
+            color: #031018;
+            font-weight: 950;
+            cursor: pointer;
+            transition: transform .15s ease;
+        }
+
+        .start-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        /* ---------- COMPLETE ---------- */
+
+        #completeScreen {
+            position: absolute;
+            inset: 0;
+            z-index: 60;
+            display: none;
+            place-items: center;
+            background: rgba(2,8,14,.88);
+            backdrop-filter: blur(13px);
+        }
+
+        #completeScreen.show {
+            display: grid;
+        }
+
+        .complete-card {
+            width: min(700px, 92%);
+            padding: 34px;
+            border-radius: 28px;
+            border: 1px solid rgba(85,232,169,.27);
+            background: linear-gradient(145deg, rgba(10,31,42,.98), rgba(6,16,28,.98));
+            text-align: center;
+        }
+
+        .complete-card h2 {
+            margin-top: 8px;
+            font-size: 36px;
+        }
+
+        .complete-card p {
+            margin-top: 12px;
+            color: var(--muted);
+            line-height: 1.7;
+        }
+
+        .summary {
+            margin-top: 20px;
+            display: grid;
+            gap: 9px;
+            text-align: left;
+        }
+
+        .summary div {
+            padding: 11px 13px;
+            border-radius: 11px;
+            background: rgba(255,255,255,.04);
+            color: #dce7f4;
+            font-size: 13px;
+        }
+
+        /* ---------- POINTER LOCK ---------- */
+
+        #resume {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%,-50%);
+            z-index: 45;
+            display: none;
+            padding: 15px 20px;
+            border-radius: 14px;
+            border: 1px solid var(--line);
+            background: rgba(5,14,25,.94);
+            text-align: center;
+            cursor: pointer;
+        }
+
+        #resume.show {
+            display: block;
+        }
+
+        @media (max-width: 900px) {
+            .learn-card {
+                display: none;
+            }
+
+            .story-card {
+                width: 64vw;
+            }
+
+            .controls {
+                display: none;
+            }
+
+            .objective-wrap {
+                width: 45vw;
+            }
+
+            #conceptReveal {
+                width: calc(100% - 32px);
+                right: 16px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="assets/css/universal-learning-journey.css?v=1">
+</head>
+
+<body>
+
+<div id="game">
+
+    <div id="scene"></div>
+
+    <div class="top-hud">
+
+        <div class="story-card">
+            <div class="eyebrow">
+                Topic 1 • Why Physics?
+            </div>
+
+            <h1>
+                A Day Powered by Physics
+            </h1>
+
+            <p id="objectiveText">
+                Arjun has just woken up. Walk to the switchboard and turn on the room light.
+            </p>
+        </div>
+
+        <div class="learn-card">
+            <h3>⚛️ Physics Learned</h3>
+
+            <div class="learn-item" id="learnLight">
+                ⭕ Electrical → Light energy
+            </div>
+
+            <div class="learn-item" id="learnFan">
+                ⭕ Electrical → Mechanical energy
+            </div>
+
+            <div class="learn-item" id="learnEveryday">
+                ⭕ Physics powers everyday life
+            </div>
+        </div>
+
+    </div>
+
+    <div class="objective-wrap">
+
+        <div class="objective-title">
+            <span>Morning Mission</span>
+            <span id="progressText">0%</span>
+        </div>
+
+        <div class="progress">
+            <div id="progressBar"></div>
+        </div>
+
+    </div>
+
+    <div class="controls">
+
+        <strong>🎮 Controls</strong>
+
+        <div class="control-grid">
+            <div class="control">
+                <span>Move</span>
+                <b>WASD</b>
+            </div>
+
+            <div class="control">
+                <span>Camera</span>
+                <b>Mouse</b>
+            </div>
+
+            <div class="control">
+                <span>Sprint</span>
+                <b>Shift</b>
+            </div>
+
+            <div class="control">
+                <span>Interact</span>
+                <b>E</b>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="interactionPrompt">
+        <kbd>E</kbd>
+        <span id="interactionText">Interact</span>
+    </div>
+
+    <div id="subtitle"></div>
+
+    <div id="conceptReveal">
+
+        <div class="eyebrow">
+            Physics discovered
+        </div>
+
+        <h2 id="conceptTitle">
+            Energy Conversion
+        </h2>
+
+        <p id="conceptText"></p>
+
+        <div class="formula" id="conceptExample"></div>
+
+    </div>
+
+    <div id="resume">
+        <strong style="color:#38dcff;">
+            Click to continue
+        </strong>
+        <br>
+        <span style="color:#9eb1c9;font-size:12px;">
+            Mouse camera control is paused.
+        </span>
+    </div>
+
+    <div id="startScreen">
+
+        <div class="start-card">
+
+            <div class="character-icon">
+                🧑‍🎓
+            </div>
+
+            <div class="eyebrow">
+                Story Game • Level 1
+            </div>
+
+            <h2>
+                Meet <span>Arjun</span>
+            </h2>
+
+            <p>
+                Arjun is a college student beginning a normal day.
+                He doesn't realise that almost everything he is about
+                to use depends on Physics.
+            </p>
+
+            <div class="story-line">
+                🌅 <strong>7:00 AM — Hostel Room</strong><br><br>
+                Arjun wakes up. The room is dark and warm.
+                His first task is simple: get ready for college.
+                But even this simple morning already depends on Physics.
+            </div>
+
+            <button class="start-btn" id="startBtn">
+                ▶ Start Arjun's Day
+            </button>
+
+        </div>
+
+    </div>
+
+    <div id="completeScreen">
+
+        <div class="complete-card">
+
+            <div style="font-size:64px;">
+                🌅
+            </div>
+
+            <div class="eyebrow">
+                Morning complete
+            </div>
+
+            <h2>
+                Arjun is Ready for College
+            </h2>
+
+            <p>
+                Before even leaving his room, Arjun already used Physics twice.
+                Electricity powered the light and the fan through two different
+                energy conversions.
+            </p>
+
+            <div class="summary">
+                <div>
+                    💡 Electrical energy → Light energy
+                </div>
+
+                <div>
+                    🌀 Electrical energy → Mechanical rotational energy
+                </div>
+
+                <div>
+                    ⚛️ Physics is already part of ordinary daily life.
+                </div>
+            </div>
+
+            <button class="start-btn" id="reviewBtn">
+                Review Room
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script src="assets/vendor/three-0.160.1.min.js"></script>
+
+<script>
+(() => {
+
+    // ------------------------------------------------------------
+    // DOM
+    // ------------------------------------------------------------
+
+    const container =
+        document.getElementById("scene");
+
+    const startScreen =
+        document.getElementById("startScreen");
+
+    const startBtn =
+        document.getElementById("startBtn");
+
+    const objectiveText =
+        document.getElementById("objectiveText");
+
+    const progressBar =
+        document.getElementById("progressBar");
+
+    const progressText =
+        document.getElementById("progressText");
+
+    const interactionPrompt =
+        document.getElementById("interactionPrompt");
+
+    const interactionText =
+        document.getElementById("interactionText");
+
+    const subtitle =
+        document.getElementById("subtitle");
+
+    const conceptReveal =
+        document.getElementById("conceptReveal");
+
+    const conceptTitle =
+        document.getElementById("conceptTitle");
+
+    const conceptText =
+        document.getElementById("conceptText");
+
+    const conceptExample =
+        document.getElementById("conceptExample");
+
+    const learnLight =
+        document.getElementById("learnLight");
+
+    const learnFan =
+        document.getElementById("learnFan");
+
+    const learnEveryday =
+        document.getElementById("learnEveryday");
+
+    const completeScreen =
+        document.getElementById("completeScreen");
+
+    const reviewBtn =
+        document.getElementById("reviewBtn");
+
+    const resume =
+        document.getElementById("resume");
+
+
+    // ------------------------------------------------------------
+    // GAME STATE
+    // ------------------------------------------------------------
+
+    let gameStarted = false;
+
+    let pointerLocked = false;
+
+    let storyStep = 0;
+
+    let currentInteractable = null;
+
+    let cameraYaw = Math.PI;
+
+    let cameraPitch = -0.18;
+
+    let subtitleTimer = null;
+
+    let conceptTimer = null;
+
+    const keys = {};
+
+
+    // ------------------------------------------------------------
+    // THREE SETUP
+    // ------------------------------------------------------------
+
+    const scene =
+        new THREE.Scene();
+
+    scene.background =
+        new THREE.Color(0x121820);
+
+
+    const camera =
+        new THREE.PerspectiveCamera(
+            65,
+            window.innerWidth / window.innerHeight,
+            0.1,
+            150
+        );
+
+
+    const renderer =
+        new THREE.WebGLRenderer({
+            antialias: true
+        });
+
+    renderer.setSize(
+        window.innerWidth,
+        window.innerHeight
+    );
+
+    renderer.setPixelRatio(
+        Math.min(window.devicePixelRatio, 2)
+    );
+
+    renderer.shadowMap.enabled = true;
+
+    renderer.shadowMap.type =
+        THREE.PCFSoftShadowMap;
+
+    renderer.outputColorSpace =
+        THREE.SRGBColorSpace;
+
+    container.appendChild(
+        renderer.domElement
+    );
+
+
+    // ------------------------------------------------------------
+    // MATERIAL HELPERS
+    // ------------------------------------------------------------
+
+    function material(
+        color,
+        roughness = 0.7,
+        metalness = 0.05
+    ) {
+        return new THREE.MeshStandardMaterial({
+            color,
+            roughness,
+            metalness
+        });
+    }
+
+
+    function box(
+        w,
+        h,
+        d,
+        color
+    ) {
+        const mesh =
+            new THREE.Mesh(
+                new THREE.BoxGeometry(w, h, d),
+                material(color)
+            );
+
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+
+        return mesh;
+    }
+
+
+    function cylinder(
+        radius,
+        height,
+        color
+    ) {
+        const mesh =
+            new THREE.Mesh(
+                new THREE.CylinderGeometry(
+                    radius,
+                    radius,
+                    height,
+                    18
+                ),
+                material(color)
+            );
+
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+
+        return mesh;
+    }
+
+
+    // ------------------------------------------------------------
+    // LIGHTING
+    // ------------------------------------------------------------
+
+    const ambient =
+        new THREE.HemisphereLight(
+            0x8fa8bb,
+            0x252118,
+            0.48
+        );
+
+    scene.add(ambient);
+
+
+    const moonLight =
+        new THREE.DirectionalLight(
+            0xaac7e5,
+            0.45
+        );
+
+    moonLight.position.set(
+        -5,
+        8,
+        6
+    );
+
+    moonLight.castShadow = true;
+
+    scene.add(moonLight);
+
+
+    // Main room bulb
+    const roomLight =
+        new THREE.PointLight(
+            0xffdf91,
+            0,
+            20,
+            2
+        );
+
+    roomLight.position.set(
+        0,
+        3.5,
+        0
+    );
+
+    scene.add(roomLight);
+
+
+    // ------------------------------------------------------------
+    // ROOM
+    // ------------------------------------------------------------
+
+    const floor =
+        new THREE.Mesh(
+            new THREE.PlaneGeometry(
+                14,
+                12
+            ),
+            material(
+                0x60554a,
+                1
+            )
+        );
+
+    floor.rotation.x =
+        -Math.PI / 2;
+
+    floor.receiveShadow = true;
+
+    scene.add(floor);
+
+
+    // Walls
+
+    const backWall =
+        box(
+            14,
+            4.5,
+            .18,
+            0xcfc4af
+        );
+
+    backWall.position.set(
+        0,
+        2.25,
+        6
+    );
+
+    scene.add(backWall);
+
+
+    const leftWall =
+        box(
+            .18,
+            4.5,
+            12,
+            0xc5baa6
+        );
+
+    leftWall.position.set(
+        -7,
+        2.25,
+        0
+    );
+
+    scene.add(leftWall);
+
+
+    const rightWall =
+        box(
+            .18,
+            4.5,
+            12,
+            0xc5baa6
+        );
+
+    rightWall.position.set(
+        7,
+        2.25,
+        0
+    );
+
+    scene.add(rightWall);
+
+
+    // Front wall split around door
+
+    const frontLeft =
+        box(
+            5.6,
+            4.5,
+            .18,
+            0xcfc4af
+        );
+
+    frontLeft.position.set(
+        -4.2,
+        2.25,
+        -6
+    );
+
+    scene.add(frontLeft);
+
+
+    const frontRight =
+        box(
+            5.6,
+            4.5,
+            .18,
+            0xcfc4af
+        );
+
+    frontRight.position.set(
+        4.2,
+        2.25,
+        -6
+    );
+
+    scene.add(frontRight);
+
+
+    // ------------------------------------------------------------
+    // WINDOW
+    // ------------------------------------------------------------
+
+    const windowFrame =
+        box(
+            3.4,
+            2.2,
+            .1,
+            0x353d45
+        );
+
+    windowFrame.position.set(
+        -2,
+        2.4,
+        5.86
+    );
+
+    scene.add(windowFrame);
+
+
+    const windowGlass =
+        new THREE.Mesh(
+            new THREE.PlaneGeometry(
+                3.05,
+                1.85
+            ),
+            new THREE.MeshStandardMaterial({
+                color: 0x274361,
+                emissive: 0x142b43,
+                emissiveIntensity: 0.7,
+                roughness: 0.25
+            })
+        );
+
+    windowGlass.position.set(
+        -2,
+        2.4,
+        5.8
+    );
+
+    windowGlass.rotation.y =
+        Math.PI;
+
+    scene.add(windowGlass);
+
+
+    // ------------------------------------------------------------
+    // BED
+    // ------------------------------------------------------------
+
+    const bedBase =
+        box(
+            4.2,
+            .55,
+            2.3,
+            0x503a2c
+        );
+
+    bedBase.position.set(
+        -4.15,
+        .28,
+        2.2
+    );
+
+    scene.add(bedBase);
+
+
+    const mattress =
+        box(
+            4,
+            .35,
+            2.1,
+            0xded7c9
+        );
+
+    mattress.position.set(
+        -4.15,
+        .72,
+        2.2
+    );
+
+    scene.add(mattress);
+
+
+    const pillow =
+        box(
+            1,
+            .22,
+            1.45,
+            0xf0ede4
+        );
+
+    pillow.position.set(
+        -5.3,
+        .99,
+        2.2
+    );
+
+    scene.add(pillow);
+
+
+    // ------------------------------------------------------------
+    // TABLE
+    // ------------------------------------------------------------
+
+    const tableTop =
+        box(
+            3,
+            .18,
+            1.5,
+            0x624735
+        );
+
+    tableTop.position.set(
+        3.8,
+        1.05,
+        3.8
+    );
+
+    scene.add(tableTop);
+
+
+    [
+        [2.55, .5, 3.25],
+        [5.05, .5, 3.25],
+        [2.55, .5, 4.35],
+        [5.05, .5, 4.35]
+    ].forEach(
+        p => {
+            const leg =
+                box(
+                    .17,
+                    1,
+                    .17,
+                    0x4b3628
+                );
+
+            leg.position.set(
+                p[0],
+                p[1],
+                p[2]
+            );
+
+            scene.add(leg);
+        }
+    );
+
+
+    // Laptop prop
+
+    const laptop =
+        box(
+            1.1,
+            .08,
+            .8,
+            0x252b32
+        );
+
+    laptop.position.set(
+        3.8,
+        1.18,
+        3.7
+    );
+
+    scene.add(laptop);
+
+
+    // ------------------------------------------------------------
+    // CEILING BULB
+    // ------------------------------------------------------------
+
+    const bulbMaterial =
+        new THREE.MeshStandardMaterial({
+            color: 0x777064,
+            emissive: 0x000000,
+            emissiveIntensity: 0,
+            roughness: .35
+        });
+
+
+    const bulb =
+        new THREE.Mesh(
+            new THREE.SphereGeometry(
+                .27,
+                20,
+                16
+            ),
+            bulbMaterial
+        );
+
+    bulb.position.set(
+        0,
+        3.62,
+        0
+    );
+
+    scene.add(bulb);
+
+
+    const bulbWire =
+        cylinder(
+            .035,
+            .8,
+            0x262b31
+        );
+
+    bulbWire.position.set(
+        0,
+        4.12,
+        0
+    );
+
+    scene.add(bulbWire);
+
+
+    // ------------------------------------------------------------
+    // FAN
+    // ------------------------------------------------------------
+
+    const fanGroup =
+        new THREE.Group();
+
+    fanGroup.position.set(
+        3,
+        3.55,
+        -1
+    );
+
+    scene.add(fanGroup);
+
+
+    const fanHub =
+        new THREE.Mesh(
+            new THREE.SphereGeometry(
+                .25,
+                18,
+                16
+            ),
+            material(
+                0x454f5b,
+                .4,
+                .3
+            )
+        );
+
+    fanGroup.add(fanHub);
+
+
+    for (
+        let i = 0;
+        i < 4;
+        i++
+    ) {
+        const bladePivot =
+            new THREE.Group();
+
+        bladePivot.rotation.y =
+            i * Math.PI / 2;
+
+        const blade =
+            box(
+                .4,
+                .08,
+                1.65,
+                0x677887
+            );
+
+        blade.position.z =
+            0.95;
+
+        bladePivot.add(blade);
+
+        fanGroup.add(
+            bladePivot
+        );
+    }
+
+
+    const fanRod =
+        cylinder(
+            .06,
+            .8,
+            0x353d45
+        );
+
+    fanRod.position.set(
+        3,
+        4.02,
+        -1
+    );
+
+    scene.add(fanRod);
+
+
+    // ------------------------------------------------------------
+    // SWITCHBOARD
+    // ------------------------------------------------------------
+
+    const board =
+        box(
+            .14,
+            1.45,
+            1.25,
+            0xf0eee7
+        );
+
+    board.position.set(
+        6.78,
+        1.55,
+        .6
+    );
+
+    scene.add(board);
+
+
+    const lightSwitch =
+        box(
+            .12,
+            .38,
+            .32,
+            0x323a43
+        );
+
+    lightSwitch.position.set(
+        6.68,
+        1.78,
+        .85
+    );
+
+    scene.add(lightSwitch);
+
+
+    const fanSwitch =
+        box(
+            .12,
+            .38,
+            .32,
+            0x323a43
+        );
+
+    fanSwitch.position.set(
+        6.68,
+        1.28,
+        .35
+    );
+
+    scene.add(fanSwitch);
+
+
+    // ------------------------------------------------------------
+    // DOOR
+    // ------------------------------------------------------------
+
+    const doorPivot =
+        new THREE.Group();
+
+    doorPivot.position.set(
+        -1.4,
+        0,
+        -5.88
+    );
+
+    scene.add(doorPivot);
+
+
+    const door =
+        box(
+            2.8,
+            3.7,
+            .14,
+            0x6b4c35
+        );
+
+    door.position.set(
+        1.4,
+        1.85,
+        0
+    );
+
+    doorPivot.add(door);
+
+
+    const handle =
+        new THREE.Mesh(
+            new THREE.SphereGeometry(
+                .09,
+                12,
+                10
+            ),
+            material(
+                0xd0a849,
+                .25,
+                .8
+            )
+        );
+
+    handle.position.set(
+        2.45,
+        1.8,
+        -.11
+    );
+
+    doorPivot.add(handle);
+
+
+    // ------------------------------------------------------------
+    // ARJUN - SIMPLE 3D HUMAN CHARACTER
+    // ------------------------------------------------------------
+
+    const arjun =
+        new THREE.Group();
+
+    scene.add(arjun);
+
+
+    const skin =
+        material(
+            0xb97956,
+            .7
+        );
+
+
+    const shirt =
+        material(
+            0x245fa8,
+            .75
+        );
+
+
+    const pants =
+        material(
+            0x202837,
+            .8
+        );
+
+
+    // torso
+
+    const torso =
+        box(
+            .72,
+            1.05,
+            .38,
+            0x245fa8
+        );
+
+    torso.position.y =
+        1.45;
+
+    arjun.add(torso);
+
+
+    // head
+
+    const head =
+        new THREE.Mesh(
+            new THREE.SphereGeometry(
+                .32,
+                18,
+                16
+            ),
+            skin
+        );
+
+    head.position.y =
+        2.18;
+
+    head.castShadow = true;
+
+    arjun.add(head);
+
+
+    // hair
+
+    const hair =
+        new THREE.Mesh(
+            new THREE.SphereGeometry(
+                .325,
+                18,
+                14,
+                0,
+                Math.PI * 2,
+                0,
+                Math.PI / 2
+            ),
+            material(
+                0x191919,
+                .9
+            )
+        );
+
+    hair.position.y =
+        2.24;
+
+    arjun.add(hair);
+
+
+    // arms
+
+    const leftArmPivot =
+        new THREE.Group();
+
+    leftArmPivot.position.set(
+        -.48,
+        1.83,
+        0
+    );
+
+    arjun.add(leftArmPivot);
+
+
+    const leftArm =
+        box(
+            .22,
+            .95,
+            .22,
+            0xb97956
+        );
+
+    leftArm.position.y =
+        -.4;
+
+    leftArmPivot.add(leftArm);
+
+
+    const rightArmPivot =
+        new THREE.Group();
+
+    rightArmPivot.position.set(
+        .48,
+        1.83,
+        0
+    );
+
+    arjun.add(rightArmPivot);
+
+
+    const rightArm =
+        box(
+            .22,
+            .95,
+            .22,
+            0xb97956
+        );
+
+    rightArm.position.y =
+        -.4;
+
+    rightArmPivot.add(rightArm);
+
+
+    // legs
+
+    const leftLegPivot =
+        new THREE.Group();
+
+    leftLegPivot.position.set(
+        -.22,
+        .95,
+        0
+    );
+
+    arjun.add(leftLegPivot);
+
+
+    const leftLeg =
+        box(
+            .28,
+            1.05,
+            .3,
+            0x202837
+        );
+
+    leftLeg.position.y =
+        -.48;
+
+    leftLegPivot.add(leftLeg);
+
+
+    const rightLegPivot =
+        new THREE.Group();
+
+    rightLegPivot.position.set(
+        .22,
+        .95,
+        0
+    );
+
+    arjun.add(rightLegPivot);
+
+
+    const rightLeg =
+        box(
+            .28,
+            1.05,
+            .3,
+            0x202837
+        );
+
+    rightLeg.position.y =
+        -.48;
+
+    rightLegPivot.add(rightLeg);
+
+
+    arjun.position.set(
+        -3.7,
+        0,
+        2.1
+    );
+
+
+    // ------------------------------------------------------------
+    // INTERACTABLES
+    // ------------------------------------------------------------
+
+    const interactables = [
+        {
+            id: "light",
+            position: new THREE.Vector3(
+                6.25,
+                0,
+                .85
+            ),
+            radius: 1.55,
+            text: "Turn ON room light"
+        },
+        {
+            id: "fan",
+            position: new THREE.Vector3(
+                6.25,
+                0,
+                .25
+            ),
+            radius: 1.55,
+            text: "Turn ON ceiling fan"
+        },
+        {
+            id: "door",
+            position: new THREE.Vector3(
+                0,
+                0,
+                -4.95
+            ),
+            radius: 1.6,
+            text: "Open door and leave for college"
+        }
+    ];
+
+
+    // ------------------------------------------------------------
+    // UI HELPERS
+    // ------------------------------------------------------------
+
+    function say(
+        speaker,
+        text,
+        duration = 3500
+    ) {
+
+        subtitle.innerHTML =
+            `<strong>${speaker}:</strong> ${text}`;
+
+        subtitle.classList.add(
+            "show"
+        );
+
+
+        clearTimeout(
+            subtitleTimer
+        );
+
+
+        subtitleTimer =
+            setTimeout(() => {
+
+                subtitle.classList.remove(
+                    "show"
+                );
+
+            }, duration);
+    }
+
+
+    function showConcept(
+        title,
+        text,
+        example
+    ) {
+
+        conceptTitle.textContent =
+            title;
+
+        conceptText.textContent =
+            text;
+
+        conceptExample.textContent =
+            example;
+
+        conceptReveal.classList.add(
+            "show"
+        );
+
+
+        clearTimeout(
+            conceptTimer
+        );
+
+
+        conceptTimer =
+            setTimeout(() => {
+
+                conceptReveal.classList.remove(
+                    "show"
+                );
+
+            }, 6500);
+    }
+
+
+    function setProgress(
+        value
+    ) {
+
+        progressBar.style.width =
+            `${value}%`;
+
+        progressText.textContent =
+            `${value}%`;
+    }
+
+
+    // ------------------------------------------------------------
+    // INTERACTION LOGIC
+    // ------------------------------------------------------------
+
+    function updateInteractionPrompt() {
+
+        if (
+            !gameStarted
+        ) {
+            interactionPrompt.classList.remove(
+                "show"
+            );
+
+            return;
+        }
+
+
+        currentInteractable =
+            null;
+
+
+        let bestDistance =
+            Infinity;
+
+
+        interactables.forEach(
+            item => {
+
+                const dist =
+                    arjun.position.distanceTo(
+                        item.position
+                    );
+
+
+                if (
+                    dist <
+                    item.radius &&
+                    dist <
+                    bestDistance
+                ) {
+
+                    // Story order restriction
+
+                    if (
+                        item.id === "fan" &&
+                        storyStep < 1
+                    ) {
+                        return;
+                    }
+
+
+                    if (
+                        item.id === "door" &&
+                        storyStep < 2
+                    ) {
+                        return;
+                    }
+
+
+                    if (
+                        item.id === "light" &&
+                        storyStep > 0
+                    ) {
+                        return;
+                    }
+
+
+                    if (
+                        item.id === "fan" &&
+                        storyStep > 1
+                    ) {
+                        return;
+                    }
+
+
+                    bestDistance =
+                        dist;
+
+                    currentInteractable =
+                        item;
+                }
+            }
+        );
+
+
+        if (
+            currentInteractable
+        ) {
+
+            interactionText.textContent =
+                currentInteractable.text;
+
+            interactionPrompt.classList.add(
+                "show"
+            );
+
+        } else {
+
+            interactionPrompt.classList.remove(
+                "show"
+            );
+        }
+    }
+
+
+    function interact() {
+
+        if (
+            !currentInteractable
+        ) {
+            return;
+        }
+
+
+        if (
+            currentInteractable.id ===
+            "light"
+        ) {
+
+            turnOnLight();
+        }
+
+
+        if (
+            currentInteractable.id ===
+            "fan"
+        ) {
+
+            turnOnFan();
+        }
+
+
+        if (
+            currentInteractable.id ===
+            "door"
+        ) {
+
+            leaveRoom();
+        }
+    }
+
+
+    // ------------------------------------------------------------
+    // STORY ACTION 1 — LIGHT
+    // ------------------------------------------------------------
+
+    function turnOnLight() {
+
+        storyStep = 1;
+
+
+        roomLight.intensity =
+            18;
+
+
+        bulbMaterial.color.set(
+            0xffefaa
+        );
+
+
+        bulbMaterial.emissive.set(
+            0xffb330
+        );
+
+
+        bulbMaterial.emissiveIntensity =
+            2.6;
+
+
+        lightSwitch.rotation.z =
+            .28;
+
+
+        ambient.intensity =
+            1.05;
+
+
+        objectiveText.textContent =
+            "The room is bright now. Next, turn on the fan because the room is warm.";
+
+
+        setProgress(33);
+
+
+        learnLight.classList.add(
+            "done"
+        );
+
+
+        learnLight.innerHTML =
+            "✅ Electrical → Light energy";
+
+
+        say(
+            "Arjun",
+            "Nice! One switch changed electrical energy into light. I use Physics before I even leave my room."
+        );
+
+
+        showConcept(
+            "Electrical → Light Energy",
+            "When Arjun closes the switch, electrical energy reaches the lamp. The lamp converts part of that energy into visible light.",
+            "Real world: room lights, street lights, headlights, projectors."
+        );
+
+
+        updateInteractionPrompt();
+    }
+
+
+    // ------------------------------------------------------------
+    // STORY ACTION 2 — FAN
+    // ------------------------------------------------------------
+
+    let fanOn = false;
+
+
+    function turnOnFan() {
+
+        storyStep = 2;
+
+        fanOn = true;
+
+
+        fanSwitch.rotation.z =
+            .28;
+
+
+        objectiveText.textContent =
+            "Arjun is ready. Walk to the door and leave the hostel room for college.";
+
+
+        setProgress(66);
+
+
+        learnFan.classList.add(
+            "done"
+        );
+
+
+        learnFan.innerHTML =
+            "✅ Electrical → Mechanical energy";
+
+
+        say(
+            "Arjun",
+            "The same electricity can do something different here — the motor turns the fan blades."
+        );
+
+
+        showConcept(
+            "Electrical → Mechanical Energy",
+            "The fan motor converts electrical energy into rotational mechanical energy, causing the blades to spin and move air.",
+            "Real world: fans, pumps, mixers, electric vehicles and industrial motors."
+        );
+
+
+        updateInteractionPrompt();
+    }
+
+
+    // ------------------------------------------------------------
+    // STORY ACTION 3 — DOOR
+    // ------------------------------------------------------------
+
+    let doorOpening =
+        false;
+
+
+    function leaveRoom() {
+
+        storyStep = 3;
+
+        doorOpening =
+            true;
+
+
+        objectiveText.textContent =
+            "Morning mission complete — Arjun has discovered Physics before leaving his room.";
+
+
+        setProgress(100);
+
+
+        learnEveryday.classList.add(
+            "done"
+        );
+
+
+        learnEveryday.innerHTML =
+            "✅ Physics powers everyday life";
+
+
+        say(
+            "Arjun",
+            "Light, fan, electricity, motion... Physics was already everywhere this morning!"
+        );
+
+
+        setTimeout(() => {
+
+            if (
+                document.pointerLockElement
+            ) {
+
+                document.exitPointerLock();
+            }
+
+
+            completeScreen.classList.add(
+                "show"
+            );
+
+        }, 3000);
+    }
+
+
+    // ------------------------------------------------------------
+    // PLAYER MOVEMENT
+    // ------------------------------------------------------------
+
+    const moveForward =
+        new THREE.Vector3();
+
+    const moveRight =
+        new THREE.Vector3();
+
+    const moveVector =
+        new THREE.Vector3();
+
+
+    let isMoving =
+        false;
+
+
+    function updatePlayer(
+        dt,
+        time
+    ) {
+
+        if (
+            !gameStarted ||
+            !pointerLocked
+        ) {
+
+            isMoving = false;
+
+            return;
+        }
+
+
+        moveVector.set(
+            0,
+            0,
+            0
+        );
+
+
+        moveForward.set(
+            -Math.sin(cameraYaw),
+            0,
+            -Math.cos(cameraYaw)
+        );
+
+
+        moveRight.set(
+            Math.cos(cameraYaw),
+            0,
+            -Math.sin(cameraYaw)
+        );
+
+
+        if (
+            keys["KeyW"]
+        ) {
+
+            moveVector.add(
+                moveForward
+            );
+        }
+
+
+        if (
+            keys["KeyS"]
+        ) {
+
+            moveVector.sub(
+                moveForward
+            );
+        }
+
+
+        if (
+            keys["KeyD"]
+        ) {
+
+            moveVector.add(
+                moveRight
+            );
+        }
+
+
+        if (
+            keys["KeyA"]
+        ) {
+
+            moveVector.sub(
+                moveRight
+            );
+        }
+
+
+        isMoving =
+            moveVector.lengthSq() >
+            0;
+
+
+        if (
+            isMoving
+        ) {
+
+            moveVector.normalize();
+
+
+            const speed =
+                keys["ShiftLeft"] ?
+                5.2 :
+                3.25;
+
+
+            arjun.position.addScaledVector(
+                moveVector,
+                speed * dt
+            );
+
+
+            // character faces movement direction
+
+            const targetRotation =
+                Math.atan2(
+                    moveVector.x,
+                    moveVector.z
+                );
+
+
+            arjun.rotation.y =
+                targetRotation;
+
+
+            // walking animation
+
+            const swing =
+                Math.sin(
+                    time * 0.012
+                ) * .65;
+
+
+            leftLegPivot.rotation.x =
+                swing;
+
+
+            rightLegPivot.rotation.x =
+                -swing;
+
+
+            leftArmPivot.rotation.x =
+                -swing * .75;
+
+
+            rightArmPivot.rotation.x =
+                swing * .75;
+
+        } else {
+
+            leftLegPivot.rotation.x *=
+                .82;
+
+            rightLegPivot.rotation.x *=
+                .82;
+
+            leftArmPivot.rotation.x *=
+                .82;
+
+            rightArmPivot.rotation.x *=
+                .82;
+        }
+
+
+        // Room boundaries
+
+        arjun.position.x =
+            THREE.MathUtils.clamp(
+                arjun.position.x,
+                -6.2,
+                6.2
+            );
+
+
+        arjun.position.z =
+            THREE.MathUtils.clamp(
+                arjun.position.z,
+                -5.3,
+                5.3
+            );
+
+
+        updateInteractionPrompt();
+    }
+
+
+    // ------------------------------------------------------------
+    // THIRD PERSON CAMERA
+    // ------------------------------------------------------------
+
+    function updateCamera(
+        dt
+    ) {
+
+        const target =
+            arjun.position
+                .clone()
+                .add(
+                    new THREE.Vector3(
+                        0,
+                        1.45,
+                        0
+                    )
+                );
+
+
+        const distance =
+            4.2;
+
+
+        const horizontal =
+            Math.cos(
+                cameraPitch
+            ) *
+            distance;
+
+
+        const desired =
+            new THREE.Vector3(
+                target.x +
+                Math.sin(cameraYaw) *
+                horizontal,
+
+                target.y +
+                1.2 +
+                Math.sin(-cameraPitch) *
+                distance,
+
+                target.z +
+                Math.cos(cameraYaw) *
+                horizontal
+            );
+
+
+        camera.position.lerp(
+            desired,
+            1 -
+            Math.pow(
+                .002,
+                dt
+            )
+        );
+
+
+        camera.lookAt(
+            target
+        );
+    }
+
+
+    // ------------------------------------------------------------
+    // ANIMATIONS
+    // ------------------------------------------------------------
+
+    function updateWorld(
+        dt
+    ) {
+
+        if (
+            fanOn
+        ) {
+
+            fanGroup.rotation.y +=
+                dt * 7.2;
+        }
+
+
+        if (
+            doorOpening
+        ) {
+
+            doorPivot.rotation.y =
+                THREE.MathUtils.lerp(
+                    doorPivot.rotation.y,
+                    Math.PI / 2,
+                    dt * 3
+                );
+        }
+    }
+
+
+    // ------------------------------------------------------------
+    // INPUT
+    // ------------------------------------------------------------
+
+    startBtn.addEventListener(
+        "click",
+        () => {
+
+            startScreen.style.display =
+                "none";
+
+
+            gameStarted =
+                true;
+
+
+            renderer.domElement.requestPointerLock();
+
+
+            say(
+                "Arjun",
+                "It's dark in here. Let me switch on the light first."
+            );
+        }
+    );
+
+
+    renderer.domElement.addEventListener(
+        "click",
+        () => {
+
+            if (
+                gameStarted &&
+                !pointerLocked &&
+                !completeScreen.classList.contains(
+                    "show"
+                )
+            ) {
+
+                renderer.domElement.requestPointerLock();
+            }
+        }
+    );
+
+
+    document.addEventListener(
+        "pointerlockchange",
+        () => {
+
+            pointerLocked =
+                document.pointerLockElement ===
+                renderer.domElement;
+
+
+            resume.classList.toggle(
+                "show",
+                gameStarted &&
+                !pointerLocked &&
+                !completeScreen.classList.contains(
+                    "show"
+                )
+            );
+        }
+    );
+
+
+    resume.addEventListener(
+        "click",
+        () => {
+
+            renderer.domElement.requestPointerLock();
+        }
+    );
+
+
+    document.addEventListener(
+        "mousemove",
+        event => {
+
+            if (
+                !pointerLocked
+            ) {
+                return;
+            }
+
+
+            const sensitivity =
+                .0024;
+
+
+            cameraYaw -=
+                event.movementX *
+                sensitivity;
+
+
+            cameraPitch -=
+                event.movementY *
+                sensitivity;
+
+
+            cameraPitch =
+                THREE.MathUtils.clamp(
+                    cameraPitch,
+                    -.55,
+                    .38
+                );
+        }
+    );
+
+
+    document.addEventListener(
+        "keydown",
+        event => {
+
+            keys[event.code] =
+                true;
+
+
+            if (
+                event.code ===
+                "KeyE" &&
+                !event.repeat
+            ) {
+
+                interact();
+            }
+        }
+    );
+
+
+    document.addEventListener(
+        "keyup",
+        event => {
+
+            keys[event.code] =
+                false;
+        }
+    );
+
+
+    reviewBtn.addEventListener(
+        "click",
+        () => {
+
+            completeScreen.classList.remove(
+                "show"
+            );
+
+
+            renderer.domElement.requestPointerLock();
+        }
+    );
+
+
+    // ------------------------------------------------------------
+    // RESIZE
+    // ------------------------------------------------------------
+
+    window.addEventListener(
+        "resize",
+        () => {
+
+            camera.aspect =
+                window.innerWidth /
+                window.innerHeight;
+
+
+            camera.updateProjectionMatrix();
+
+
+            renderer.setSize(
+                window.innerWidth,
+                window.innerHeight
+            );
+        }
+    );
+
+
+    // ------------------------------------------------------------
+    // GAME LOOP
+    // ------------------------------------------------------------
+
+    const clock =
+        new THREE.Clock();
+
+
+    function animate(
+        time
+    ) {
+
+        requestAnimationFrame(
+            animate
+        );
+
+
+        const dt =
+            Math.min(
+                clock.getDelta(),
+                .035
+            );
+
+
+        updatePlayer(
+            dt,
+            time
+        );
+
+
+        updateWorld(
+            dt
+        );
+
+
+        updateCamera(
+            dt
+        );
+
+
+        renderer.render(
+            scene,
+            camera
+        );
+    }
+
+
+    updateCamera(
+        .016
+    );
+
+
+    animate(0);
+
+})();
+</script>
+
+    <script src="assets/js/universal-learning-journey.js?v=1"></script>
+</body>
+</html>
