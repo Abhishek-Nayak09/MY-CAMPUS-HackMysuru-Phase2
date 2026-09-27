@@ -10,78 +10,115 @@
 *{
     box-sizing:border-box;
     margin:0;
-    padding:0
+    padding:0;
 }
 
-html,body{
+html,
+body{
     width:100%;
     height:100%;
     overflow:hidden;
+
+    font-family:
+        "Segoe UI",
+        Arial,
+        sans-serif;
+
     background:#06121c;
-    font-family:Segoe UI,Arial,sans-serif
 }
 
 #game{
     position:fixed;
-    inset:0
+    inset:0;
 }
 
 canvas{
-    display:block
+    display:block;
 }
+
+
+/* =========================================================
+   COMMON
+========================================================= */
+
+.glass{
+    background:
+        linear-gradient(
+            135deg,
+            rgba(5,20,32,.95),
+            rgba(7,29,44,.83)
+        );
+
+    border:
+        1px solid
+        rgba(255,255,255,.14);
+
+    border-radius:16px;
+
+    box-shadow:
+        0 18px 50px
+        rgba(0,0,0,.30);
+
+    backdrop-filter:
+        blur(14px);
+}
+
+
+/* =========================================================
+   HUD
+========================================================= */
 
 .hud{
     position:fixed;
     inset:0;
+
     z-index:10;
-    color:#fff;
-    pointer-events:none
+
+    color:white;
+
+    pointer-events:none;
 }
 
-.glass{
-    background:linear-gradient(
-        135deg,
-        rgba(5,20,32,.95),
-        rgba(7,29,44,.82)
-    );
-
-    border:1px solid rgba(255,255,255,.13);
-    border-radius:15px;
-
-    box-shadow:0 14px 40px rgba(0,0,0,.28);
-    backdrop-filter:blur(13px)
-}
 
 /* =========================================================
-   HEADER
+   TITLE
 ========================================================= */
 
 .title{
     position:absolute;
+
     top:18px;
     left:18px;
+
     width:350px;
-    padding:14px 17px
+
+    padding:14px 17px;
 }
 
 .eyebrow{
-    color:#66e2ff;
+    color:#65e2ff;
+
     font-size:10px;
     font-weight:900;
-    letter-spacing:1.6px
+
+    letter-spacing:1.5px;
 }
 
 .title h1{
-    margin-top:4px;
-    font-size:20px
+    margin-top:5px;
+
+    font-size:21px;
 }
 
 .title p{
     margin-top:5px;
-    color:#adc0cc;
+
+    color:#b1c4cf;
+
     font-size:11px;
-    line-height:1.4
+    line-height:1.45;
 }
+
 
 /* =========================================================
    STAGE
@@ -89,100 +126,129 @@ canvas{
 
 .stage{
     position:absolute;
+
     top:18px;
     left:50%;
-    transform:translateX(-50%);
 
-    width:410px;
-    padding:12px;
-    text-align:center
+    transform:
+        translateX(-50%);
+
+    width:420px;
+
+    padding:12px 16px;
+
+    text-align:center;
 }
 
 .stage small{
-    color:#96aaba;
+    color:#9bb0bd;
+
     font-size:9px;
-    font-weight:900
+    font-weight:900;
 }
 
 .stage strong{
     display:block;
+
     margin-top:3px;
-    color:#68e4ff;
-    font-size:18px
+
+    color:#67e4ff;
+
+    font-size:18px;
 }
 
 .stage p{
-    margin-top:3px;
-    color:#b8c7d1;
-    font-size:9px
+    margin-top:4px;
+
+    color:#c1ced6;
+
+    font-size:10px;
 }
 
+
 /* =========================================================
-   TOP RIGHT STATUS
+   SCORE / TIMER
 ========================================================= */
 
 .status-panel{
     position:absolute;
+
     top:18px;
     right:18px;
 
-    width:220px;
+    width:230px;
 
     display:grid;
-    grid-template-columns:1fr 1fr;
+
+    grid-template-columns:
+        1fr 1fr;
+
     gap:8px;
 
-    padding:10px
+    padding:10px;
 }
 
 .status-box{
-    padding:6px;
+    padding:7px;
+
     text-align:center;
 
-    border-radius:9px;
+    border-radius:10px;
 
-    background:rgba(255,255,255,.05)
+    background:
+        rgba(255,255,255,.055);
 }
 
 .status-box small{
     display:block;
-    color:#98adbc;
+
+    color:#98acba;
+
     font-size:8px;
-    font-weight:900
+    font-weight:900;
 }
 
 .status-box strong{
     display:block;
+
     margin-top:2px;
-    font-size:22px
+
+    font-size:23px;
 }
 
 #score{
-    color:#ffe16a
+    color:#ffe06b;
 }
 
 #timerValue{
-    color:#6ee5ff
+    color:#6ee5ff;
 }
 
 #timerValue.warning{
-    color:#ffcb58
+    color:#ffd05f;
 }
 
 #timerValue.danger{
-    color:#ff6565;
-    animation:pulseTimer .55s infinite alternate
+    color:#ff6363;
+
+    animation:
+        timerPulse
+        .45s
+        infinite
+        alternate;
 }
 
-@keyframes pulseTimer{
+@keyframes timerPulse{
+
     from{
-        transform:scale(1)
+        transform:scale(1);
     }
 
     to{
-        transform:scale(1.12)
+        transform:scale(1.18);
     }
 }
+
 
 /* =========================================================
    CONTROLS
@@ -190,87 +256,117 @@ canvas{
 
 .controls{
     position:absolute;
+
     top:155px;
     left:18px;
 
     width:310px;
-    padding:14px;
 
-    pointer-events:auto
+    padding:15px;
+
+    pointer-events:auto;
 }
 
 .panel-title{
     color:#69e5ff;
+
     font-size:10px;
     font-weight:950;
-    letter-spacing:1px
+
+    letter-spacing:1px;
 }
 
 .control-label{
-    margin-top:11px;
-    color:#a9bac6;
+    margin-top:12px;
+
+    color:#aebec8;
+
     font-size:9px;
-    font-weight:900
+    font-weight:900;
 }
 
 .button-row{
     display:grid;
-    grid-template-columns:repeat(5,1fr);
+
+    grid-template-columns:
+        repeat(5,1fr);
+
     gap:5px;
-    margin-top:5px
+
+    margin-top:6px;
 }
 
 .button-row.amp{
-    grid-template-columns:repeat(4,1fr)
+    grid-template-columns:
+        repeat(4,1fr);
 }
 
 .button-row button{
     padding:8px 3px;
 
-    border:1px solid rgba(255,255,255,.14);
+    border:
+        1px solid
+        rgba(255,255,255,.15);
+
     border-radius:8px;
 
-    background:rgba(255,255,255,.06);
-    color:#fff;
+    background:
+        rgba(255,255,255,.06);
+
+    color:white;
 
     font-size:9px;
     font-weight:900;
 
-    cursor:pointer
+    cursor:pointer;
+}
+
+.button-row button:hover{
+    background:
+        rgba(255,255,255,.12);
 }
 
 .button-row button.active{
     background:#62e2ff;
-    color:#03131c
+
+    color:#03131c;
 }
 
 .test-button{
     width:100%;
 
-    margin-top:13px;
+    margin-top:14px;
+
     padding:11px;
 
     border:0;
+
     border-radius:9px;
 
     background:#63e1ff;
+
     color:#03131c;
 
     font-weight:950;
-    cursor:pointer
+
+    cursor:pointer;
 }
 
 .test-button:disabled{
     opacity:.45;
-    cursor:not-allowed
+
+    cursor:not-allowed;
 }
 
 .control-help{
     margin-top:8px;
-    color:#95a9b7;
+
+    color:#9aadb9;
+
     font-size:9px;
-    line-height:1.4
+    line-height:1.4;
 }
+
 
 /* =========================================================
    VALUES
@@ -278,91 +374,116 @@ canvas{
 
 .values{
     position:absolute;
+
     right:18px;
     bottom:18px;
 
-    width:350px;
-    padding:15px
+    width:355px;
+
+    padding:15px;
 }
 
 .value-grid{
     display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:7px
+
+    grid-template-columns:
+        1fr 1fr;
+
+    gap:7px;
 }
 
 .value{
     padding:9px;
+
     border-radius:9px;
-    background:rgba(255,255,255,.05)
+
+    background:
+        rgba(255,255,255,.055);
 }
 
 .value label{
     display:block;
-    color:#92a7b5;
+
+    color:#92a6b4;
+
     font-size:8px;
-    font-weight:900
+    font-weight:900;
 }
 
 .value strong{
     display:block;
+
     margin-top:2px;
-    font-size:14px
+
+    font-size:14px;
 }
 
 .value strong.highlight{
-    color:#69e4ff
+    color:#6ae5ff;
 }
 
 .bar-title{
     display:flex;
-    justify-content:space-between;
+
+    justify-content:
+        space-between;
 
     margin-top:10px;
 
-    color:#9cafbc;
+    color:#a1b1bc;
+
     font-size:8px;
-    font-weight:900
+    font-weight:900;
 }
 
 .bar{
     height:7px;
-    margin-top:4px;
 
-    overflow:hidden;
+    margin-top:5px;
+
     border-radius:20px;
 
-    background:rgba(255,255,255,.08)
+    overflow:hidden;
+
+    background:
+        rgba(255,255,255,.09);
 }
 
 #resonanceFill{
     width:0%;
     height:100%;
 
-    background:linear-gradient(
-        90deg,
-        #54dcff,
-        #79ff9d,
-        #ffe267
-    )
+    background:
+        linear-gradient(
+            90deg,
+            #54dcff,
+            #7dff9e,
+            #ffe369
+        );
 }
 
 .equation{
     margin-top:10px;
+
     padding:10px;
 
-    border:1px solid rgba(83,220,255,.17);
+    border:
+        1px solid
+        rgba(83,220,255,.18);
+
     border-radius:10px;
 
-    background:rgba(71,216,255,.07);
+    background:
+        rgba(71,216,255,.07);
 
     font-size:10px;
-    line-height:1.5
+    line-height:1.55;
 }
 
 .equation b{
-    color:#69e4ff
+    color:#6be5ff;
 }
+
 
 /* =========================================================
    COACH
@@ -370,264 +491,347 @@ canvas{
 
 .coach{
     position:absolute;
+
     left:50%;
     bottom:15px;
 
-    transform:translateX(-50%);
+    transform:
+        translateX(-50%);
 
-    width:min(670px,41vw);
+    width:min(
+        660px,
+        42vw
+    );
+
     padding:12px 16px;
 
-    text-align:center
+    text-align:center;
 }
 
 #coachTitle{
-    color:#66e3ff;
+    color:#67e4ff;
+
     font-size:10px;
     font-weight:950;
-    letter-spacing:1px
+
+    letter-spacing:1px;
 }
 
 #coachText{
     margin-top:4px;
-    color:#e2ecf2;
+
+    color:#e5edf2;
+
     font-size:11px;
-    line-height:1.45
+    line-height:1.45;
 }
 
 #coachFormula{
     margin-top:4px;
-    color:#93a9b7;
-    font-size:10px
+
+    color:#98aab6;
+
+    font-size:10px;
 }
 
+
 /* =========================================================
-   START
+   START SCREEN
 ========================================================= */
 
 .start-screen{
     position:fixed;
+
     inset:0;
 
     z-index:40;
 
     display:flex;
+
     align-items:center;
     justify-content:center;
 
-    background:rgba(2,8,14,.75);
-    backdrop-filter:blur(8px);
+    background:
+        rgba(2,8,14,.78);
 
-    color:#fff;
-    pointer-events:auto
+    backdrop-filter:
+        blur(9px);
+
+    color:white;
+
+    pointer-events:auto;
 }
 
 .start-box{
-    width:min(660px,92vw);
-    padding:26px;
-    text-align:center
+    width:min(
+        680px,
+        92vw
+    );
+
+    padding:28px;
+
+    text-align:center;
 }
 
 .start-box h2{
-    font-size:31px
+    font-size:32px;
 }
 
 .start-box p{
     margin-top:10px;
-    color:#b7c8d3;
+
+    color:#bdcbd4;
+
     font-size:12px;
-    line-height:1.6
+    line-height:1.6;
 }
 
 .rules{
-    margin-top:13px;
-    padding:11px;
+    margin-top:15px;
 
-    border-radius:10px;
+    padding:13px;
 
-    background:rgba(255,255,255,.05);
+    border-radius:11px;
 
-    color:#d8e6ed;
+    background:
+        rgba(255,255,255,.055);
+
+    color:#dce7ed;
+
     font-size:11px;
-    line-height:1.6
+    line-height:1.75;
 }
 
 .rules b{
-    color:#68e4ff
+    color:#68e4ff;
 }
 
 .start-box button{
-    margin-top:18px;
-    padding:12px 26px;
+    margin-top:19px;
+
+    padding:13px 27px;
 
     border:0;
+
     border-radius:10px;
 
     background:#61e1ff;
+
     color:#03131c;
 
     font-weight:950;
-    cursor:pointer
+
+    cursor:pointer;
 }
 
+
 /* =========================================================
-   RESULT
+   RESULT / QUIZ
 ========================================================= */
 
 .result{
     position:fixed;
 
-    top:80px;
+    top:75px;
     left:50%;
 
-    transform:translateX(-50%);
+    transform:
+        translateX(-50%);
 
     z-index:70;
 
-    width:min(750px,92vw);
-    max-height:calc(100vh - 100px);
+    width:min(
+        760px,
+        92vw
+    );
+
+    max-height:
+        calc(
+            100vh - 95px
+        );
 
     display:none;
+
     flex-direction:column;
 
-    padding:18px;
+    padding:19px;
 
     overflow:hidden;
 
-    color:#fff;
-    pointer-events:auto
+    color:white;
+
+    pointer-events:auto;
 }
 
 .result.show{
-    display:flex
+    display:flex;
 }
 
 .result-scroll{
     min-height:0;
+
     overflow-y:auto;
-    padding-right:5px
+
+    padding-right:5px;
 }
 
 .result-badge{
     color:#ffe16b;
+
     font-size:10px;
     font-weight:950;
-    letter-spacing:1.1px
+
+    letter-spacing:1px;
 }
 
 .result h3{
     margin-top:5px;
-    font-size:20px
+
+    font-size:21px;
 }
 
 .result-text{
     margin-top:8px;
-    padding:11px;
 
-    border-radius:9px;
-    background:rgba(255,255,255,.05);
+    padding:12px;
 
-    color:#dce8ef;
+    border-radius:10px;
+
+    background:
+        rgba(255,255,255,.055);
+
+    color:#dde8ee;
+
     font-size:11px;
-    line-height:1.55
+    line-height:1.6;
 }
 
 .question-label{
-    margin-top:12px;
-    color:#68e3ff;
+    margin-top:13px;
+
+    color:#68e4ff;
+
     font-size:10px;
-    font-weight:950
+    font-weight:950;
 }
 
 #question{
-    margin-top:5px;
-    font-size:16px
+    margin-top:6px;
+
+    font-size:16px;
 }
 
 #questionHint{
     margin-top:4px;
-    color:#a2b5c2;
-    font-size:10px
+
+    color:#a9bac5;
+
+    font-size:10px;
 }
 
 .answers{
     display:grid;
-    grid-template-columns:repeat(3,1fr);
+
+    grid-template-columns:
+        repeat(3,1fr);
+
     gap:8px;
-    margin-top:10px
+
+    margin-top:11px;
 }
 
 .answer{
-    padding:10px;
+    padding:11px;
 
-    border:1px solid rgba(255,255,255,.14);
+    border:
+        1px solid
+        rgba(255,255,255,.15);
+
     border-radius:9px;
 
-    background:rgba(255,255,255,.07);
-    color:#fff;
+    background:
+        rgba(255,255,255,.07);
+
+    color:white;
 
     font-weight:900;
-    cursor:pointer
+
+    cursor:pointer;
 }
 
 .answer.correct{
-    background:rgba(77,220,125,.25);
-    border-color:#65ed93
+    background:
+        rgba(75,220,125,.25);
+
+    border-color:
+        #65ed93;
 }
 
 .answer.wrong{
-    background:rgba(255,80,80,.25);
-    border-color:#ff7474
+    background:
+        rgba(255,80,80,.25);
+
+    border-color:
+        #ff7474;
 }
 
 .answer:disabled{
-    opacity:.75
+    opacity:.8;
 }
 
 #feedback{
     display:none;
 
-    max-height:130px;
-    overflow-y:auto;
+    margin-top:11px;
 
-    margin-top:10px;
-    padding:11px;
+    padding:12px;
 
-    border:1px solid rgba(80,218,255,.17);
+    border:
+        1px solid
+        rgba(80,218,255,.18);
+
     border-radius:10px;
 
-    background:rgba(69,214,255,.08);
+    background:
+        rgba(69,214,255,.08);
 
     font-size:11px;
-    line-height:1.55
+    line-height:1.6;
 }
 
 #feedback b{
-    color:#6de4ff
+    color:#6de4ff;
 }
 
 .result-footer{
-    flex:0 0 auto;
-    padding-top:11px
+    padding-top:12px;
 }
 
 .next-button{
     display:none;
 
-    width:min(310px,90%);
+    width:min(
+        320px,
+        90%
+    );
 
-    margin:0 auto;
+    margin:auto;
+
     padding:12px;
 
     border:0;
+
     border-radius:9px;
 
     background:#61e1ff;
+
     color:#03131c;
 
     font-weight:950;
-    cursor:pointer
+
+    cursor:pointer;
 }
+
 
 /* =========================================================
    SYSTEM FAILURE
@@ -635,45 +839,57 @@ canvas{
 
 .failure{
     position:fixed;
+
     inset:0;
 
     z-index:100;
 
     display:none;
+
     align-items:center;
     justify-content:center;
 
-    background:rgba(13,3,7,.92);
-    backdrop-filter:blur(11px);
+    background:
+        rgba(13,3,7,.94);
 
-    color:#fff;
+    backdrop-filter:
+        blur(12px);
 
-    pointer-events:auto
+    color:white;
+
+    pointer-events:auto;
 }
 
 .failure.show{
-    display:flex
+    display:flex;
 }
 
 .failure-box{
-    width:min(620px,92vw);
+    width:min(
+        630px,
+        92vw
+    );
 
-    padding:30px;
+    padding:31px;
 
     text-align:center;
 
-    border:1px solid rgba(255,90,90,.35);
-    border-radius:16px;
+    border:
+        1px solid
+        rgba(255,90,90,.4);
 
-    background:linear-gradient(
-        135deg,
-        rgba(40,8,14,.96),
-        rgba(18,12,20,.94)
-    )
+    border-radius:17px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(43,8,15,.98),
+            rgba(18,12,20,.96)
+        );
 }
 
 .failure-icon{
-    font-size:50px
+    font-size:52px;
 }
 
 .failure-box h2{
@@ -681,42 +897,50 @@ canvas{
 
     color:#ff6868;
 
-    font-size:32px
+    font-size:33px;
 }
 
 .failure-box p{
     margin-top:10px;
 
-    color:#d8c5ca;
+    color:#dec9ce;
 
     font-size:12px;
-    line-height:1.6
+    line-height:1.6;
 }
 
 .failure-stage{
-    margin-top:13px;
-    padding:11px;
+    margin-top:14px;
 
-    border-radius:9px;
+    padding:12px;
 
-    background:rgba(255,255,255,.05);
+    border-radius:10px;
 
-    font-size:11px
+    background:
+        rgba(255,255,255,.055);
+
+    font-size:11px;
+    line-height:1.6;
 }
 
 .failure-box button{
-    margin-top:18px;
+    margin-top:19px;
+
     padding:12px 25px;
 
     border:0;
+
     border-radius:9px;
 
     background:#ff6262;
-    color:#fff;
+
+    color:white;
 
     font-weight:950;
-    cursor:pointer
+
+    cursor:pointer;
 }
+
 
 /* =========================================================
    FINISH
@@ -724,6 +948,7 @@ canvas{
 
 .finish{
     position:fixed;
+
     inset:0;
 
     z-index:90;
@@ -733,387 +958,511 @@ canvas{
     align-items:center;
     justify-content:center;
 
-    background:rgba(1,7,13,.86);
-    backdrop-filter:blur(11px);
+    background:
+        rgba(1,7,13,.89);
 
-    color:#fff;
-    pointer-events:auto
+    backdrop-filter:
+        blur(12px);
+
+    color:white;
+
+    pointer-events:auto;
 }
 
 .finish.show{
-    display:flex
+    display:flex;
 }
 
 .finish-box{
-    width:min(820px,94vw);
+    width:min(
+        820px,
+        94vw
+    );
 
     max-height:93vh;
+
     overflow:auto;
 
-    padding:27px
+    padding:28px;
 }
 
 .finish-box h2{
     text-align:center;
-    font-size:32px
+
+    font-size:32px;
 }
 
 .finish-sub{
-    margin-top:5px;
+    margin-top:6px;
 
     text-align:center;
 
-    color:#aabcc8;
-    font-size:11px
+    color:#afbdc7;
+
+    font-size:11px;
 }
 
 .final-grid{
     display:grid;
-    grid-template-columns:repeat(4,1fr);
+
+    grid-template-columns:
+        repeat(4,1fr);
+
     gap:8px;
-    margin-top:15px
+
+    margin-top:16px;
 }
 
 .final-card{
     padding:12px;
 
     border-radius:10px;
-    background:rgba(255,255,255,.055);
 
-    text-align:center
+    background:
+        rgba(255,255,255,.055);
+
+    text-align:center;
 }
 
 .final-card strong{
     display:block;
+
     color:#69e4ff;
-    font-size:18px
+
+    font-size:18px;
 }
 
 .final-card span{
-    color:#92a7b5;
-    font-size:8px
+    color:#94a7b4;
+
+    font-size:8px;
 }
 
 .final-explanation{
     margin-top:15px;
+
     padding:16px;
 
-    border:1px solid rgba(89,220,255,.18);
+    border:
+        1px solid
+        rgba(89,220,255,.18);
+
     border-radius:11px;
 
-    background:rgba(68,212,255,.075);
+    background:
+        rgba(68,212,255,.075);
 
     font-size:11px;
-    line-height:1.65
+    line-height:1.65;
 }
 
 .final-explanation b{
-    color:#6ee5ff
+    color:#6ee5ff;
 }
 
 .restart{
     display:block;
 
-    margin:16px auto 0;
-    padding:11px 25px;
+    margin:
+        16px auto 0;
+
+    padding:
+        11px 25px;
 
     border:0;
+
     border-radius:9px;
 
     background:#61e1ff;
+
     color:#03131c;
 
     font-weight:900;
-    cursor:pointer
+
+    cursor:pointer;
 }
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media(
+    max-width:900px
+){
+
+    .title{
+        width:290px;
+    }
+
+    .stage{
+        width:320px;
+    }
+
+    .values{
+        width:310px;
+    }
+
+    .coach{
+        display:none;
+    }
+}
+
 </style>
 </head>
 
+
 <body>
+
 
 <div id="game"></div>
 
+
+<!-- ======================================================
+     HUD
+====================================================== -->
+
 <div class="hud">
 
-<div class="title glass">
 
-    <div class="eyebrow">
-        MY CAMPUS - PHYSICS GAME
+    <div class="title glass">
+
+        <div class="eyebrow">
+            MY CAMPUS · PHYSICS GAME · TOPIC 6
+        </div>
+
+        <h1>
+            Resonance Lab
+        </h1>
+
+        <p id="studentText">
+            Stabilize the campus wave system.
+        </p>
+
     </div>
 
-    <h1>
-        Resonance Lab
-    </h1>
 
-    <p id="studentText"></p>
-
-</div>
-
-<div class="stage glass">
-
-    <small>
-        CURRENT EXPERIMENT
-    </small>
-
-    <strong id="stageName">
-        Wave Amplitude
-    </strong>
-
-    <p id="stageObjective">
-        Match the required amplitude.
-    </p>
-
-</div>
-
-<div class="status-panel glass">
-
-    <div class="status-box">
+    <div class="stage glass">
 
         <small>
-            SCORE
+            CURRENT EXPERIMENT
         </small>
 
-        <strong id="score">
-            0
+        <strong id="stageName">
+            Stage 1 - Amplitude Control
         </strong>
 
-    </div>
-
-    <div class="status-box">
-
-        <small>
-            TIME LEFT
-        </small>
-
-        <strong id="timerValue">
-            30
-        </strong>
+        <p id="stageObjective">
+            Match the required amplitude.
+        </p>
 
     </div>
 
-</div>
 
-<div class="controls glass">
+    <div class="status-panel glass">
 
-    <div class="panel-title">
-        WAVE GENERATOR
+        <div class="status-box">
+
+            <small>
+                SCORE
+            </small>
+
+            <strong id="score">
+                0
+            </strong>
+
+        </div>
+
+
+        <div class="status-box">
+
+            <small>
+                TIME LEFT
+            </small>
+
+            <strong id="timerValue">
+                30
+            </strong>
+
+        </div>
+
     </div>
 
-    <div class="control-label">
-        FREQUENCY
-    </div>
 
-    <div
-        id="frequencyButtons"
-        class="button-row">
+    <div class="controls glass">
 
-        <button data-frequency="2">
-            2 Hz
-        </button>
+        <div class="panel-title">
+            WAVE GENERATOR
+        </div>
+
+
+        <div class="control-label">
+            FREQUENCY
+        </div>
+
+
+        <div
+            id="frequencyButtons"
+            class="button-row">
+
+            <button
+                data-frequency="2">
+                2 Hz
+            </button>
+
+            <button
+                data-frequency="4"
+                class="active">
+                4 Hz
+            </button>
+
+            <button
+                data-frequency="6">
+                6 Hz
+            </button>
+
+            <button
+                data-frequency="8">
+                8 Hz
+            </button>
+
+            <button
+                data-frequency="10">
+                10 Hz
+            </button>
+
+        </div>
+
+
+        <div class="control-label">
+            AMPLITUDE
+        </div>
+
+
+        <div
+            id="amplitudeButtons"
+            class="button-row amp">
+
+            <button
+                data-amplitude="0.5">
+                0.5 m
+            </button>
+
+            <button
+                data-amplitude="1"
+                class="active">
+                1.0 m
+            </button>
+
+            <button
+                data-amplitude="1.5">
+                1.5 m
+            </button>
+
+            <button
+                data-amplitude="2">
+                2.0 m
+            </button>
+
+        </div>
+
 
         <button
-            data-frequency="4"
-            class="active">
-            4 Hz
+            id="testButton"
+            class="test-button">
+            TEST SIGNAL
         </button>
 
-        <button data-frequency="6">
-            6 Hz
-        </button>
 
-        <button data-frequency="8">
-            8 Hz
-        </button>
-
-        <button data-frequency="10">
-            10 Hz
-        </button>
+        <div class="control-help">
+            Wrong experimental settings do not stop the timer.
+            Solve the mission before it reaches zero.
+        </div>
 
     </div>
 
-    <div class="control-label">
-        AMPLITUDE
+
+    <div class="values glass">
+
+        <div class="value-grid">
+
+
+            <div class="value">
+
+                <label>
+                    FREQUENCY
+                </label>
+
+                <strong class="highlight">
+
+                    <span id="frequencyValue">
+                        4
+                    </span>
+
+                    Hz
+
+                </strong>
+
+            </div>
+
+
+            <div class="value">
+
+                <label>
+                    AMPLITUDE
+                </label>
+
+                <strong>
+
+                    <span id="amplitudeValue">
+                        1.0
+                    </span>
+
+                    m
+
+                </strong>
+
+            </div>
+
+
+            <div class="value">
+
+                <label>
+                    WAVE SPEED
+                </label>
+
+                <strong>
+
+                    <span id="waveSpeedValue">
+                        12
+                    </span>
+
+                    m/s
+
+                </strong>
+
+            </div>
+
+
+            <div class="value">
+
+                <label>
+                    WAVELENGTH
+                </label>
+
+                <strong class="highlight">
+
+                    <span id="wavelengthValue">
+                        3.00
+                    </span>
+
+                    m
+
+                </strong>
+
+            </div>
+
+
+            <div class="value">
+
+                <label>
+                    TARGET FREQUENCY
+                </label>
+
+                <strong>
+
+                    <span id="targetFrequency">
+                        --
+                    </span>
+
+                    Hz
+
+                </strong>
+
+            </div>
+
+
+            <div class="value">
+
+                <label>
+                    NATURAL FREQUENCY
+                </label>
+
+                <strong>
+
+                    <span id="naturalFrequency">
+                        --
+                    </span>
+
+                    Hz
+
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <div class="bar-title">
+
+            <span>
+                RESONANCE RESPONSE
+            </span>
+
+            <span id="resonancePercent">
+                0%
+            </span>
+
+        </div>
+
+
+        <div class="bar">
+
+            <div id="resonanceFill"></div>
+
+        </div>
+
+
+        <div
+            id="equation"
+            class="equation">
+
+            <b>
+                Wave relation
+            </b>
+
+            <br>
+
+            v = f × λ
+
+        </div>
+
     </div>
 
-    <div
-        id="amplitudeButtons"
-        class="button-row amp">
 
-        <button data-amplitude="0.5">
-            0.5 m
-        </button>
+    <div class="coach glass">
 
-        <button
-            data-amplitude="1"
-            class="active">
-            1.0 m
-        </button>
+        <div id="coachTitle">
+            WAVE MOTION
+        </div>
 
-        <button data-amplitude="1.5">
-            1.5 m
-        </button>
+        <div id="coachText">
+            Waves transfer energy through oscillations.
+        </div>
 
-        <button data-amplitude="2">
-            2.0 m
-        </button>
+        <div id="coachFormula">
+            v = f × λ
+        </div>
 
-    </div>
-
-    <button
-        id="testButton"
-        class="test-button">
-        TEST SIGNAL
-    </button>
-
-    <div class="control-help">
-        Solve the experiment before the timer reaches zero.
     </div>
 
 </div>
 
-<div class="values glass">
 
-    <div class="value-grid">
 
-        <div class="value">
-
-            <label>
-                FREQUENCY
-            </label>
-
-            <strong class="highlight">
-                <span id="frequencyValue">
-                    4
-                </span>
-                Hz
-            </strong>
-
-        </div>
-
-        <div class="value">
-
-            <label>
-                AMPLITUDE
-            </label>
-
-            <strong>
-                <span id="amplitudeValue">
-                    1.0
-                </span>
-                m
-            </strong>
-
-        </div>
-
-        <div class="value">
-
-            <label>
-                WAVE SPEED
-            </label>
-
-            <strong>
-                <span id="waveSpeedValue">
-                    12
-                </span>
-                m/s
-            </strong>
-
-        </div>
-
-        <div class="value">
-
-            <label>
-                WAVELENGTH
-            </label>
-
-            <strong class="highlight">
-                <span id="wavelengthValue">
-                    3.00
-                </span>
-                m
-            </strong>
-
-        </div>
-
-        <div class="value">
-
-            <label>
-                TARGET FREQUENCY
-            </label>
-
-            <strong>
-                <span id="targetFrequency">
-                    --
-                </span>
-                Hz
-            </strong>
-
-        </div>
-
-        <div class="value">
-
-            <label>
-                NATURAL FREQUENCY
-            </label>
-
-            <strong>
-                <span id="naturalFrequency">
-                    --
-                </span>
-                Hz
-            </strong>
-
-        </div>
-
-    </div>
-
-    <div class="bar-title">
-
-        <span>
-            RESONANCE RESPONSE
-        </span>
-
-        <span id="resonancePercent">
-            0%
-        </span>
-
-    </div>
-
-    <div class="bar">
-        <div id="resonanceFill"></div>
-    </div>
-
-    <div
-        id="equation"
-        class="equation">
-
-        <b>Wave relation</b><br>
-
-        v = f x lambda
-
-    </div>
-
-</div>
-
-<div class="coach glass">
-
-    <div id="coachTitle">
-        WAVE MOTION
-    </div>
-
-    <div id="coachText">
-        The source oscillates and transfers energy through the wave.
-    </div>
-
-    <div id="coachFormula">
-        Wave speed = frequency x wavelength
-    </div>
-
-</div>
-
-</div>
-
-<!-- START -->
+<!-- ======================================================
+     START SCREEN
+====================================================== -->
 
 <div
     id="startScreen"
@@ -1125,44 +1474,68 @@ canvas{
             Campus Resonance Lab
         </h2>
 
+
         <p>
-            Repair the campus wave and sound system using amplitude,
-            frequency, wavelength, sound and resonance.
+            Repair the campus wave and sound system using
+            amplitude, frequency, wavelength, vibration and resonance.
         </p>
+
 
         <div class="rules">
 
-            <b>MISSION RULES</b><br>
+            <b>MISSION RULES</b>
 
-            Each experiment:
-            <b>30 seconds</b><br>
+            <br><br>
 
-            Final frequency locks:
-            <b>20 seconds each</b><br>
+            Stage 1–5:
+            <b>30 seconds each</b>
+
+            <br>
+
+            Final Frequency Locks:
+            <b>20 seconds each</b>
+
+            <br><br>
 
             Correct experiment:
-            <b>+100 points</b><br>
+            <b>+100</b>
+
+            <br>
 
             Correct physics answer:
-            <b>+50 points</b><br>
+            <b>+50</b>
+
+            <br>
 
             Wrong physics answer:
-            <b>-50 points</b><br>
+            <b>-50</b>
+
+            <br><br>
+
+            Wrong experimental setting:
+            <b>timer continues</b>
+
+            <br>
 
             Timer reaches zero:
             <b>SYSTEM FAILURE</b>
 
         </div>
 
+
         <button id="startButton">
-            Start Timed Mission
+            START TIMED MISSION
         </button>
 
     </div>
 
 </div>
 
-<!-- RESULT -->
+
+
+<!-- ======================================================
+     RESULT + QUIZ
+====================================================== -->
 
 <div
     id="resultBox"
@@ -1170,47 +1543,62 @@ canvas{
 
     <div class="result-scroll">
 
+
         <div class="result-badge">
             EXPERIMENT RESULT
         </div>
 
+
         <h3 id="resultTitle"></h3>
+
 
         <div
             id="resultText"
             class="result-text">
         </div>
 
+
         <div class="question-label">
             PHYSICS CHECK
         </div>
 
+
         <div id="question"></div>
 
+
         <div id="questionHint"></div>
+
 
         <div
             id="answers"
             class="answers">
         </div>
 
+
         <div id="feedback"></div>
 
     </div>
+
 
     <div class="result-footer">
 
         <button
             id="nextButton"
             class="next-button">
+
             NEXT EXPERIMENT
+
         </button>
 
     </div>
 
 </div>
 
-<!-- FAILURE -->
+
+
+<!-- ======================================================
+     FAILURE
+====================================================== -->
 
 <div
     id="failure"
@@ -1218,33 +1606,45 @@ canvas{
 
     <div class="failure-box">
 
+
         <div class="failure-icon">
-            ⚠
+            ⚠️
         </div>
+
 
         <h2>
             SYSTEM FAILED
         </h2>
 
+
         <p>
-            The wave control system was not stabilized before
-            the mission timer reached zero.
+            The wave control system was not stabilized
+            before the mission timer reached zero.
         </p>
+
 
         <div
             id="failureStage"
             class="failure-stage">
         </div>
 
-        <button onclick="location.reload()">
+
+        <button
+            id="restartFailureButton">
+
             RESTART MISSION
+
         </button>
 
     </div>
 
 </div>
 
-<!-- FINISH -->
+
+
+<!-- ======================================================
+     FINISH
+====================================================== -->
 
 <div
     id="finish"
@@ -1252,15 +1652,19 @@ canvas{
 
     <div class="finish-box glass">
 
+
         <h2>
             Resonance Mission Complete!
         </h2>
 
+
         <div class="finish-sub">
-            You completed the timed Waves, Sound and Vibrations mission.
+            Waves, Sound & Vibrations mission completed successfully.
         </div>
 
+
         <div class="final-grid">
+
 
             <div class="final-card">
 
@@ -1274,6 +1678,7 @@ canvas{
 
             </div>
 
+
             <div class="final-card">
 
                 <strong id="finalWavelength">
@@ -1286,6 +1691,7 @@ canvas{
 
             </div>
 
+
             <div class="final-card">
 
                 <strong id="finalResonance">
@@ -1293,10 +1699,11 @@ canvas{
                 </strong>
 
                 <span>
-                    RESONANCE RESPONSE
+                    RESONANCE
                 </span>
 
             </div>
+
 
             <div class="final-card">
 
@@ -1312,22 +1719,33 @@ canvas{
 
         </div>
 
+
         <div
             id="finalExplanation"
             class="final-explanation">
         </div>
 
+
         <button
-            class="restart"
-            onclick="location.reload()">
-            Run New Timed Mission
+            id="restartFinishButton"
+            class="restart">
+
+            RUN NEW TIMED MISSION
+
         </button>
 
     </div>
 
 </div>
 
+
+
+<!-- ======================================================
+     THREE.JS
+====================================================== -->
+
 <script src="../../vendor/three-0.160.1.min.js"></script>
+
 
 <script>
 
@@ -1335,74 +1753,108 @@ canvas{
 
 "use strict";
 
+
 /* =========================================================
    CONFIG
 ========================================================= */
 
-const WAVE_SPEED = 12;
+const WAVE_SPEED =
+    12;
 
-const STAGE_TIME = 30;
 
-const FINAL_LOCK_TIME = 20;
+const STAGE_TIME =
+    30;
+
+
+const FINAL_LOCK_TIME =
+    20;
+
 
 const FREQUENCIES = [
-    2,4,6,8,10
+    2,
+    4,
+    6,
+    8,
+    10
 ];
+
+
+const AMPLITUDES = [
+    0.5,
+    1,
+    1.5,
+    2
+];
+
 
 const studentName =
     localStorage.getItem(
         "student_name"
-    ) ||
+    )
+    ||
     sessionStorage.getItem(
         "student_name"
-    ) ||
+    )
+    ||
     "Student";
+
 
 document
 .getElementById(
     "studentText"
 )
 .textContent =
-    studentName +
-    " - stabilize the wave system before time runs out.";
+    `${studentName} — stabilize the wave system before time runs out.`;
+
+
 
 /* =========================================================
-   THREE
+   THREE.JS SCENE
 ========================================================= */
 
 const scene =
     new THREE.Scene();
+
 
 scene.background =
     new THREE.Color(
         0x82c8e9
     );
 
+
 scene.fog =
     new THREE.Fog(
         0x82c8e9,
-        90,
-        240
+        85,
+        230
     );
+
 
 const camera =
     new THREE.PerspectiveCamera(
         58,
-        innerWidth/innerHeight,
-        .1,
+        innerWidth /
+        innerHeight,
+        0.1,
         350
     );
 
+
 const renderer =
     new THREE.WebGLRenderer({
-        antialias:true,
-        powerPreference:"high-performance"
+        antialias:
+            true,
+
+        powerPreference:
+            "high-performance"
     });
+
 
 renderer.setSize(
     innerWidth,
     innerHeight
 );
+
 
 renderer.setPixelRatio(
     Math.min(
@@ -1411,17 +1863,22 @@ renderer.setPixelRatio(
     )
 );
 
+
 renderer.shadowMap.enabled =
     true;
+
 
 renderer.outputColorSpace =
     THREE.SRGBColorSpace;
 
+
 renderer.toneMapping =
     THREE.ACESFilmicToneMapping;
 
+
 renderer.toneMappingExposure =
-    1.08;
+    1.05;
+
 
 document
 .getElementById(
@@ -1431,15 +1888,22 @@ document
     renderer.domElement
 );
 
-/* LIGHTING */
+
+
+/* =========================================================
+   LIGHTS
+========================================================= */
 
 scene.add(
+
     new THREE.HemisphereLight(
         0xdaf4ff,
-        0x486c43,
-        2.6
+        0x3d5e3c,
+        2.7
     )
+
 );
+
 
 const sun =
     new THREE.DirectionalLight(
@@ -1447,23 +1911,23 @@ const sun =
         4
     );
 
+
 sun.position.set(
     -30,
     70,
     -40
 );
 
+
 sun.castShadow =
     true;
 
-sun.shadow.mapSize.set(
-    2048,
-    2048
-);
 
 scene.add(
     sun
 );
+
+
 
 /* =========================================================
    MATERIALS
@@ -1472,43 +1936,73 @@ scene.add(
 const MAT = {
 
     floor:
-    new THREE.MeshStandardMaterial({
-        color:0x343e45,
-        roughness:.9
-    }),
+        new THREE.MeshStandardMaterial({
+            color:
+                0x343e45,
+
+            roughness:
+                0.9
+        }),
+
 
     concrete:
-    new THREE.MeshStandardMaterial({
-        color:0xbac2c5,
-        roughness:.9
-    }),
+        new THREE.MeshStandardMaterial({
+            color:
+                0xbac2c5,
+
+            roughness:
+                0.9
+        }),
+
 
     dark:
-    new THREE.MeshStandardMaterial({
-        color:0x141a20,
-        roughness:.55,
-        metalness:.3
-    }),
+        new THREE.MeshStandardMaterial({
+            color:
+                0x141a20,
+
+            roughness:
+                0.55,
+
+            metalness:
+                0.3
+        }),
+
 
     blue:
-    new THREE.MeshStandardMaterial({
-        color:0x1aa6e5,
-        roughness:.4,
-        metalness:.25
-    }),
+        new THREE.MeshStandardMaterial({
+            color:
+                0x1aa6e5,
+
+            roughness:
+                0.4,
+
+            metalness:
+                0.25
+        }),
+
 
     yellow:
-    new THREE.MeshStandardMaterial({
-        color:0xf4bc38,
-        roughness:.55
-    }),
+        new THREE.MeshStandardMaterial({
+            color:
+                0xf4bc38,
+
+            roughness:
+                0.55
+        }),
+
 
     purple:
-    new THREE.MeshStandardMaterial({
-        color:0x8d70db,
-        roughness:.55
-    })
+        new THREE.MeshStandardMaterial({
+            color:
+                0x8d70db,
+
+            roughness:
+                0.55
+        })
+
 };
+
+
 
 function box(
     width,
@@ -1518,69 +2012,84 @@ function box(
     x,
     y,
     z,
-    parent=scene
+    parent = scene
 ){
 
     const mesh =
         new THREE.Mesh(
+
             new THREE.BoxGeometry(
                 width,
                 height,
                 depth
             ),
+
             material
         );
 
+
     mesh.position.set(
-        x,y,z
+        x,
+        y,
+        z
     );
+
 
     mesh.castShadow =
         true;
 
+
     mesh.receiveShadow =
         true;
+
 
     parent.add(
         mesh
     );
 
+
     return mesh;
 }
 
+
+
 /* =========================================================
-   LAB
+   LAB FLOOR
 ========================================================= */
 
 box(
     48,
-    .25,
+    0.25,
     82,
     MAT.floor,
     0,
-    -.12,
+    -0.12,
     25
 );
 
-box(
-    50,
-    .35,
-    2,
-    MAT.concrete,
-    0,
-    .15,
-    -15
-);
 
 box(
     50,
-    .35,
+    0.35,
     2,
     MAT.concrete,
     0,
-    .15,
+    0.15,
+    -15
+);
+
+
+box(
+    50,
+    0.35,
+    2,
+    MAT.concrete,
+    0,
+    0.15,
     65
 );
+
+
 
 /* =========================================================
    SPEAKER
@@ -1589,15 +2098,18 @@ box(
 const speaker =
     new THREE.Group();
 
+
 scene.add(
     speaker
 );
+
 
 speaker.position.set(
     0,
     0,
     -6
 );
+
 
 box(
     6,
@@ -1610,19 +2122,24 @@ box(
     speaker
 );
 
+
 const speakerCone =
     new THREE.Mesh(
+
         new THREE.CylinderGeometry(
             2.1,
-            .9,
+            0.9,
             1.1,
             32
         ),
+
         MAT.blue
     );
 
+
 speakerCone.rotation.x =
-    Math.PI/2;
+    Math.PI / 2;
+
 
 speakerCone.position.set(
     0,
@@ -1630,37 +2147,49 @@ speakerCone.position.set(
     1.8
 );
 
+
 speaker.add(
     speakerCone
 );
 
+
+
 /* =========================================================
-   WAVE
+   WAVE LINE
 ========================================================= */
 
 const WAVE_POINTS =
     180;
 
+
 const wavePositions =
     new Float32Array(
-        WAVE_POINTS*3
+        WAVE_POINTS * 3
     );
+
 
 const waveGeometry =
     new THREE.BufferGeometry();
 
+
 waveGeometry.setAttribute(
+
     "position",
+
     new THREE.BufferAttribute(
         wavePositions,
         3
     )
+
 );
+
 
 const waveMaterial =
     new THREE.LineBasicMaterial({
-        color:0x5de2ff
+        color:
+            0x5de2ff
     });
+
 
 const waveLine =
     new THREE.Line(
@@ -1668,36 +2197,114 @@ const waveLine =
         waveMaterial
     );
 
+
 scene.add(
     waveLine
 );
 
+
+
+/* =========================================================
+   WAVE PARTICLES
+========================================================= */
+
 const waveDots = [];
 
+
 for(
-    let i=0;
-    i<45;
+    let i = 0;
+    i < 45;
     i++
 ){
 
     const dot =
         new THREE.Mesh(
+
             new THREE.SphereGeometry(
-                .18,
+                0.18,
                 10,
                 8
             ),
+
             MAT.blue
         );
+
 
     scene.add(
         dot
     );
 
+
     waveDots.push(
         dot
     );
 }
+
+
+
+/* =========================================================
+   SOUND RINGS
+========================================================= */
+
+const soundRings = [];
+
+
+for(
+    let i = 0;
+    i < 6;
+    i++
+){
+
+    const ring =
+        new THREE.Mesh(
+
+            new THREE.TorusGeometry(
+                2.5 +
+                i * 0.65,
+
+                0.045,
+
+                8,
+
+                44
+            ),
+
+            new THREE.MeshBasicMaterial({
+                color:
+                    0x79e9ff,
+
+                transparent:
+                    true,
+
+                opacity:
+                    0.35
+            })
+        );
+
+
+    ring.rotation.x =
+        Math.PI / 2;
+
+
+    ring.position.set(
+        0,
+        3.5,
+        -2 +
+        i * 1.6
+    );
+
+
+    speaker.add(
+        ring
+    );
+
+
+    soundRings.push(
+        ring
+    );
+}
+
+
 
 /* =========================================================
    RESONATOR
@@ -1706,9 +2313,11 @@ for(
 const resonator =
     new THREE.Group();
 
+
 scene.add(
     resonator
 );
+
 
 resonator.position.set(
     0,
@@ -1716,21 +2325,23 @@ resonator.position.set(
     51
 );
 
+
 box(
     7,
-    .6,
+    0.6,
     5,
     MAT.concrete,
     0,
-    .3,
+    0.3,
     0,
     resonator
 );
 
+
 box(
-    .55,
+    0.55,
     8,
-    .55,
+    0.55,
     MAT.purple,
     -1.5,
     4.3,
@@ -1738,10 +2349,11 @@ box(
     resonator
 );
 
+
 box(
-    .55,
+    0.55,
     8,
-    .55,
+    0.55,
     MAT.purple,
     1.5,
     4.3,
@@ -1749,10 +2361,11 @@ box(
     resonator
 );
 
+
 box(
     3.5,
-    .45,
-    .6,
+    0.45,
+    0.6,
     MAT.yellow,
     0,
     8.1,
@@ -1760,51 +2373,7 @@ box(
     resonator
 );
 
-/* =========================================================
-   SOUND RINGS
-========================================================= */
 
-const soundRings = [];
-
-for(
-    let i=0;
-    i<6;
-    i++
-){
-
-    const ring =
-        new THREE.Mesh(
-            new THREE.TorusGeometry(
-                2.5+i*.65,
-                .045,
-                8,
-                44
-            ),
-
-            new THREE.MeshBasicMaterial({
-                color:0x79e9ff,
-                transparent:true,
-                opacity:.35
-            })
-        );
-
-    ring.rotation.x =
-        Math.PI/2;
-
-    ring.position.set(
-        0,
-        3.5,
-        -2+i*1.6
-    );
-
-    speaker.add(
-        ring
-    );
-
-    soundRings.push(
-        ring
-    );
-}
 
 /* =========================================================
    STATE
@@ -1813,59 +2382,165 @@ for(
 let started =
     false;
 
+
 let failed =
     false;
+
 
 let finished =
     false;
 
+
 let stage =
     1;
 
-let selectedFrequency =
-    4;
-
-let selectedAmplitude =
-    1;
-
-let score =
-    0;
-
-let animationTime =
-    0;
-
-let timerRemaining =
-    STAGE_TIME;
-
-let timerRunning =
-    false;
-
-let targetAmplitude =
-    1.5;
-
-let targetFrequency =
-    6;
-
-let targetWavelength =
-    2;
-
-let naturalFrequency =
-    8;
-
-let resonanceResponse =
-    0;
-
-let finalLocks =
-    [];
-
-let finalLockIndex =
-    0;
 
 let stageComplete =
     false;
 
+
+let score =
+    0;
+
+
+let selectedFrequency =
+    4;
+
+
+let selectedAmplitude =
+    1;
+
+
+let targetAmplitude =
+    1.5;
+
+
+let targetFrequency =
+    6;
+
+
+let targetWavelength =
+    2;
+
+
+let naturalFrequency =
+    8;
+
+
+let resonanceResponse =
+    0;
+
+
+let finalLocks = [];
+
+
+let finalLockIndex =
+    0;
+
+
+let timerRemaining =
+    STAGE_TIME;
+
+
+let timerRunning =
+    false;
+
+
+let animationTime =
+    0;
+
+
+
 /* =========================================================
-   BUTTONS
+   HELPERS
+========================================================= */
+
+function randomItem(
+    array
+){
+
+    return array[
+        Math.floor(
+            Math.random() *
+            array.length
+        )
+    ];
+}
+
+
+
+function shuffle(
+    array
+){
+
+    const copy =
+        [
+            ...array
+        ];
+
+
+    for(
+        let i =
+            copy.length - 1;
+
+        i > 0;
+
+        i--
+    ){
+
+        const j =
+            Math.floor(
+                Math.random() *
+                (i + 1)
+            );
+
+
+        [
+            copy[i],
+            copy[j]
+        ] =
+        [
+            copy[j],
+            copy[i]
+        ];
+    }
+
+
+    return copy;
+}
+
+
+
+function optionSet(
+    correct,
+    wrong1,
+    wrong2
+){
+
+    const list =
+        shuffle([
+            correct,
+            wrong1,
+            wrong2
+        ]);
+
+
+    return {
+
+        list,
+
+        correct:
+            list.indexOf(
+                correct
+            )
+
+    };
+}
+
+
+
+/* =========================================================
+   CONTROL BUTTONS
 ========================================================= */
 
 const frequencyButtons =
@@ -1875,6 +2550,7 @@ const frequencyButtons =
         )
     ];
 
+
 const amplitudeButtons =
     [
         ...document.querySelectorAll(
@@ -1882,97 +2558,93 @@ const amplitudeButtons =
         )
     ];
 
-frequencyButtons.forEach(
-    button=>{
 
-        button.onclick =
-            ()=>{
+frequencyButtons.forEach(
+    button => {
+
+        button.addEventListener(
+            "click",
+            () => {
 
                 if(
                     failed ||
                     finished
                 ){
+
                     return;
                 }
+
 
                 selectedFrequency =
                     Number(
-                        button.dataset.frequency
+                        button.dataset
+                            .frequency
                     );
 
+
                 frequencyButtons.forEach(
-                    item=>
-                    item.classList.remove(
-                        "active"
-                    )
+                    item =>
+                        item.classList.remove(
+                            "active"
+                        )
                 );
+
 
                 button.classList.add(
                     "active"
                 );
 
+
                 updateHUD();
-            };
+            }
+        );
     }
 );
 
-amplitudeButtons.forEach(
-    button=>{
 
-        button.onclick =
-            ()=>{
+amplitudeButtons.forEach(
+    button => {
+
+        button.addEventListener(
+            "click",
+            () => {
 
                 if(
                     failed ||
                     finished
                 ){
+
                     return;
                 }
 
+
                 selectedAmplitude =
                     Number(
-                        button.dataset.amplitude
+                        button.dataset
+                            .amplitude
                     );
 
+
                 amplitudeButtons.forEach(
-                    item=>
-                    item.classList.remove(
-                        "active"
-                    )
+                    item =>
+                        item.classList.remove(
+                            "active"
+                        )
                 );
+
 
                 button.classList.add(
                     "active"
                 );
 
+
                 updateHUD();
-            };
+            }
+        );
     }
 );
 
-/* =========================================================
-   START
-========================================================= */
 
-document
-.getElementById(
-    "startButton"
-)
-.onclick =
-()=>{
-
-    started =
-        true;
-
-    document
-    .getElementById(
-        "startScreen"
-    )
-    .style.display =
-        "none";
-
-    prepareStage();
-};
 
 /* =========================================================
    TIMER
@@ -1985,17 +2657,67 @@ function startStageTimer(
     timerRemaining =
         seconds;
 
+
     timerRunning =
         true;
 
+
     updateTimerDisplay();
 }
+
+
 
 function pauseTimer(){
 
     timerRunning =
         false;
 }
+
+
+
+function updateTimerDisplay(){
+
+    const element =
+        document.getElementById(
+            "timerValue"
+        );
+
+
+    element.textContent =
+        Math.ceil(
+            Math.max(
+                0,
+                timerRemaining
+            )
+        );
+
+
+    element.classList.remove(
+        "warning",
+        "danger"
+    );
+
+
+    if(
+        timerRemaining <= 5
+    ){
+
+        element.classList.add(
+            "danger"
+        );
+    }
+
+    else if(
+        timerRemaining <= 10
+    ){
+
+        element.classList.add(
+            "warning"
+        );
+    }
+}
+
+
 
 function updateMissionTimer(
     dt
@@ -2011,67 +2733,36 @@ function updateMissionTimer(
         return;
     }
 
+
     timerRemaining -=
         dt;
 
+
     if(
-        timerRemaining<=0
+        timerRemaining <= 0
     ){
 
         timerRemaining =
             0;
 
+
         updateTimerDisplay();
 
+
         systemFailure();
+
 
         return;
     }
 
+
     updateTimerDisplay();
 }
 
-function updateTimerDisplay(){
 
-    const element =
-        document.getElementById(
-            "timerValue"
-        );
-
-    element.textContent =
-        Math.ceil(
-            Math.max(
-                0,
-                timerRemaining
-            )
-        );
-
-    element.classList.remove(
-        "warning",
-        "danger"
-    );
-
-    if(
-        timerRemaining<=5
-    ){
-
-        element.classList.add(
-            "danger"
-        );
-    }
-
-    else if(
-        timerRemaining<=10
-    ){
-
-        element.classList.add(
-            "warning"
-        );
-    }
-}
 
 /* =========================================================
-   FAILURE
+   SYSTEM FAILURE
 ========================================================= */
 
 function systemFailure(){
@@ -2084,11 +2775,14 @@ function systemFailure(){
         return;
     }
 
+
     failed =
         true;
 
+
     timerRunning =
         false;
+
 
     document
     .getElementById(
@@ -2097,30 +2791,59 @@ function systemFailure(){
     .disabled =
         true;
 
-    const stageName =
+
+    const currentStageName =
         document
         .getElementById(
             "stageName"
         )
         .textContent;
 
+
+    const timerRule =
+        stage === 6
+        ?
+        `${FINAL_LOCK_TIME} second final-lock timer expired.`
+        :
+        `${STAGE_TIME} second experiment timer expired.`;
+
+
     document
     .getElementById(
         "failureStage"
     )
     .innerHTML =
-    `
-    Failed during:<br>
+        `
+        <b>
+            Failed during:
+        </b>
 
-    <b>
-    ${stageName}
-    </b><br><br>
+        <br>
 
-    Final score:
-    <b>
-    ${score}
-    </b>
-    `;
+        ${currentStageName}
+
+        <br><br>
+
+        ${timerRule}
+
+        <br><br>
+
+        Score achieved:
+
+        <b>
+            ${score}
+        </b>
+        `;
+
+
+    document
+    .getElementById(
+        "resultBox"
+    )
+    .classList.remove(
+        "show"
+    );
+
 
     document
     .getElementById(
@@ -2131,54 +2854,83 @@ function systemFailure(){
     );
 }
 
+
+
 /* =========================================================
-   TEST SIGNAL
+   START GAME
 ========================================================= */
 
 document
 .getElementById(
-    "testButton"
+    "startButton"
 )
-.onclick =
-()=>{
+.addEventListener(
+    "click",
+    () => {
 
-    if(
-        !started ||
-        failed ||
-        finished ||
-        stageComplete
-    ){
+        started =
+            true;
 
-        return;
-    }
 
-    evaluateStage();
-};
+        failed =
+            false;
 
-/* =========================================================
-   RANDOM
-========================================================= */
 
-function randomItem(
-    array
-){
+        finished =
+            false;
 
-    return array[
-        Math.floor(
-            Math.random()*
-            array.length
+
+        document
+        .getElementById(
+            "startScreen"
         )
-    ];
-}
+        .style.display =
+            "none";
+
+
+        prepareStage();
+    }
+);
+
+
+
+document
+.getElementById(
+    "restartFailureButton"
+)
+.addEventListener(
+    "click",
+    () => {
+
+        location.reload();
+    }
+);
+
+
+
+document
+.getElementById(
+    "restartFinishButton"
+)
+.addEventListener(
+    "click",
+    () => {
+
+        location.reload();
+    }
+);
+
+
 
 /* =========================================================
-   STAGES
+   PREPARE STAGES
 ========================================================= */
 
 function prepareStage(){
 
     stageComplete =
         false;
+
 
     document
     .getElementById(
@@ -2187,17 +2939,16 @@ function prepareStage(){
     .disabled =
         false;
 
+
     if(
-        stage===1
+        stage === 1
     ){
 
         targetAmplitude =
-            randomItem([
-                .5,
-                1,
-                1.5,
-                2
-            ]);
+            randomItem(
+                AMPLITUDES
+            );
+
 
         document
         .getElementById(
@@ -2206,12 +2957,14 @@ function prepareStage(){
         .textContent =
             "Stage 1 - Amplitude Control";
 
+
         document
         .getElementById(
             "stageObjective"
         )
         .textContent =
             `Generate amplitude ${targetAmplitude.toFixed(1)} m.`;
+
 
         document
         .getElementById(
@@ -2220,6 +2973,7 @@ function prepareStage(){
         .textContent =
             "AMPLITUDE";
 
+
         document
         .getElementById(
             "coachText"
@@ -2227,22 +2981,30 @@ function prepareStage(){
         .textContent =
             "Amplitude is the maximum displacement from equilibrium.";
 
+
         document
         .getElementById(
             "coachFormula"
         )
         .textContent =
-            "Greater amplitude means larger vibration.";
+            "Greater amplitude = larger vibration";
+
+
+        startStageTimer(
+            STAGE_TIME
+        );
     }
 
+
     else if(
-        stage===2
+        stage === 2
     ){
 
         targetFrequency =
             randomItem(
                 FREQUENCIES
             );
+
 
         document
         .getElementById(
@@ -2251,12 +3013,14 @@ function prepareStage(){
         .textContent =
             "Stage 2 - Frequency Control";
 
+
         document
         .getElementById(
             "stageObjective"
         )
         .textContent =
-            `Generate exactly ${targetFrequency} oscillations per second.`;
+            `Generate ${targetFrequency} oscillations per second.`;
+
 
         document
         .getElementById(
@@ -2265,33 +3029,45 @@ function prepareStage(){
         .textContent =
             "FREQUENCY";
 
+
         document
         .getElementById(
             "coachText"
         )
         .textContent =
-            "Frequency tells how many complete oscillations occur every second.";
+            "Frequency is the number of complete oscillations every second.";
+
 
         document
         .getElementById(
             "coachFormula"
         )
         .textContent =
-            "Frequency unit = hertz (Hz).";
+            "1 Hz = 1 oscillation per second";
+
+
+        startStageTimer(
+            STAGE_TIME
+        );
     }
 
+
     else if(
-        stage===3
+        stage === 3
     ){
 
-        const frequency =
+        const targetF =
             randomItem([
-                2,4,6
+                2,
+                4,
+                6
             ]);
 
+
         targetWavelength =
-            WAVE_SPEED/
-            frequency;
+            WAVE_SPEED /
+            targetF;
+
 
         document
         .getElementById(
@@ -2300,12 +3076,14 @@ function prepareStage(){
         .textContent =
             "Stage 3 - Wavelength Match";
 
+
         document
         .getElementById(
             "stageObjective"
         )
         .textContent =
             `Produce wavelength ${targetWavelength.toFixed(2)} m.`;
+
 
         document
         .getElementById(
@@ -2314,23 +3092,31 @@ function prepareStage(){
         .textContent =
             "WAVELENGTH";
 
+
         document
         .getElementById(
             "coachText"
         )
         .textContent =
-            "When wave speed is constant, increasing frequency reduces wavelength.";
+            "At constant wave speed, wavelength decreases when frequency increases.";
+
 
         document
         .getElementById(
             "coachFormula"
         )
         .textContent =
-            "v = f x lambda";
+            "λ = v / f";
+
+
+        startStageTimer(
+            STAGE_TIME
+        );
     }
 
+
     else if(
-        stage===4
+        stage === 4
     ){
 
         targetAmplitude =
@@ -2340,12 +3126,14 @@ function prepareStage(){
                 2
             ]);
 
+
         document
         .getElementById(
             "stageName"
         )
         .textContent =
             "Stage 4 - Sound Vibration";
+
 
         document
         .getElementById(
@@ -2354,36 +3142,46 @@ function prepareStage(){
         .textContent =
             `Calibrate speaker amplitude to ${targetAmplitude.toFixed(1)} m.`;
 
+
         document
         .getElementById(
             "coachTitle"
         )
         .textContent =
-            "SOUND AND VIBRATION";
+            "SOUND & VIBRATION";
+
 
         document
         .getElementById(
             "coachText"
         )
         .textContent =
-            "Sound is produced by a vibrating source.";
+            "Sound begins with a vibrating source.";
+
 
         document
         .getElementById(
             "coachFormula"
         )
         .textContent =
-            "Vibration -> disturbance -> wave";
+            "Vibration → disturbance → sound wave";
+
+
+        startStageTimer(
+            STAGE_TIME
+        );
     }
 
+
     else if(
-        stage===5
+        stage === 5
     ){
 
         naturalFrequency =
             randomItem(
                 FREQUENCIES
             );
+
 
         document
         .getElementById(
@@ -2392,12 +3190,14 @@ function prepareStage(){
         .textContent =
             "Stage 5 - Resonance";
 
+
         document
         .getElementById(
             "stageObjective"
         )
         .textContent =
-            "Find the resonator's natural frequency.";
+            "Find the resonator natural frequency.";
+
 
         document
         .getElementById(
@@ -2406,12 +3206,14 @@ function prepareStage(){
         .textContent =
             "RESONANCE";
 
+
         document
         .getElementById(
             "coachText"
         )
         .textContent =
-            "Find the frequency that produces maximum vibration.";
+            "Find the driving frequency that creates maximum vibration.";
+
 
         document
         .getElementById(
@@ -2419,21 +3221,30 @@ function prepareStage(){
         )
         .textContent =
             "Driving frequency = Natural frequency";
+
+
+        startStageTimer(
+            STAGE_TIME
+        );
     }
+
 
     else{
 
         finalLocks =
             [];
 
+
         while(
-            finalLocks.length<3
+            finalLocks.length <
+            3
         ){
 
             const candidate =
                 randomItem(
                     FREQUENCIES
                 );
+
 
             if(
                 !finalLocks.includes(
@@ -2447,8 +3258,10 @@ function prepareStage(){
             }
         }
 
+
         finalLockIndex =
             0;
+
 
         document
         .getElementById(
@@ -2457,7 +3270,6 @@ function prepareStage(){
         .textContent =
             "Final - Frequency Lock";
 
-        updateFinalObjective();
 
         document
         .getElementById(
@@ -2466,52 +3278,90 @@ function prepareStage(){
         .textContent =
             "FINAL SYSTEM LOCK";
 
+
         document
         .getElementById(
             "coachText"
         )
         .textContent =
-            "Match three frequencies before each timer expires.";
+            "Match three frequency targets. Each lock gets only 20 seconds.";
+
 
         document
         .getElementById(
             "coachFormula"
         )
         .textContent =
-            "Frequency + wavelength + resonance";
-    }
+            "3 locks × 20 seconds";
 
-    if(
-        stage===6
-    ){
+
+        updateFinalObjective();
+
 
         startStageTimer(
             FINAL_LOCK_TIME
         );
     }
 
-    else{
-
-        startStageTimer(
-            STAGE_TIME
-        );
-    }
 
     updateHUD();
 }
 
+
+
+/* =========================================================
+   FINAL OBJECTIVE
+========================================================= */
+
 function updateFinalObjective(){
+
+    const target =
+        finalLocks[
+            finalLockIndex
+        ];
+
 
     document
     .getElementById(
         "stageObjective"
     )
     .textContent =
-        `Lock ${finalLockIndex+1}/3: ${finalLocks[finalLockIndex]} Hz`;
+        `Lock ${finalLockIndex + 1}/3 — set frequency to ${target} Hz.`;
 }
 
+
+
 /* =========================================================
-   EVALUATION
+   TEST SIGNAL
+========================================================= */
+
+document
+.getElementById(
+    "testButton"
+)
+.addEventListener(
+    "click",
+    () => {
+
+        if(
+            !started ||
+            failed ||
+            finished ||
+            stageComplete
+        ){
+
+            return;
+        }
+
+
+        evaluateStage();
+    }
+);
+
+
+
+/* =========================================================
+   STAGE EVALUATION
 ========================================================= */
 
 function evaluateStage(){
@@ -2519,21 +3369,25 @@ function evaluateStage(){
     let success =
         false;
 
+
     let title =
         "";
+
 
     let explanation =
         "";
 
+
     if(
-        stage===1
+        stage === 1
     ){
 
         success =
             Math.abs(
-                selectedAmplitude-
+                selectedAmplitude -
                 targetAmplitude
-            )<.01;
+            ) < 0.01;
+
 
         title =
             success
@@ -2542,26 +3396,37 @@ function evaluateStage(){
             :
             "AMPLITUDE DOES NOT MATCH";
 
+
         explanation =
-        `
-        Target amplitude =
-        <b>${targetAmplitude.toFixed(1)} m</b><br>
+            `
+            Target amplitude =
+            <b>
+                ${targetAmplitude.toFixed(1)} m
+            </b>
 
-        Selected amplitude =
-        <b>${selectedAmplitude.toFixed(1)} m</b><br><br>
+            <br>
 
-        Amplitude is the maximum displacement
-        from the equilibrium position.
-        `;
+            Selected amplitude =
+            <b>
+                ${selectedAmplitude.toFixed(1)} m
+            </b>
+
+            <br><br>
+
+            Amplitude is the maximum displacement
+            from the equilibrium position.
+            `;
     }
 
+
     else if(
-        stage===2
+        stage === 2
     ){
 
         success =
-            selectedFrequency===
+            selectedFrequency ===
             targetFrequency;
+
 
         title =
             success
@@ -2570,32 +3435,44 @@ function evaluateStage(){
             :
             "FREQUENCY DOES NOT MATCH";
 
+
         explanation =
-        `
-        Target frequency =
-        <b>${targetFrequency} Hz</b><br>
+            `
+            Target =
+            <b>
+                ${targetFrequency} Hz
+            </b>
 
-        Selected frequency =
-        <b>${selectedFrequency} Hz</b><br><br>
+            <br>
 
-        ${selectedFrequency} Hz means
-        ${selectedFrequency} complete oscillations every second.
-        `;
+            Selected =
+            <b>
+                ${selectedFrequency} Hz
+            </b>
+
+            <br><br>
+
+            Frequency tells how many complete
+            oscillations occur each second.
+            `;
     }
 
+
     else if(
-        stage===3
+        stage === 3
     ){
 
         const wavelength =
-            WAVE_SPEED/
+            WAVE_SPEED /
             selectedFrequency;
+
 
         success =
             Math.abs(
-                wavelength-
+                wavelength -
                 targetWavelength
-            )<.02;
+            ) < 0.02;
+
 
         title =
             success
@@ -2604,42 +3481,48 @@ function evaluateStage(){
             :
             "WAVELENGTH DOES NOT MATCH";
 
+
         explanation =
-        `
-        v =
-        ${WAVE_SPEED} m/s<br>
+            `
+            <b>Formula</b>
 
-        f =
-        ${selectedFrequency} Hz<br><br>
+            <br>
 
-        lambda =
-        v / f<br>
+            λ = v / f
 
-        =
-        ${WAVE_SPEED} /
-        ${selectedFrequency}<br>
+            <br><br>
 
-        =
-        <b>
-        ${wavelength.toFixed(2)} m
-        </b><br><br>
+            λ =
+            ${WAVE_SPEED} /
+            ${selectedFrequency}
 
-        Target =
-        <b>
-        ${targetWavelength.toFixed(2)} m
-        </b>.
-        `;
+            <br>
+
+            =
+            <b>
+                ${wavelength.toFixed(2)} m
+            </b>
+
+            <br><br>
+
+            Target =
+            <b>
+                ${targetWavelength.toFixed(2)} m
+            </b>
+            `;
     }
 
+
     else if(
-        stage===4
+        stage === 4
     ){
 
         success =
             Math.abs(
-                selectedAmplitude-
+                selectedAmplitude -
                 targetAmplitude
-            )<.01;
+            ) < 0.01;
+
 
         title =
             success
@@ -2648,32 +3531,41 @@ function evaluateStage(){
             :
             "SIGNAL AMPLITUDE INCORRECT";
 
+
         explanation =
-        `
-        Required amplitude =
-        <b>
-        ${targetAmplitude.toFixed(1)} m
-        </b><br>
+            `
+            Required speaker amplitude =
+            <b>
+                ${targetAmplitude.toFixed(1)} m
+            </b>
 
-        Selected amplitude =
-        <b>
-        ${selectedAmplitude.toFixed(1)} m
-        </b><br><br>
+            <br>
 
-        The speaker cone acts as the vibrating source.
-        `;
+            Selected =
+            <b>
+                ${selectedAmplitude.toFixed(1)} m
+            </b>
+
+            <br><br>
+
+            The speaker cone vibrates and produces
+            a travelling disturbance through the medium.
+            `;
     }
 
+
     else if(
-        stage===5
+        stage === 5
     ){
 
         success =
-            selectedFrequency===
+            selectedFrequency ===
             naturalFrequency;
+
 
         resonanceResponse =
             calculateResonance();
+
 
         title =
             success
@@ -2682,105 +3574,50 @@ function evaluateStage(){
             :
             "NO RESONANCE YET";
 
+
         explanation =
-        `
-        Natural frequency =
-        <b>
-        ${naturalFrequency} Hz
-        </b><br>
-
-        Driving frequency =
-        <b>
-        ${selectedFrequency} Hz
-        </b><br><br>
-
-        ${
-            success
-            ?
             `
-            Frequencies match.
+            Natural frequency =
+            <b>
+                ${naturalFrequency} Hz
+            </b>
 
-            The system produces maximum vibration response.
-            `
-            :
-            `
-            Frequencies do not match.
+            <br>
 
-            Adjust the driving frequency before time runs out.
-            `
-        }
-        `;
+            Driving frequency =
+            <b>
+                ${selectedFrequency} Hz
+            </b>
+
+            <br><br>
+
+            ${
+                success
+
+                ?
+                `
+                The frequencies match.
+                Resonance produces maximum vibration.
+                `
+
+                :
+                `
+                The frequencies do not match.
+                Try another driving frequency
+                before the timer reaches zero.
+                `
+            }
+            `;
     }
+
 
     else{
 
-        const target =
-            finalLocks[
-                finalLockIndex
-            ];
-
-        success =
-            selectedFrequency===
-            target;
-
-        if(
-            success
-        ){
-
-            score +=
-                100;
-
-            updateScore();
-
-            finalLockIndex++;
-
-            if(
-                finalLockIndex<3
-            ){
-
-                updateFinalObjective();
-
-                /*
-                   NEW TIMER FOR NEXT LOCK
-                */
-
-                startStageTimer(
-                    FINAL_LOCK_TIME
-                );
-
-                updateHUD();
-
-                return;
-            }
-
-            pauseTimer();
-
-            stageComplete =
-                true;
-
-            finishGame();
-
-            return;
-        }
-
-        showRetry(
-            "WRONG FREQUENCY LOCK",
-
-            `
-            Required frequency =
-            <b>${target} Hz</b><br>
-
-            Selected frequency =
-            <b>${selectedFrequency} Hz</b>.<br><br>
-
-            Change the frequency quickly.
-
-            The mission timer is still running.
-            `
-        );
+        evaluateFinalLock();
 
         return;
     }
+
 
     if(
         success
@@ -2789,12 +3626,16 @@ function evaluateStage(){
         score +=
             100;
 
+
         updateScore();
+
 
         stageComplete =
             true;
 
+
         pauseTimer();
+
 
         document
         .getElementById(
@@ -2803,18 +3644,15 @@ function evaluateStage(){
         .disabled =
             true;
 
+
         showStageResult(
             title,
             explanation
         );
     }
 
-    else{
 
-        /*
-           Wrong experimental setting:
-           timer keeps running.
-        */
+    else{
 
         showRetry(
             title,
@@ -2823,8 +3661,107 @@ function evaluateStage(){
     }
 }
 
+
+
 /* =========================================================
-   RETRY POPUP
+   FINAL FREQUENCY LOCK
+========================================================= */
+
+function evaluateFinalLock(){
+
+    const target =
+        finalLocks[
+            finalLockIndex
+        ];
+
+
+    const success =
+        selectedFrequency ===
+        target;
+
+
+    if(
+        !success
+    ){
+
+        showRetry(
+
+            "WRONG FREQUENCY LOCK",
+
+            `
+            Required frequency =
+            <b>
+                ${target} Hz
+            </b>
+
+            <br>
+
+            Selected frequency =
+            <b>
+                ${selectedFrequency} Hz
+            </b>
+
+            <br><br>
+
+            Change the frequency quickly.
+
+            <br>
+
+            <b>
+                The 20 second timer is still running.
+            </b>
+            `
+        );
+
+
+        return;
+    }
+
+
+    score +=
+        100;
+
+
+    updateScore();
+
+
+    finalLockIndex++;
+
+
+    if(
+        finalLockIndex <
+        3
+    ){
+
+        updateFinalObjective();
+
+
+        startStageTimer(
+            FINAL_LOCK_TIME
+        );
+
+
+        updateHUD();
+
+
+        return;
+    }
+
+
+    stageComplete =
+        true;
+
+
+    pauseTimer();
+
+
+    finishGame();
+}
+
+
+
+/* =========================================================
+   RETRY RESULT
 ========================================================= */
 
 function showRetry(
@@ -2837,11 +3774,6 @@ function showRetry(
             "resultBox"
         );
 
-    /*
-       Do NOT pause timer here.
-       Student used wrong experiment setting.
-       Countdown continues.
-    */
 
     document
     .getElementById(
@@ -2850,12 +3782,14 @@ function showRetry(
     .textContent =
         title;
 
+
     document
     .getElementById(
         "resultText"
     )
     .innerHTML =
         explanation;
+
 
     document
     .getElementById(
@@ -2864,12 +3798,14 @@ function showRetry(
     .textContent =
         "Adjust the controls and try again before time reaches zero.";
 
+
     document
     .getElementById(
         "questionHint"
     )
     .textContent =
-        "";
+        "Wrong settings do not pause the mission timer.";
+
 
     document
     .getElementById(
@@ -2878,6 +3814,7 @@ function showRetry(
     .innerHTML =
         "";
 
+
     document
     .getElementById(
         "feedback"
@@ -2885,298 +3822,282 @@ function showRetry(
     .style.display =
         "none";
 
-    const next =
-        document
-        .getElementById(
+
+    const nextButton =
+        document.getElementById(
             "nextButton"
         );
 
-    next.style.display =
+
+    nextButton.style.display =
         "block";
 
-    next.textContent =
+
+    nextButton.textContent =
         "TRY AGAIN";
 
-    next.onclick =
-        ()=>{
+
+    nextButton.onclick =
+        () => {
 
             resultBox
-            .classList
-            .remove(
+            .classList.remove(
                 "show"
             );
         };
 
+
     resultBox
-    .classList
-    .add(
+    .classList.add(
         "show"
     );
 }
 
+
+
 /* =========================================================
-   QUESTION HELPERS
+   QUESTIONS
 ========================================================= */
-
-function shuffle(
-    array
-){
-
-    const copy =
-        [...array];
-
-    for(
-        let i=
-            copy.length-1;
-
-        i>0;
-
-        i--
-    ){
-
-        const j =
-            Math.floor(
-                Math.random()*
-                (i+1)
-            );
-
-        [
-            copy[i],
-            copy[j]
-        ]=[
-            copy[j],
-            copy[i]
-        ];
-    }
-
-    return copy;
-}
-
-function optionSet(
-    correct,
-    wrong1,
-    wrong2
-){
-
-    const list =
-        shuffle([
-            correct,
-            wrong1,
-            wrong2
-        ]);
-
-    return {
-
-        list,
-
-        correct:
-            list.indexOf(
-                correct
-            )
-    };
-}
-
-function frequencyQuestion(){
-
-    const frequency =
-        randomItem([
-            2,4,5,8,10
-        ]);
-
-    const answer =
-        frequency+
-        " oscillations";
-
-    const option =
-        optionSet(
-            answer,
-
-            frequency*2+
-            " oscillations",
-
-            Math.max(
-                1,
-                frequency-1
-            )+
-            " oscillations"
-        );
-
-    return {
-
-        q:
-        `A source has frequency ${frequency} Hz. How many complete oscillations occur in one second?`,
-
-        hint:
-        "1 Hz means 1 oscillation per second.",
-
-        answers:
-            option.list,
-
-        correct:
-            option.correct,
-
-        explanation:
-        `
-        Frequency =
-        oscillations / time.<br><br>
-
-        ${frequency} Hz means
-
-        <b>
-        ${frequency} complete oscillations per second
-        </b>.
-        `
-    };
-}
-
-function wavelengthQuestion(){
-
-    const frequency =
-        randomItem([
-            2,3,4,6
-        ]);
-
-    const wavelength =
-        WAVE_SPEED/
-        frequency;
-
-    const answer =
-        wavelength.toFixed(2)+
-        " m";
-
-    const option =
-        optionSet(
-            answer,
-
-            (
-                wavelength*2
-            ).toFixed(2)+
-            " m",
-
-            (
-                wavelength/2
-            ).toFixed(2)+
-            " m"
-        );
-
-    return {
-
-        q:
-        `A wave travels at ${WAVE_SPEED} m/s with frequency ${frequency} Hz. Find wavelength.`,
-
-        hint:
-        "lambda = v / f",
-
-        answers:
-            option.list,
-
-        correct:
-            option.correct,
-
-        explanation:
-        `
-        <b>Formula</b><br>
-
-        v =
-        f x lambda<br><br>
-
-        lambda =
-        v / f<br><br>
-
-        =
-        ${WAVE_SPEED} /
-        ${frequency}<br><br>
-
-        =
-        <b>
-        ${wavelength.toFixed(2)} m
-        </b>.
-        `
-    };
-}
 
 function amplitudeQuestion(){
 
     return {
 
         q:
-        "Which change produces a larger displacement from equilibrium?",
+            "Which change produces a larger displacement from equilibrium?",
 
         hint:
-        "Think about the definition of amplitude.",
+            "Think about the definition of amplitude.",
 
-        answers:[
+        answers: [
             "Increasing amplitude",
             "Reducing amplitude",
             "Changing only the time unit"
         ],
 
-        correct:0,
+        correct:
+            0,
 
         explanation:
-        `
-        Amplitude is the maximum displacement
-        from equilibrium.
+            `
+            Amplitude is the maximum displacement
+            from equilibrium.
 
-        Therefore,
-        increasing amplitude produces a larger vibration.
-        `
+            Therefore increasing amplitude
+            produces a larger vibration.
+            `
     };
 }
+
+
+
+function frequencyQuestion(){
+
+    const frequency =
+        randomItem([
+            2,
+            4,
+            5,
+            8,
+            10
+        ]);
+
+
+    const correct =
+        `${frequency} oscillations`;
+
+
+    const options =
+        optionSet(
+
+            correct,
+
+            `${frequency * 2} oscillations`,
+
+            `${Math.max(
+                1,
+                frequency - 1
+            )} oscillations`
+        );
+
+
+    return {
+
+        q:
+            `A source has frequency ${frequency} Hz.
+             How many complete oscillations occur in one second?`,
+
+        hint:
+            "1 Hz means one complete oscillation per second.",
+
+        answers:
+            options.list,
+
+        correct:
+            options.correct,
+
+        explanation:
+            `
+            <b>Frequency</b>
+            =
+            oscillations / time.
+
+            <br><br>
+
+            ${frequency} Hz means
+
+            <b>
+                ${frequency} complete oscillations
+                every second.
+            </b>
+            `
+    };
+}
+
+
+
+function wavelengthQuestion(){
+
+    const frequency =
+        randomItem([
+            2,
+            3,
+            4,
+            6
+        ]);
+
+
+    const wavelength =
+        WAVE_SPEED /
+        frequency;
+
+
+    const correct =
+        `${wavelength.toFixed(2)} m`;
+
+
+    const options =
+        optionSet(
+
+            correct,
+
+            `${(
+                wavelength * 2
+            ).toFixed(2)} m`,
+
+            `${(
+                wavelength / 2
+            ).toFixed(2)} m`
+        );
+
+
+    return {
+
+        q:
+            `A wave travels at ${WAVE_SPEED} m/s
+             with frequency ${frequency} Hz.
+             Find the wavelength.`,
+
+        hint:
+            "Use λ = v / f",
+
+        answers:
+            options.list,
+
+        correct:
+            options.correct,
+
+        explanation:
+            `
+            <b>Formula</b>
+
+            <br><br>
+
+            v = f × λ
+
+            <br>
+
+            λ = v / f
+
+            <br><br>
+
+            λ =
+            ${WAVE_SPEED}
+            /
+            ${frequency}
+
+            <br>
+
+            =
+            <b>
+                ${wavelength.toFixed(2)} m
+            </b>
+            `
+    };
+}
+
+
 
 function resonanceQuestion(){
 
     return {
 
         q:
-        "When is resonance strongest?",
+            "When is resonance strongest?",
 
         hint:
-        "Compare driving frequency and natural frequency.",
+            "Compare driving frequency and natural frequency.",
 
-        answers:[
+        answers: [
             "Driving frequency equals natural frequency",
             "Amplitude becomes zero",
             "The source stops vibrating"
         ],
 
-        correct:0,
+        correct:
+            0,
 
         explanation:
-        `
-        Resonance occurs when the driving frequency
-        matches the natural frequency of the system.
+            `
+            Resonance occurs when
+            the driving frequency matches
+            the natural frequency.
 
-        The vibration response becomes very large.
-        `
+            The vibration response becomes maximum.
+            `
     };
 }
+
+
 
 function questionForStage(){
 
     if(
-        stage===1
+        stage === 1
     ){
 
         return amplitudeQuestion();
     }
 
+
     if(
-        stage===2
+        stage === 2
     ){
 
         return frequencyQuestion();
     }
 
+
     if(
-        stage===3
+        stage === 3
     ){
 
         return wavelengthQuestion();
     }
 
+
     if(
-        stage===4
+        stage === 4
     ){
 
         return randomItem([
@@ -3185,11 +4106,14 @@ function questionForStage(){
         ])();
     }
 
+
     return resonanceQuestion();
 }
 
+
+
 /* =========================================================
-   RESULT + QUIZ
+   SUCCESS RESULT + PHYSICS CHECK
 ========================================================= */
 
 function showStageResult(
@@ -3202,12 +4126,14 @@ function showStageResult(
             "resultBox"
         );
 
+
     document
     .getElementById(
         "resultTitle"
     )
     .textContent =
         title;
+
 
     document
     .getElementById(
@@ -3216,8 +4142,10 @@ function showStageResult(
     .innerHTML =
         explanation;
 
+
     const question =
         questionForStage();
+
 
     document
     .getElementById(
@@ -3226,6 +4154,7 @@ function showStageResult(
     .textContent =
         question.q;
 
+
     document
     .getElementById(
         "questionHint"
@@ -3233,61 +4162,80 @@ function showStageResult(
     .textContent =
         question.hint;
 
+
     const answersRoot =
         document.getElementById(
             "answers"
         );
+
 
     const feedback =
         document.getElementById(
             "feedback"
         );
 
+
     const nextButton =
         document.getElementById(
             "nextButton"
         );
 
+
     answersRoot.innerHTML =
         "";
+
 
     feedback.style.display =
         "none";
 
+
     nextButton.style.display =
         "none";
 
+
     question.answers.forEach(
-        (answer,index)=>{
+        (
+            answer,
+            index
+        ) => {
 
             const button =
                 document.createElement(
                     "button"
                 );
 
+
             button.className =
                 "answer";
+
 
             button.textContent =
                 answer;
 
-            button.onclick =
-                ()=>{
+
+            button.addEventListener(
+                "click",
+                () => {
 
                     answersRoot
                     .querySelectorAll(
                         "button"
                     )
                     .forEach(
-                        item=>
-                        item.disabled=true
+                        item => {
+
+                            item.disabled =
+                                true;
+                        }
                     );
+
 
                     feedback.style.display =
                         "block";
 
+
                     if(
-                        index===
+                        index ===
                         question.correct
                     ){
 
@@ -3295,18 +4243,23 @@ function showStageResult(
                             "correct"
                         );
 
+
                         score +=
                             50;
 
-                        feedback.innerHTML =
-                        `
-                        <b>
-                        CORRECT +50 POINTS
-                        </b><br><br>
 
-                        ${question.explanation}
-                        `;
+                        feedback.innerHTML =
+                            `
+                            <b>
+                                CORRECT · +50 POINTS
+                            </b>
+
+                            <br><br>
+
+                            ${question.explanation}
+                            `;
                     }
+
 
                     else{
 
@@ -3314,29 +4267,32 @@ function showStageResult(
                             "wrong"
                         );
 
-                        /*
-                           NEW RULE:
-                           EVERY WRONG ANSWER = -50
-                        */
 
                         score -=
                             50;
 
-                        feedback.innerHTML =
-                        `
-                        <b>
-                        WRONG ANSWER -50 POINTS
-                        </b><br><br>
 
-                        ${question.explanation}
-                        `;
+                        feedback.innerHTML =
+                            `
+                            <b>
+                                WRONG ANSWER · -50 POINTS
+                            </b>
+
+                            <br><br>
+
+                            ${question.explanation}
+                            `;
                     }
+
 
                     updateScore();
 
+
                     nextButton.style.display =
                         "block";
-                };
+                }
+            );
+
 
             answersRoot.appendChild(
                 button
@@ -3344,33 +4300,42 @@ function showStageResult(
         }
     );
 
+
     nextButton.textContent =
-        stage<5
+        stage < 5
         ?
         "NEXT EXPERIMENT"
         :
         "START FINAL FREQUENCY LOCK";
 
+
     nextButton.onclick =
-        ()=>{
+        () => {
 
             resultBox
-            .classList
-            .remove(
+            .classList.remove(
                 "show"
             );
 
+
             stage++;
+
 
             prepareStage();
         };
 
+
     resultBox
-    .classList
-    .add(
+    .classList.add(
         "show"
     );
 }
+
+
+
+/* =========================================================
+   SCORE
+========================================================= */
 
 function updateScore(){
 
@@ -3382,100 +4347,118 @@ function updateScore(){
         score;
 }
 
+
+
 /* =========================================================
-   RESONANCE
+   RESONANCE CALCULATION
 ========================================================= */
 
 function calculateResonance(){
 
     const difference =
         Math.abs(
-            selectedFrequency-
+            selectedFrequency -
             naturalFrequency
         );
 
+
     if(
-        difference===0
+        difference === 0
     ){
 
         return 100;
     }
 
+
     if(
-        difference<=2
+        difference <= 2
     ){
 
         return 55;
     }
 
+
     if(
-        difference<=4
+        difference <= 4
     ){
 
         return 25;
     }
 
+
     return 8;
 }
 
+
+
 /* =========================================================
-   WAVE
+   WAVE ANIMATION
 ========================================================= */
 
 function updateWave(){
 
     const wavelength =
-        WAVE_SPEED/
+        WAVE_SPEED /
         selectedFrequency;
+
 
     const k =
-        2*
-        Math.PI/
+        2 *
+        Math.PI /
         wavelength;
 
+
     const omega =
-        2*
-        Math.PI*
+        2 *
+        Math.PI *
         selectedFrequency;
 
+
     for(
-        let i=0;
-        i<WAVE_POINTS;
+        let i = 0;
+        i < WAVE_POINTS;
         i++
     ){
 
         const progress =
-            i/
+            i /
             (
-                WAVE_POINTS-1
+                WAVE_POINTS - 1
             );
+
 
         const z =
-            -1+
-            progress*50;
+            -1 +
+            progress * 50;
+
 
         const x =
-            selectedAmplitude*
+            selectedAmplitude *
             Math.sin(
-                k*z-
-                omega*animationTime
+                k * z -
+                omega *
+                animationTime
             );
 
+
         wavePositions[
-            i*3
+            i * 3
         ] =
             x;
 
+
         wavePositions[
-            i*3+1
+            i * 3 + 1
         ] =
             3.4;
 
+
         wavePositions[
-            i*3+2
+            i * 3 + 2
         ] =
             z;
     }
+
 
     waveGeometry
     .attributes
@@ -3483,25 +4466,34 @@ function updateWave(){
     .needsUpdate =
         true;
 
+
     waveDots.forEach(
-        (dot,index)=>{
+        (
+            dot,
+            index
+        ) => {
 
             const progress =
-                index/
+                index /
                 (
-                    waveDots.length-1
+                    waveDots.length -
+                    1
                 );
+
 
             const z =
-                -1+
-                progress*50;
+                -1 +
+                progress * 50;
+
 
             const x =
-                selectedAmplitude*
+                selectedAmplitude *
                 Math.sin(
-                    k*z-
-                    omega*animationTime
+                    k * z -
+                    omega *
+                    animationTime
                 );
+
 
             dot.position.set(
                 x,
@@ -3512,30 +4504,42 @@ function updateWave(){
     );
 }
 
+
+
 /* =========================================================
-   SOUND
+   SOUND ANIMATION
 ========================================================= */
 
-function updateSoundRings(){
+function updateSound(){
 
     soundRings.forEach(
-        (ring,index)=>{
+        (
+            ring,
+            index
+        ) => {
 
             const phase =
                 (
-                    animationTime*
-                    selectedFrequency*
-                    .45+
-                    index*.15
-                )%1;
+                    animationTime *
+                    selectedFrequency *
+                    0.45
+                    +
+                    index *
+                    0.15
+                )
+                %
+                1;
+
 
             const scale =
-                1+
-                phase*
+                1 +
+                phase *
                 (
-                    .5+
-                    selectedAmplitude*.25
+                    0.5 +
+                    selectedAmplitude *
+                    0.25
                 );
+
 
             ring.scale.set(
                 scale,
@@ -3543,75 +4547,89 @@ function updateSoundRings(){
                 scale
             );
 
+
             ring.material.opacity =
                 Math.max(
-                    .05,
-                    .45-
-                    phase*.4
+                    0.05,
+                    0.45 -
+                    phase *
+                    0.4
                 );
         }
     );
 
+
     speakerCone.scale.z =
-        1+
+        1 +
         Math.sin(
-            animationTime*
-            selectedFrequency*
-            Math.PI*
+            animationTime *
+            selectedFrequency *
+            Math.PI *
             2
-        )*
-        selectedAmplitude*
-        .06;
+        )
+        *
+        selectedAmplitude
+        *
+        0.06;
 }
 
+
+
 /* =========================================================
-   RESONATOR
+   RESONATOR ANIMATION
 ========================================================= */
 
 function updateResonator(){
 
     resonanceResponse =
-        stage>=5
+        stage >= 5
         ?
         calculateResonance()
         :
         0;
 
+
     const multiplier =
-        resonanceResponse/
+        resonanceResponse /
         100;
+
 
     const vibration =
         Math.sin(
-            animationTime*
-            selectedFrequency*
-            Math.PI*
+            animationTime *
+            selectedFrequency *
+            Math.PI *
             2
-        )*
+        )
+        *
         (
-            .04+
-            multiplier*.55
+            0.04 +
+            multiplier *
+            0.55
         );
+
 
     resonator.position.x =
         vibration;
+
 
     document
     .getElementById(
         "resonanceFill"
     )
     .style.width =
-        resonanceResponse+
-        "%";
+        `${resonanceResponse}%`;
+
 
     document
     .getElementById(
         "resonancePercent"
     )
     .textContent =
-        resonanceResponse+
-        "%";
+        `${resonanceResponse}%`;
 }
+
+
 
 /* =========================================================
    HUD
@@ -3620,8 +4638,9 @@ function updateResonator(){
 function updateHUD(){
 
     const wavelength =
-        WAVE_SPEED/
+        WAVE_SPEED /
         selectedFrequency;
+
 
     document
     .getElementById(
@@ -3630,71 +4649,97 @@ function updateHUD(){
     .textContent =
         selectedFrequency;
 
+
     document
     .getElementById(
         "amplitudeValue"
     )
     .textContent =
-        selectedAmplitude.toFixed(1);
+        selectedAmplitude
+        .toFixed(
+            1
+        );
+
 
     document
     .getElementById(
         "wavelengthValue"
     )
     .textContent =
-        wavelength.toFixed(2);
+        wavelength
+        .toFixed(
+            2
+        );
+
 
     document
     .getElementById(
         "targetFrequency"
     )
     .textContent =
-        stage===2
+
+        stage === 2
         ?
         targetFrequency
+
         :
-        stage===6 &&
-        finalLocks[
-            finalLockIndex
-        ]
+
+        (
+            stage === 6
+            &&
+            finalLocks[
+                finalLockIndex
+            ]
+        )
+
         ?
         finalLocks[
             finalLockIndex
         ]
+
         :
         "--";
+
 
     document
     .getElementById(
         "naturalFrequency"
     )
     .textContent =
-        stage===5
+
+        stage === 5
         ?
         naturalFrequency
         :
         "--";
+
 
     document
     .getElementById(
         "equation"
     )
     .innerHTML =
-    `
-    <b>Wave Equation</b><br>
+        `
+        <b>
+            Wave Equation
+        </b>
 
-    v =
-    f x lambda<br><br>
+        <br>
 
-    ${WAVE_SPEED}
-    =
-    ${selectedFrequency}
-    x
-    ${wavelength.toFixed(2)}
-    `;
+        v = f × λ
+
+        <br><br>
+
+        ${WAVE_SPEED}
+        =
+        ${selectedFrequency}
+        ×
+        ${wavelength.toFixed(2)}
+        `;
+
 
     if(
-        stage===3
+        stage === 3
     ){
 
         document
@@ -3702,11 +4747,13 @@ function updateHUD(){
             "coachText"
         )
         .textContent =
-        `At ${selectedFrequency} Hz, wavelength is ${wavelength.toFixed(2)} m.`;
+            `At ${selectedFrequency} Hz,
+             wavelength = ${wavelength.toFixed(2)} m.`;
     }
 
-    else if(
-        stage===5
+
+    if(
+        stage === 5
     ){
 
         document
@@ -3714,9 +4761,12 @@ function updateHUD(){
             "coachText"
         )
         .textContent =
-        `Driving frequency = ${selectedFrequency} Hz. Watch the resonator and find the maximum response.`;
+            `Driving frequency = ${selectedFrequency} Hz.
+             Find the strongest resonance response.`;
     }
 }
+
+
 
 /* =========================================================
    CAMERA
@@ -3730,12 +4780,15 @@ function updateCamera(){
         -18
     );
 
+
     camera.lookAt(
         0,
         3,
         24
     );
 }
+
+
 
 /* =========================================================
    FINISH
@@ -3746,39 +4799,51 @@ function finishGame(){
     finished =
         true;
 
+
     timerRunning =
         false;
 
+
+    document
+    .getElementById(
+        "testButton"
+    )
+    .disabled =
+        true;
+
+
     const wavelength =
-        WAVE_SPEED/
+        WAVE_SPEED /
         selectedFrequency;
+
 
     const finalResonance =
         calculateResonance();
+
 
     document
     .getElementById(
         "finalFrequency"
     )
     .textContent =
-        selectedFrequency+
-        " Hz";
+        `${selectedFrequency} Hz`;
+
 
     document
     .getElementById(
         "finalWavelength"
     )
     .textContent =
-        wavelength.toFixed(2)+
-        " m";
+        `${wavelength.toFixed(2)} m`;
+
 
     document
     .getElementById(
         "finalResonance"
     )
     .textContent =
-        finalResonance+
-        "%";
+        `${finalResonance}%`;
+
 
     document
     .getElementById(
@@ -3787,102 +4852,79 @@ function finishGame(){
     .textContent =
         score;
 
+
     document
     .getElementById(
         "finalExplanation"
     )
     .innerHTML =
-    `
-    <b>MISSION PERFORMANCE</b><br><br>
+        `
+        <b>
+            MISSION PERFORMANCE
+        </b>
 
-    You completed all wave experiments and the final frequency locks
-    before their timers expired.<br><br>
+        <br><br>
 
-    Correct experiment:
-    <b>+100 points</b><br>
+        You completed all five wave experiments
+        and all three final frequency locks
+        before their timers expired.
 
-    Correct physics answer:
-    <b>+50 points</b><br>
+        <br><br>
 
-    Wrong physics answer:
-    <b>-50 points</b><br><br>
+        Correct experiment:
+        <b>+100</b>
 
-    Final score:
-    <b>${score}</b><br><br>
+        <br>
 
+        Correct physics answer:
+        <b>+50</b>
 
-    <b>1. AMPLITUDE</b><br><br>
+        <br>
 
-    Amplitude is maximum displacement from equilibrium.
+        Wrong physics answer:
+        <b>-50</b>
 
-    Increasing amplitude made the displayed wave vibration larger.<br><br>
+        <br><br>
 
+        Final score:
+        <b>
+            ${score}
+        </b>
 
-    <b>2. FREQUENCY</b><br><br>
+        <br><br>
 
-    Frequency is the number of complete oscillations per second.
+        <b>
+            PHYSICS CONNECTION
+        </b>
 
-    A frequency of ${selectedFrequency} Hz represents
-    ${selectedFrequency} oscillations each second.<br><br>
+        <br><br>
 
+        Amplitude describes maximum displacement.
 
-    <b>3. WAVELENGTH</b><br><br>
+        <br>
 
-    Wave relation:<br><br>
+        Frequency describes oscillations per second.
 
-    <b>
-    v = f x lambda
-    </b><br><br>
+        <br>
 
-    Therefore:<br><br>
+        Wavelength is connected to wave speed by
+        <b>v = f × λ</b>.
 
-    lambda =
-    v / f<br>
+        <br>
 
-    =
-    ${WAVE_SPEED} /
-    ${selectedFrequency}<br>
+        Sound originates from vibration.
 
-    =
-    <b>
-    ${wavelength.toFixed(2)} m
-    </b>.<br><br>
+        <br>
 
+        Resonance becomes strongest when the
+        driving frequency equals the natural frequency.
 
-    <b>4. SOUND AND VIBRATIONS</b><br><br>
+        <br><br>
 
-    The speaker cone acted as a vibrating source.
+        The final stage tested whether you could apply
+        these concepts under a real-time constraint.
+        `;
 
-    Its oscillation produced travelling disturbances represented
-    by the wave and moving sound rings.<br><br>
-
-
-    <b>5. RESONANCE</b><br><br>
-
-    Resonance occurs when the driving frequency matches
-    the natural frequency of a system.<br><br>
-
-    At resonance,
-    the vibration response becomes much larger.<br><br>
-
-
-    <b>FINAL CONNECTION</b><br>
-
-    Amplitude = vibration size.<br>
-
-    Frequency = oscillations per second.<br>
-
-    Wavelength = length of one complete wave cycle.<br>
-
-    Wave speed connects frequency and wavelength.<br>
-
-    Sound originates from vibrations.<br>
-
-    Resonance occurs when driving and natural frequencies match.<br><br>
-
-    This mission also required you to apply those concepts
-    under a real-time constraint.
-    `;
 
     document
     .getElementById(
@@ -3893,12 +4935,15 @@ function finishGame(){
     );
 }
 
+
+
 /* =========================================================
-   LOOP
+   GAME LOOP
 ========================================================= */
 
 let lastTime =
     performance.now();
+
 
 function animate(
     now
@@ -3908,16 +4953,24 @@ function animate(
         animate
     );
 
+
     const dt =
         Math.min(
+
             (
-                now-lastTime
-            )/1000,
-            .035
+                now -
+                lastTime
+            )
+            /
+            1000,
+
+            0.035
         );
+
 
     lastTime =
         now;
+
 
     if(
         started &&
@@ -3928,18 +4981,24 @@ function animate(
         animationTime +=
             dt;
 
+
         updateMissionTimer(
             dt
         );
     }
 
+
     updateWave();
 
-    updateSoundRings();
+
+    updateSound();
+
 
     updateResonator();
 
+
     updateCamera();
+
 
     renderer.render(
         scene,
@@ -3947,35 +5006,45 @@ function animate(
     );
 }
 
+
+
 /* =========================================================
    INITIAL
 ========================================================= */
 
 updateHUD();
 
+
 updateScore();
+
 
 updateTimerDisplay();
 
+
 updateCamera();
+
 
 requestAnimationFrame(
     animate
 );
 
+
+
 /* =========================================================
    RESIZE
 ========================================================= */
 
-addEventListener(
+window.addEventListener(
     "resize",
-    ()=>{
+    () => {
 
         camera.aspect =
-            innerWidth/
+            innerWidth /
             innerHeight;
 
+
         camera.updateProjectionMatrix();
+
 
         renderer.setSize(
             innerWidth,
@@ -3984,9 +5053,11 @@ addEventListener(
     }
 );
 
+
 })();
 
 </script>
+
 
 </body>
 </html>
