@@ -9,9 +9,14 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: fresh-install-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   fresh-install:
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
     strategy:
       fail-fast: false
       matrix:
@@ -37,15 +42,24 @@ jobs:
       - name: Windows one-click setup and repeat-start verification
         if: runner.os == 'Windows'
         shell: powershell
+        timeout-minutes: 5
         run: |
-          .\setup_my_campus.ps1
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          .\start_my_campus.ps1 -NoBrowser
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          $before = Invoke-RestMethod http://127.0.0.1:8000/health
-          .\start_my_campus.ps1 -NoBrowser
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          $after = Invoke-RestMethod http://127.0.0.1:8000/health
-          if (-not $after.content.ready -or $before.process_id -ne $after.process_id) {
-            throw 'Repeat launch must reuse the same initialized backend.'
+          try {
+            .\setup_my_campus.ps1
+            if ($LASTEXITCODE -ne 0) { throw 'Windows setup failed' }
+            .\start_my_campus.ps1 -NoBrowser
+            if ($LASTEXITCODE -ne 0) { throw 'First Windows startup failed' }
+            $before = Invoke-RestMethod http://127.0.0.1:8000/health
+            .\start_my_campus.ps1 -NoBrowser
+            if ($LASTEXITCODE -ne 0) { throw 'Repeat Windows startup failed' }
+            $after = Invoke-RestMethod http://127.0.0.1:8000/health
+            if (-not $after.content.ready -or $before.process_id -ne $after.process_id) {
+              throw 'Repeat launch must reuse the same initialized backend.'
+            }
+          } finally {
+            # Only this dedicated runner's test servers use these module/port pairs.
+            Get-CimInstance Win32_Process | Where-Object {
+              $_.Name -match '^python' -and
+              $_.CommandLine -match 'uvicorn.+--port 8000\b|http.server 5500\b'
+            } | ForEach-Object { Stop-Process -Id $_.ProcessId -ErrorAction SilentlyContinue }
           }
