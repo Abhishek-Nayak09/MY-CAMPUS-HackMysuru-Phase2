@@ -39,6 +39,8 @@ class Note(Base):
     )
 
 
+    level_id: Mapped[int | None] = mapped_column(ForeignKey("levels.id"), nullable=True, index=True)
+
     # Faculty who created/uploaded it
     created_by: Mapped[int | None] = mapped_column(
         ForeignKey("users.id"),

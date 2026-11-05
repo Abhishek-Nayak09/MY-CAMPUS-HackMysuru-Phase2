@@ -1,0 +1,159 @@
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 450">
+
+    <rect
+        width="1000"
+        height="450"
+        rx="28"
+        fill="#eef2ff"
+    />
+
+    <text
+        x="45"
+        y="60"
+        font-family="Arial"
+        font-size="32"
+        font-weight="700"
+        fill="#172033"
+    >
+        A Simple Electric Circuit
+    </text>
+
+    <!-- WIRES -->
+
+    <path
+        d="M180 220
+           L180 120
+           L760 120
+           L760 220"
+        fill="none"
+        stroke="#334155"
+        stroke-width="8"
+    />
+
+    <path
+        d="M760 300
+           L760 350
+           L180 350
+           L180 300"
+        fill="none"
+        stroke="#334155"
+        stroke-width="8"
+    />
+
+    <!-- BATTERY -->
+
+    <line
+        x1="150"
+        y1="220"
+        x2="210"
+        y2="220"
+        stroke="#ef4444"
+        stroke-width="8"
+    />
+
+    <line
+        x1="160"
+        y1="250"
+        x2="200"
+        y2="250"
+        stroke="#ef4444"
+        stroke-width="5"
+    />
+
+    <line
+        x1="180"
+        y1="220"
+        x2="180"
+        y2="300"
+        stroke="#334155"
+        stroke-width="6"
+    />
+
+    <text
+        x="105"
+        y="285"
+        font-family="Arial"
+        font-size="20"
+        fill="#b91c1c"
+    >
+        Battery
+    </text>
+
+    <!-- BULB -->
+
+    <circle
+        cx="760"
+        cy="260"
+        r="45"
+        fill="#fde68a"
+        stroke="#f59e0b"
+        stroke-width="7"
+    >
+
+        <animate
+            attributeName="fill"
+            values="#fde68a;#facc15;#fde68a"
+            dur="1s"
+            repeatCount="indefinite"
+        />
+
+    </circle>
+
+    <path
+        d="M735 255 Q760 220 785 255"
+        fill="none"
+        stroke="#92400e"
+        stroke-width="5"
+    />
+
+    <path
+        d="M735 265 Q760 300 785 265"
+        fill="none"
+        stroke="#92400e"
+        stroke-width="5"
+    />
+
+    <text
+        x="725"
+        y="330"
+        font-family="Arial"
+        font-size="20"
+        fill="#92400e"
+    >
+        Bulb
+    </text>
+
+    <!-- MOVING CHARGE -->
+
+    <circle
+        r="12"
+        fill="#4f46e5"
+    >
+
+        <animateMotion
+            dur="4s"
+            repeatCount="indefinite"
+            path="
+                M180 120
+                L760 120
+                L760 350
+                L180 350
+                L180 120
+            "
+        />
+
+    </circle>
+
+    <text
+        x="330"
+        y="410"
+        font-family="Arial"
+        font-size="22"
+        font-weight="700"
+        fill="#4338ca"
+    >
+        Closed circuit → current can flow
+    </text>
+
+</svg>

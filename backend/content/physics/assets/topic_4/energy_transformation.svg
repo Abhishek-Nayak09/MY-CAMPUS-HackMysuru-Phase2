@@ -1,0 +1,102 @@
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 430">
+
+    <rect
+        width="1000"
+        height="430"
+        rx="28"
+        fill="#ecfdf5"
+    />
+
+    <text
+        x="45"
+        y="60"
+        font-family="Arial"
+        font-size="32"
+        font-weight="700"
+        fill="#172033"
+    >
+        Energy Transformation
+    </text>
+
+    <!-- SLOPE -->
+
+    <path
+        d="M120 120 L820 330"
+        stroke="#64748b"
+        stroke-width="14"
+        fill="none"
+    />
+
+    <!-- BALL -->
+
+    <circle
+        r="30"
+        fill="#ef4444"
+    >
+
+        <animateMotion
+            dur="4s"
+            repeatCount="indefinite"
+            path="M150 95 L790 290"
+        />
+
+    </circle>
+
+    <!-- TOP -->
+
+    <text
+        x="120"
+        y="185"
+        font-family="Arial"
+        font-size="21"
+        font-weight="700"
+        fill="#15803d"
+    >
+        High Position
+    </text>
+
+    <text
+        x="120"
+        y="215"
+        font-family="Arial"
+        font-size="19"
+        fill="#15803d"
+    >
+        More Potential Energy
+    </text>
+
+    <!-- BOTTOM -->
+
+    <text
+        x="650"
+        y="375"
+        font-family="Arial"
+        font-size="21"
+        font-weight="700"
+        fill="#b91c1c"
+    >
+        Faster Motion
+    </text>
+
+    <text
+        x="650"
+        y="405"
+        font-family="Arial"
+        font-size="19"
+        fill="#b91c1c"
+    >
+        More Kinetic Energy
+    </text>
+
+    <text
+        x="385"
+        y="130"
+        font-family="Arial"
+        font-size="22"
+        fill="#172033"
+    >
+        Potential Energy → Kinetic Energy
+    </text>
+
+</svg>

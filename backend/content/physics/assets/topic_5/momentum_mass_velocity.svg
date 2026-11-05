@@ -1,0 +1,136 @@
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 430">
+
+    <rect
+        width="1000"
+        height="430"
+        rx="28"
+        fill="#eef2ff"
+    />
+
+    <text
+        x="45"
+        y="60"
+        font-family="Arial"
+        font-size="32"
+        font-weight="700"
+        fill="#172033"
+    >
+        Momentum Depends on Mass and Velocity
+    </text>
+
+    <!-- SMALL CAR -->
+
+    <g>
+
+        <animateTransform
+            attributeName="transform"
+            type="translate"
+            values="0 0;220 0;0 0"
+            dur="4s"
+            repeatCount="indefinite"
+        />
+
+        <rect
+            x="100"
+            y="170"
+            width="170"
+            height="65"
+            rx="20"
+            fill="#2563eb"
+        />
+
+        <circle
+            cx="140"
+            cy="240"
+            r="22"
+            fill="#111827"
+        />
+
+        <circle
+            cx="230"
+            cy="240"
+            r="22"
+            fill="#111827"
+        />
+
+    </g>
+
+    <text
+        x="100"
+        y="300"
+        font-family="Arial"
+        font-size="20"
+        fill="#172033"
+    >
+        Lower mass
+    </text>
+
+    <!-- TRUCK -->
+
+    <g>
+
+        <animateTransform
+            attributeName="transform"
+            type="translate"
+            values="0 0;120 0;0 0"
+            dur="4s"
+            repeatCount="indefinite"
+        />
+
+        <rect
+            x="570"
+            y="150"
+            width="250"
+            height="90"
+            rx="20"
+            fill="#7c3aed"
+        />
+
+        <rect
+            x="760"
+            y="120"
+            width="90"
+            height="120"
+            rx="15"
+            fill="#6d28d9"
+        />
+
+        <circle
+            cx="625"
+            cy="250"
+            r="27"
+            fill="#111827"
+        />
+
+        <circle
+            cx="780"
+            cy="250"
+            r="27"
+            fill="#111827"
+        />
+
+    </g>
+
+    <text
+        x="620"
+        y="305"
+        font-family="Arial"
+        font-size="20"
+        fill="#172033"
+    >
+        Greater mass
+    </text>
+
+    <text
+        x="320"
+        y="380"
+        font-family="Arial"
+        font-size="25"
+        font-weight="700"
+        fill="#4338ca"
+    >
+        Momentum: p = m × v
+    </text>
+
+</svg>

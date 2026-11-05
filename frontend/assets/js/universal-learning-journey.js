@@ -15,10 +15,25 @@
         simply add those topic IDs here.
     */
 
-    const GAME_TOPICS =
-        new Set([
-            1
-        ]);
+    const GAME_TOPICS = new Set([1,2,3,4,5,6,7,8,9,10]);
+    let curriculumKey = null;
+    let followingTopicId = null;
+    const gamePages = {
+        1: "game_topic_1.html",
+        2: "assets/games/physics/topic2-bike-race.html",
+        3: "assets/games/physics/topic3-newton-cargo.html",
+        4: "assets/games/physics/topic4-work-energy-power.html",
+        5: "assets/games/physics/topic5-momentum-collisions.html",
+        6: "assets/games/physics/topic6-waves-sound-vibrations.html",
+        7: "assets/games/physics/topic7-electricity-circuits.html",
+        8: "assets/games/physics/topic8-magnetism-electromagnetism.html",
+        9: "assets/games/physics/topic9-light-optics.html",
+        10: "assets/games/physics/topic10-modern-physics.html"
+    };
+    function levelQuery() {
+        const value = new URLSearchParams(location.search).get("level_id");
+        return value ? "&level_id=" + encodeURIComponent(value) : "";
+    }
 
 
     const RESOURCE_LABELS = {
@@ -548,18 +563,18 @@
     ) {
 
         if (
-            Number(topicId)
+            curriculumKey
             === 1
         ) {
 
             return (
-                `interactive.html?topic_id=${topicId}`
+                `interactive.html?topic_id=${topicId}${levelQuery()}`
             );
         }
 
 
         return (
-            `interactive_topic_${topicId}.html?topic_id=${topicId}`
+            `interactive_topic_${curriculumKey}.html?topic_id=${topicId}${levelQuery()}`
         );
     }
 
@@ -606,7 +621,7 @@
                     "Video",
 
                 url:
-                    `video.html?topic_id=${topicId}`
+                    `video.html?topic_id=${topicId}${levelQuery()}`
             };
         }
 
@@ -638,9 +653,7 @@
 
             if (
                 GAME_TOPICS.has(
-                    Number(
-                        topicId
-                    )
+                    curriculumKey
                 )
             ) {
 
@@ -652,7 +665,7 @@
                         "Game",
 
                     url:
-                        `game_topic_${topicId}.html?topic_id=${topicId}`
+                        `${gamePages[curriculumKey]}?topic_id=${topicId}${levelQuery()}`
                 };
             }
 
@@ -827,8 +840,7 @@
 
 
         if (
-            Number(topicId)
-            >= 10
+            !followingTopicId
         ) {
 
             window.setTimeout(
@@ -846,10 +858,7 @@
         }
 
 
-        const nextTopicId =
-            Number(topicId)
-            +
-            1;
+        const nextTopicId = followingTopicId;
 
 
         window.setTimeout(
@@ -1889,6 +1898,16 @@
         }
 
 
+        try {
+            const response = await fetch(`${API_BASE}/content/topic/${topicId}`);
+            if (!response.ok) throw new Error("Topic context unavailable");
+            const data = await response.json();
+            curriculumKey = data.topic.curriculum_key;
+            followingTopicId = data.topic.next_topic_id;
+        } catch (error) {
+            console.warn("Learning journey context unavailable", error);
+            return;
+        }
         buildResourceBar(
             topicId,
             resource

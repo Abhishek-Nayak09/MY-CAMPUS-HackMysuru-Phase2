@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
+from app.services.curriculum import TOPIC_KEYS
 from sqlalchemy.orm import Session
 
 from app.db.database import get_db
@@ -201,15 +202,17 @@ def get_subject_learning_path(
         topics = (
             db.query(Topic)
             .filter(
-                Topic.subject_id == subject.id,
-                Topic.level_id == level.id
+                Topic.subject_id == subject.id
             )
             .order_by(
                 Topic.topic_order
             )
             .all()
         )
-
+        topics = [topic for topic in topics if topic.level_id == level.id or (
+            (subject.code == "PHY101" or subject.name == "Physics") and topic.title in TOPIC_KEYS
+        )]
+        topics.sort(key=lambda topic: (TOPIC_KEYS.get(topic.title, 1000), topic.topic_order))
 
         level_list.append(
             {
@@ -219,6 +222,8 @@ def get_subject_learning_path(
 
                 "level_order":
                     level.level_order,
+
+                "is_default_unlocked": level.is_default_unlocked,
 
                 "is_unlocked":
                     level.is_default_unlocked,
@@ -230,6 +235,8 @@ def get_subject_learning_path(
 
                     {
                         "id": topic.id,
+                        "curriculum_key": TOPIC_KEYS.get(topic.title),
+                        "level_id": level.id,
 
                         "title":
                             topic.title,

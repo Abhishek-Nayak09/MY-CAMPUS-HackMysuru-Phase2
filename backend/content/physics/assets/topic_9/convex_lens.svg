@@ -1,0 +1,142 @@
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 470">
+
+    <rect
+        width="1000"
+        height="470"
+        rx="28"
+        fill="#fff7ed"
+    />
+
+    <text
+        x="45"
+        y="60"
+        font-family="Arial"
+        font-size="32"
+        font-weight="700"
+        fill="#172033"
+    >
+        Convex Lens — Converging Light
+    </text>
+
+    <!-- PRINCIPAL AXIS -->
+
+    <line
+        x1="70"
+        y1="250"
+        x2="930"
+        y2="250"
+        stroke="#94a3b8"
+        stroke-width="4"
+        stroke-dasharray="12 10"
+    />
+
+    <!-- LENS -->
+
+    <path
+        d="M475 110
+           Q535 250 475 390
+           Q425 250 475 110"
+        fill="#bfdbfe"
+        stroke="#2563eb"
+        stroke-width="6"
+        opacity="0.85"
+    />
+
+    <!-- INCIDENT RAYS -->
+
+    <line
+        x1="90"
+        y1="150"
+        x2="465"
+        y2="150"
+        stroke="#ef4444"
+        stroke-width="7"
+    />
+
+    <line
+        x1="90"
+        y1="250"
+        x2="465"
+        y2="250"
+        stroke="#ef4444"
+        stroke-width="7"
+    />
+
+    <line
+        x1="90"
+        y1="350"
+        x2="465"
+        y2="350"
+        stroke="#ef4444"
+        stroke-width="7"
+    />
+
+    <!-- REFRACTED RAYS -->
+
+    <line
+        x1="485"
+        y1="150"
+        x2="760"
+        y2="250"
+        stroke="#16a34a"
+        stroke-width="7"
+    />
+
+    <line
+        x1="485"
+        y1="250"
+        x2="760"
+        y2="250"
+        stroke="#16a34a"
+        stroke-width="7"
+    />
+
+    <line
+        x1="485"
+        y1="350"
+        x2="760"
+        y2="250"
+        stroke="#16a34a"
+        stroke-width="7"
+    />
+
+    <!-- FOCUS -->
+
+    <circle
+        cx="760"
+        cy="250"
+        r="13"
+        fill="#7c3aed"
+    >
+        <animate
+            attributeName="r"
+            values="10;18;10"
+            dur="1.2s"
+            repeatCount="indefinite"
+        />
+    </circle>
+
+    <text
+        x="740"
+        y="295"
+        font-family="Arial"
+        font-size="21"
+        font-weight="700"
+        fill="#7c3aed"
+    >
+        Focus
+    </text>
+
+    <text
+        x="245"
+        y="430"
+        font-family="Arial"
+        font-size="23"
+        font-weight="700"
+        fill="#ea580c"
+    >
+        Parallel rays converge near the focal point
+    </text>
+
+</svg>

@@ -1,0 +1,129 @@
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 430">
+
+    <rect
+        width="1000"
+        height="430"
+        rx="28"
+        fill="#ecfdf5"
+    />
+
+    <text
+        x="45"
+        y="60"
+        font-family="Arial"
+        font-size="32"
+        font-weight="700"
+        fill="#172033"
+    >
+        Newton's Third Law — Action &amp; Reaction
+    </text>
+
+    <!-- PERSON -->
+
+    <circle
+        cx="300"
+        cy="160"
+        r="34"
+        fill="#f59e0b"
+    />
+
+    <line
+        x1="300"
+        y1="195"
+        x2="300"
+        y2="280"
+        stroke="#172033"
+        stroke-width="12"
+    />
+
+    <line
+        x1="300"
+        y1="225"
+        x2="365"
+        y2="250"
+        stroke="#172033"
+        stroke-width="10"
+    />
+
+    <line
+        x1="300"
+        y1="280"
+        x2="260"
+        y2="335"
+        stroke="#172033"
+        stroke-width="10"
+    />
+
+    <line
+        x1="300"
+        y1="280"
+        x2="345"
+        y2="335"
+        stroke="#172033"
+        stroke-width="10"
+    />
+
+    <!-- WALL -->
+
+    <rect
+        x="620"
+        y="110"
+        width="80"
+        height="260"
+        fill="#64748b"
+    />
+
+    <!-- ACTION -->
+
+    <line
+        x1="390"
+        y1="245"
+        x2="590"
+        y2="245"
+        stroke="#dc2626"
+        stroke-width="10"
+    />
+
+    <polygon
+        points="610,245 575,225 575,265"
+        fill="#dc2626"
+    />
+
+    <text
+        x="425"
+        y="215"
+        font-family="Arial"
+        font-size="20"
+        fill="#dc2626"
+    >
+        Action: Person pushes wall
+    </text>
+
+    <!-- REACTION -->
+
+    <line
+        x1="610"
+        y1="300"
+        x2="410"
+        y2="300"
+        stroke="#2563eb"
+        stroke-width="10"
+    />
+
+    <polygon
+        points="390,300 425,280 425,320"
+        fill="#2563eb"
+    />
+
+    <text
+        x="410"
+        y="345"
+        font-family="Arial"
+        font-size="20"
+        fill="#2563eb"
+    >
+        Reaction: Wall pushes person
+    </text>
+
+</svg>

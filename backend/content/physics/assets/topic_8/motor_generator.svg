@@ -1,0 +1,151 @@
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 470">
+
+    <rect
+        width="1000"
+        height="470"
+        rx="28"
+        fill="#fff7ed"
+    />
+
+    <text
+        x="45"
+        y="60"
+        font-family="Arial"
+        font-size="32"
+        font-weight="700"
+        fill="#172033"
+    >
+        Electricity and Magnetism Work Both Ways
+    </text>
+
+    <!-- MOTOR -->
+
+    <rect
+        x="90"
+        y="125"
+        width="350"
+        height="245"
+        rx="24"
+        fill="#ffffff"
+        stroke="#fdba74"
+        stroke-width="4"
+    />
+
+    <text
+        x="265"
+        y="175"
+        text-anchor="middle"
+        font-family="Arial"
+        font-size="27"
+        font-weight="700"
+        fill="#ea580c"
+    >
+        ELECTRIC MOTOR
+    </text>
+
+    <text
+        x="265"
+        y="235"
+        text-anchor="middle"
+        font-family="Arial"
+        font-size="21"
+        fill="#172033"
+    >
+        Electrical Energy
+    </text>
+
+    <text
+        x="265"
+        y="275"
+        text-anchor="middle"
+        font-family="Arial"
+        font-size="34"
+        font-weight="700"
+        fill="#7c3aed"
+    >
+        ↓
+    </text>
+
+    <text
+        x="265"
+        y="325"
+        text-anchor="middle"
+        font-family="Arial"
+        font-size="21"
+        fill="#172033"
+    >
+        Mechanical Motion
+    </text>
+
+    <!-- GENERATOR -->
+
+    <rect
+        x="560"
+        y="125"
+        width="350"
+        height="245"
+        rx="24"
+        fill="#ffffff"
+        stroke="#86efac"
+        stroke-width="4"
+    />
+
+    <text
+        x="735"
+        y="175"
+        text-anchor="middle"
+        font-family="Arial"
+        font-size="27"
+        font-weight="700"
+        fill="#15803d"
+    >
+        GENERATOR
+    </text>
+
+    <text
+        x="735"
+        y="235"
+        text-anchor="middle"
+        font-family="Arial"
+        font-size="21"
+        fill="#172033"
+    >
+        Mechanical Motion
+    </text>
+
+    <text
+        x="735"
+        y="275"
+        text-anchor="middle"
+        font-family="Arial"
+        font-size="34"
+        font-weight="700"
+        fill="#7c3aed"
+    >
+        ↓
+    </text>
+
+    <text
+        x="735"
+        y="325"
+        text-anchor="middle"
+        font-family="Arial"
+        font-size="21"
+        fill="#172033"
+    >
+        Electrical Energy
+    </text>
+
+    <text
+        x="245"
+        y="425"
+        font-family="Arial"
+        font-size="22"
+        font-weight="700"
+        fill="#172033"
+    >
+        Electromagnetism connects electricity with mechanical motion
+    </text>
+
+</svg>

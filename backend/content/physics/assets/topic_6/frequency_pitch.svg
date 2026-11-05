@@ -1,0 +1,89 @@
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 430">
+
+    <rect
+        width="1000"
+        height="430"
+        rx="28"
+        fill="#ecfdf5"
+    />
+
+    <text
+        x="45"
+        y="60"
+        font-family="Arial"
+        font-size="32"
+        font-weight="700"
+        fill="#172033"
+    >
+        Frequency Controls Pitch
+    </text>
+
+    <text
+        x="85"
+        y="120"
+        font-family="Arial"
+        font-size="22"
+        font-weight="700"
+        fill="#166534"
+    >
+        Low Frequency → Low Pitch
+    </text>
+
+    <path
+        d="M80 190
+           Q140 100 200 190
+           T320 190
+           T440 190"
+        fill="none"
+        stroke="#16a34a"
+        stroke-width="7"
+    />
+
+    <text
+        x="570"
+        y="120"
+        font-family="Arial"
+        font-size="22"
+        font-weight="700"
+        fill="#b91c1c"
+    >
+        High Frequency → High Pitch
+    </text>
+
+    <path
+        d="M550 190
+           Q575 120 600 190
+           T650 190
+           T700 190
+           T750 190
+           T800 190
+           T850 190
+           T900 190"
+        fill="none"
+        stroke="#ef4444"
+        stroke-width="7"
+    />
+
+    <text
+        x="290"
+        y="330"
+        font-family="Arial"
+        font-size="24"
+        font-weight="700"
+        fill="#172033"
+    >
+        Frequency = number of vibrations per second
+    </text>
+
+    <text
+        x="405"
+        y="380"
+        font-family="Arial"
+        font-size="21"
+        fill="#172033"
+    >
+        Unit: Hertz (Hz)
+    </text>
+
+</svg>

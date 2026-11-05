@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from app.db.database import get_db
+from app.services.curriculum import topic_navigation
 
 # Import dependencies so SQLAlchemy knows the full model graph
 from app.models.user import User
@@ -70,6 +71,7 @@ def get_topic_content(
     return {
 
         "topic": {
+            **topic_navigation(db, topic),
 
             "id":
                 topic.id,

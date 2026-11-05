@@ -1,0 +1,79 @@
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 430">
+
+    <rect
+        width="1000"
+        height="430"
+        rx="28"
+        fill="#fff7ed"
+    />
+
+    <text
+        x="45"
+        y="60"
+        font-family="Arial"
+        font-size="32"
+        font-weight="700"
+        fill="#172033"
+    >
+        Same Work — Different Power
+    </text>
+
+    <!-- STAIRS A -->
+
+    <g>
+
+        <rect x="100" y="310" width="70" height="40" fill="#94a3b8"/>
+        <rect x="170" y="270" width="70" height="80" fill="#94a3b8"/>
+        <rect x="240" y="230" width="70" height="120" fill="#94a3b8"/>
+        <rect x="310" y="190" width="70" height="160" fill="#94a3b8"/>
+
+        <circle cx="155" cy="245" r="25" fill="#2563eb"/>
+
+        <text
+            x="110"
+            y="390"
+            font-family="Arial"
+            font-size="20"
+            fill="#172033"
+        >
+            Person A: 10 s
+        </text>
+
+    </g>
+
+    <!-- STAIRS B -->
+
+    <g>
+
+        <rect x="570" y="310" width="70" height="40" fill="#94a3b8"/>
+        <rect x="640" y="270" width="70" height="80" fill="#94a3b8"/>
+        <rect x="710" y="230" width="70" height="120" fill="#94a3b8"/>
+        <rect x="780" y="190" width="70" height="160" fill="#94a3b8"/>
+
+        <circle cx="825" cy="165" r="25" fill="#ef4444"/>
+
+        <text
+            x="585"
+            y="390"
+            font-family="Arial"
+            font-size="20"
+            fill="#172033"
+        >
+            Person B: 5 s
+        </text>
+
+    </g>
+
+    <text
+        x="310"
+        y="115"
+        font-family="Arial"
+        font-size="23"
+        font-weight="700"
+        fill="#ea580c"
+    >
+        Less Time → Greater Power
+    </text>
+
+</svg>

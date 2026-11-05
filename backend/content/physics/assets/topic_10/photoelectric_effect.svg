@@ -1,0 +1,120 @@
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 470">
+
+    <rect
+        width="1000"
+        height="470"
+        rx="28"
+        fill="#fff7ed"
+    />
+
+    <text
+        x="45"
+        y="60"
+        font-family="Arial"
+        font-size="32"
+        font-weight="700"
+        fill="#172033"
+    >
+        Photoelectric Effect
+    </text>
+
+    <!-- LIGHT -->
+
+    <path
+        d="M100 160
+           Q140 120 180 160
+           T260 160
+           T340 160"
+        fill="none"
+        stroke="#f59e0b"
+        stroke-width="8"
+    />
+
+    <polygon
+        points="350,160 320,142 320,178"
+        fill="#f59e0b"
+    />
+
+    <text
+        x="120"
+        y="120"
+        font-family="Arial"
+        font-size="21"
+        fill="#b45309"
+    >
+        Incoming photons
+    </text>
+
+    <!-- METAL -->
+
+    <rect
+        x="430"
+        y="115"
+        width="90"
+        height="250"
+        rx="12"
+        fill="#64748b"
+    />
+
+    <text
+        x="455"
+        y="405"
+        font-family="Arial"
+        font-size="20"
+        fill="#475569"
+    >
+        Metal
+    </text>
+
+    <!-- ELECTRONS -->
+
+    <circle cx="470" cy="180" r="12" fill="#2563eb"/>
+    <circle cx="470" cy="245" r="12" fill="#2563eb"/>
+    <circle cx="470" cy="310" r="12" fill="#2563eb"/>
+
+    <!-- EJECTED ELECTRON -->
+
+    <circle
+        r="14"
+        fill="#2563eb"
+    >
+        <animateMotion
+            dur="2.5s"
+            repeatCount="indefinite"
+            path="M500 180 Q650 100 830 145"
+        />
+    </circle>
+
+    <line
+        x1="520"
+        y1="180"
+        x2="820"
+        y2="140"
+        stroke="#2563eb"
+        stroke-width="4"
+        stroke-dasharray="12 10"
+    />
+
+    <text
+        x="645"
+        y="105"
+        font-family="Arial"
+        font-size="21"
+        fill="#1d4ed8"
+    >
+        Electron emitted
+    </text>
+
+    <text
+        x="580"
+        y="330"
+        font-family="Arial"
+        font-size="23"
+        font-weight="700"
+        fill="#ea580c"
+    >
+        Photon energy can free an electron
+    </text>
+
+</svg>

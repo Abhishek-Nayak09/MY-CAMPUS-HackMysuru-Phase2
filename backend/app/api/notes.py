@@ -2,8 +2,11 @@ import json
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from sqlalchemy import or_
+from app.models.level import Level
 
 from app.db.database import get_db
+from app.services.curriculum import topic_navigation
 
 from app.models.user import User
 from app.models.topic import Topic
@@ -23,7 +26,8 @@ router = APIRouter(
 @router.get("/topic/{topic_id}")
 def get_topic_notes(
     topic_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    level_id: int | None = None
 ):
 
     # =====================================================
@@ -51,11 +55,19 @@ def get_topic_notes(
     # FIND ACTIVE NOTE
     # =====================================================
 
+    requested_level = db.get(Level, level_id or topic.level_id)
+    if requested_level is None or requested_level.subject_id != topic.subject_id:
+        raise HTTPException(400, "Level does not belong to this topic's subject")
+    scope = Note.level_id == requested_level.id
+    if requested_level.id == topic.level_id:
+        scope = or_(scope, Note.level_id.is_(None))
+
     note = (
         db.query(Note)
         .filter(
             Note.topic_id == topic_id,
-            Note.is_active == True
+            Note.is_active == True,
+            scope
         )
         .order_by(
             Note.version.desc()
@@ -172,6 +184,7 @@ def get_topic_notes(
     return {
 
         "topic": {
+            **topic_navigation(db, topic),
             "id":
                 topic.id,
 
@@ -182,6 +195,8 @@ def get_topic_notes(
                 topic.description
         },
 
+
+        "level": {"id": requested_level.id, "name": requested_level.name},
 
         "note": {
 

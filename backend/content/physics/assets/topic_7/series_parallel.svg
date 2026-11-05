@@ -1,0 +1,155 @@
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 470">
+
+    <rect
+        width="1000"
+        height="470"
+        rx="28"
+        fill="#fff7ed"
+    />
+
+    <text
+        x="45"
+        y="55"
+        font-family="Arial"
+        font-size="32"
+        font-weight="700"
+        fill="#172033"
+    >
+        Series vs Parallel Circuits
+    </text>
+
+    <!-- SERIES SIDE -->
+
+    <text
+        x="200"
+        y="105"
+        font-family="Arial"
+        font-size="25"
+        font-weight="700"
+        fill="#7c3aed"
+    >
+        SERIES
+    </text>
+
+    <path
+        d="M80 200 L430 200"
+        stroke="#334155"
+        stroke-width="7"
+        fill="none"
+    />
+
+    <circle
+        cx="190"
+        cy="200"
+        r="35"
+        fill="#fde68a"
+        stroke="#f59e0b"
+        stroke-width="5"
+    />
+
+    <circle
+        cx="330"
+        cy="200"
+        r="35"
+        fill="#fde68a"
+        stroke="#f59e0b"
+        stroke-width="5"
+    />
+
+    <text
+        x="95"
+        y="300"
+        font-family="Arial"
+        font-size="19"
+        fill="#172033"
+    >
+        One path for current
+    </text>
+
+    <text
+        x="95"
+        y="335"
+        font-family="Arial"
+        font-size="19"
+        fill="#172033"
+    >
+        Same current through components
+    </text>
+
+    <!-- PARALLEL SIDE -->
+
+    <text
+        x="685"
+        y="105"
+        font-family="Arial"
+        font-size="25"
+        font-weight="700"
+        fill="#15803d"
+    >
+        PARALLEL
+    </text>
+
+    <path
+        d="M560 150 L560 300"
+        stroke="#334155"
+        stroke-width="7"
+    />
+
+    <path
+        d="M900 150 L900 300"
+        stroke="#334155"
+        stroke-width="7"
+    />
+
+    <path
+        d="M560 165 L900 165"
+        stroke="#334155"
+        stroke-width="7"
+    />
+
+    <path
+        d="M560 285 L900 285"
+        stroke="#334155"
+        stroke-width="7"
+    />
+
+    <circle
+        cx="730"
+        cy="165"
+        r="33"
+        fill="#fde68a"
+        stroke="#f59e0b"
+        stroke-width="5"
+    />
+
+    <circle
+        cx="730"
+        cy="285"
+        r="33"
+        fill="#fde68a"
+        stroke="#f59e0b"
+        stroke-width="5"
+    />
+
+    <text
+        x="615"
+        y="370"
+        font-family="Arial"
+        font-size="19"
+        fill="#172033"
+    >
+        Multiple paths for current
+    </text>
+
+    <text
+        x="615"
+        y="405"
+        font-family="Arial"
+        font-size="19"
+        fill="#172033"
+    >
+        Same voltage across branches
+    </text>
+
+</svg>

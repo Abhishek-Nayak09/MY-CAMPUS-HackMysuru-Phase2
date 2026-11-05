@@ -389,7 +389,7 @@
 
 
                 window.location.href =
-                    `video.html?topic_id=${topicId}`;
+                    `video.html?topic_id=${topicId}&${new URLSearchParams(location.search).toString()}`;
             }
         );
 

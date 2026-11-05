@@ -1,0 +1,116 @@
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 430">
+
+    <rect
+        width="1000"
+        height="430"
+        rx="28"
+        fill="#eef2ff"
+    />
+
+    <text
+        x="45"
+        y="60"
+        font-family="Arial"
+        font-size="32"
+        font-weight="700"
+        fill="#172033"
+    >
+        How a Wave Travels
+    </text>
+
+    <line
+        x1="80"
+        y1="235"
+        x2="920"
+        y2="235"
+        stroke="#cbd5e1"
+        stroke-width="3"
+    />
+
+    <path
+        d="M80 235
+           Q130 115 180 235
+           T280 235
+           T380 235
+           T480 235
+           T580 235
+           T680 235
+           T780 235
+           T880 235"
+        fill="none"
+        stroke="#4f46e5"
+        stroke-width="8"
+        stroke-linecap="round"
+    >
+
+        <animateTransform
+            attributeName="transform"
+            type="translate"
+            values="0 0;40 0;0 0"
+            dur="2s"
+            repeatCount="indefinite"
+        />
+
+    </path>
+
+    <line
+        x1="130"
+        y1="235"
+        x2="130"
+        y2="120"
+        stroke="#16a34a"
+        stroke-width="5"
+    />
+
+    <text
+        x="145"
+        y="155"
+        font-family="Arial"
+        font-size="20"
+        fill="#15803d"
+    >
+        Amplitude
+    </text>
+
+    <line
+        x1="180"
+        y1="330"
+        x2="380"
+        y2="330"
+        stroke="#dc2626"
+        stroke-width="5"
+    />
+
+    <polygon
+        points="180,330 200,318 200,342"
+        fill="#dc2626"
+    />
+
+    <polygon
+        points="380,330 360,318 360,342"
+        fill="#dc2626"
+    />
+
+    <text
+        x="225"
+        y="370"
+        font-family="Arial"
+        font-size="20"
+        fill="#dc2626"
+    >
+        Wavelength
+    </text>
+
+    <text
+        x="500"
+        y="395"
+        font-family="Arial"
+        font-size="22"
+        font-weight="700"
+        fill="#172033"
+    >
+        Wave transfers energy without transporting matter overall
+    </text>
+
+</svg>

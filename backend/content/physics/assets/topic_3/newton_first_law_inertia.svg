@@ -1,0 +1,135 @@
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 430">
+
+    <rect
+        width="1000"
+        height="430"
+        rx="28"
+        fill="#fff7ed"
+    />
+
+    <text
+        x="45"
+        y="60"
+        font-family="Arial"
+        font-size="32"
+        font-weight="700"
+        fill="#172033"
+    >
+        Newton's First Law — Inertia
+    </text>
+
+    <!-- CAR -->
+
+    <rect
+        x="150"
+        y="230"
+        width="280"
+        height="85"
+        rx="25"
+        fill="#2563eb"
+    />
+
+    <circle
+        cx="205"
+        cy="320"
+        r="28"
+        fill="#111827"
+    />
+
+    <circle
+        cx="370"
+        cy="320"
+        r="28"
+        fill="#111827"
+    />
+
+    <!-- PASSENGER -->
+
+    <circle
+        cx="290"
+        cy="185"
+        r="28"
+        fill="#f59e0b"
+    />
+
+    <line
+        x1="290"
+        y1="213"
+        x2="290"
+        y2="265"
+        stroke="#172033"
+        stroke-width="10"
+    />
+
+    <!-- FORWARD BODY ARROW -->
+
+    <line
+        x1="300"
+        y1="150"
+        x2="520"
+        y2="150"
+        stroke="#ef4444"
+        stroke-width="9"
+    />
+
+    <polygon
+        points="540,150 505,130 505,170"
+        fill="#ef4444"
+    />
+
+    <text
+        x="350"
+        y="125"
+        font-family="Arial"
+        font-size="20"
+        fill="#ef4444"
+    >
+        Body tends to keep moving
+    </text>
+
+    <!-- BRAKE -->
+
+    <text
+        x="600"
+        y="230"
+        font-family="Arial"
+        font-size="25"
+        font-weight="700"
+        fill="#172033"
+    >
+        CAR BRAKES
+    </text>
+
+    <text
+        x="600"
+        y="275"
+        font-family="Arial"
+        font-size="20"
+        fill="#172033"
+    >
+        Car stops quickly
+    </text>
+
+    <text
+        x="600"
+        y="310"
+        font-family="Arial"
+        font-size="20"
+        fill="#172033"
+    >
+        Passenger tends to continue forward
+    </text>
+
+    <text
+        x="600"
+        y="350"
+        font-family="Arial"
+        font-size="22"
+        font-weight="700"
+        fill="#ea580c"
+    >
+        This is INERTIA
+    </text>
+
+</svg>

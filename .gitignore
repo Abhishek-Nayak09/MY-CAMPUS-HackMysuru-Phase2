@@ -61,3 +61,12 @@ FINAL_BIKE_FIX.ps1
 *.db
 *.sqlite
 *.sqlite3
+
+# Runtime database sidecars, initialization locks, backups and test output
+*.db-*
+*.sqlite-*
+*.initialize.lock
+backend/backups/
+.test-runs/
+.run/
+backend/resource_files/

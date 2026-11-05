@@ -385,7 +385,113 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
-### Start Backend
+### One-click Windows startup (recommended)
+
+Double-click `start_my_campus.bat`, or run from the repository root:
+
+```powershell
+.\start_my_campus.ps1
+# Optional: skip browser opening
+.\start_my_campus.ps1 -NoBrowser
+# Check the environment and port ownership without starting services
+.\start_my_campus.ps1 -ValidateOnly
+```
+
+The launcher finds an activated environment, a repository `.venv`, or the existing
+parent `.venv` (including `C:\hackthon my campus\.venv`). It validates imports,
+initializes safely, starts hidden local backend/frontend processes, waits for
+readiness, and opens the frontend. It reuses responding MY CAMPUS services on
+8000/5500 and rejects unrelated port occupants. Logs are in `.run/`.
+No operating-system settings are changed. The batch file uses execution-policy
+bypass only for that PowerShell process. If policy disallows it, use the direct
+Python commands below.
+
+### Automatic content initialization
+
+FastAPI's lifespan calls `app.db.initialize.initialize_database()` before serving
+requests, including when Uvicorn is started directly or with `--reload`. No seed
+commands are required. `setup_demo.py` and the legacy `seed_*.py` / video seed
+entry points call the same safe initializer for compatibility.
+
+The default database is always `backend/learning.db`, resolved from the backend
+source location rather than the shell's working directory. An explicit
+`DATABASE_URL` overrides it; use an absolute SQLite path. SQLite URLs supplied
+through this variable now receive SQLite's connection settings too. PostgreSQL
+URLs remain supported, but this change's automated migration checks cover SQLite.
+
+On the first migration of an existing SQLite database, SQLite's online backup API
+creates a unique `backend/backups/learning-before-initialize-*.db`. It includes
+committed WAL data and never overwrites `learning_backup.db`. Runtime databases,
+sidecars, backups, locks, logs and private faculty uploads are ignored by Git.
+Stop the backend before manually restoring a backup, and preserve the current DB
+and any WAL/SHM files before restoration.
+
+Initialization holds an OS file lock plus a SQLite `BEGIN IMMEDIATE` transaction
+(a transaction advisory lock on PostgreSQL). Table creation, the additive nullable
+`notes.level_id` migration, and content inserts commit together or roll back.
+Readers cannot observe partial content. Reload workers serialize initialization;
+process exit releases the lock. Do not delete the lock file while servers run.
+
+The initializer inserts missing rows using course/year/subject/level/topic identity,
+not hardcoded primary keys. It never deletes accounts, resets progress, updates
+existing note text, or replaces faculty resources. Missing section orders in
+recognized system-owned notes are restored; authored and inactive notes/resources
+are preserved. Conflicting custom curriculum slots stop startup with an error
+instead of silently replacing content. Existing notes without a level retain
+their original topic-level meaning. New note requests accept optional `level_id`;
+existing API URLs remain valid.
+
+### Content coverage and limits
+
+- Ten Physics topics remain ten database topics. The dashboard lists them under
+  each of Entry, Basics, Intermediate and Pro, using separate topic/level notes.
+- Forty note packages combine the original 118 rich sections with distinct level
+  explanations, assumptions, formulas and worked examples. Thirty bundled SVGs
+  restore missing generated assets without overwriting existing files.
+- Ten original YouTube resources are shared across levels. These are ten topic
+  videos, not forty level-specific recordings. Their links come from the original
+  repository; availability, regional access and embedding are controlled by
+  YouTube. Playback has not been verified for every video. The video page offers
+  a Notes fallback and explains external availability limits.
+- Entry is unlocked by default; higher levels retain the original unlock rules.
+  The original three ten-question tests and eight-correct pass threshold remain.
+  Their original question scope is unchanged (topics 1–2, 3–5, and 6–8). Incorrect
+  answers include explanations. Initialization does not touch attempts or scores.
+- Games and experiments keep their existing implementations. Dashboard and shared
+  resource routing use curriculum keys for bundled filenames and actual database
+  IDs for API calls. Notes and video navigation carry the selected level.
+- AI Tutor and faculty support are retained. External OpenAI responses require
+  `OPENAI_API_KEY`; the existing local tutor fallback is not an external AI service.
+
+### Verification and troubleshooting
+
+Run the isolated initialization tests from `backend` using the project Python:
+
+```powershell
+& 'C:\hackthon my campus\.venv\Scripts\python.exe' -m unittest discover -s tests -p test_initialization.py -v
+& 'C:\hackthon my campus\.venv\Scripts\python.exe' -X utf8 tests/test_faculty_hub.py
+```
+
+The initialization suite uses temporary databases for fresh starts, three repeat
+starts, populated legacy migration and backup, concurrent processes, rollback,
+nonstandard IDs, missing content repair, forty note API combinations, bundled
+assets, configured video URLs, student/faculty authentication, lifespan startup,
+and seven-versus-eight-correct unlock submissions. The faculty test uses an
+in-memory copy of the local DB; it does not save test accounts to that database.
+These checks do not prove external video playback, external AI availability, or
+every interaction in every Three.js game.
+
+If content is missing, restart the backend after updating source, refresh the
+dashboard, and confirm that `DATABASE_URL` points to the intended DB. Do not run
+old copies of destructive seed scripts. Initialization errors stop startup and
+appear in `.run/backend.err.log` or the Uvicorn terminal. For an occupied port,
+close the unrelated process yourself; the launcher does not kill it. If an
+existing MY CAMPUS server is reused, restart it to load new Python code. For a
+missing dependency, install `requirements.txt` into the Python environment printed
+by the launcher. Keep `bcrypt==4.0.1` for the existing Passlib integration. For a
+blocked video, open Notes; a configured URL does not guarantee playback.
+
+### Start Backend manually
 
 From the project root:
 

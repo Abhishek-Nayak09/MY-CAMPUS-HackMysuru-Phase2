@@ -1,0 +1,125 @@
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 470">
+
+    <rect
+        width="1000"
+        height="470"
+        rx="28"
+        fill="#eef2ff"
+    />
+
+    <text
+        x="45"
+        y="60"
+        font-family="Arial"
+        font-size="32"
+        font-weight="700"
+        fill="#172033"
+    >
+        Magnetic Field Around a Bar Magnet
+    </text>
+
+    <!-- MAGNET -->
+
+    <rect
+        x="365"
+        y="195"
+        width="135"
+        height="80"
+        rx="12"
+        fill="#ef4444"
+    />
+
+    <rect
+        x="500"
+        y="195"
+        width="135"
+        height="80"
+        rx="12"
+        fill="#2563eb"
+    />
+
+    <text
+        x="430"
+        y="245"
+        font-family="Arial"
+        font-size="32"
+        font-weight="700"
+        text-anchor="middle"
+        fill="white"
+    >
+        N
+    </text>
+
+    <text
+        x="565"
+        y="245"
+        font-family="Arial"
+        font-size="32"
+        font-weight="700"
+        text-anchor="middle"
+        fill="white"
+    >
+        S
+    </text>
+
+    <!-- FIELD LINES -->
+
+    <path
+        d="M390 190 C300 85, 700 85, 610 190"
+        fill="none"
+        stroke="#7c3aed"
+        stroke-width="5"
+    />
+
+    <path
+        d="M380 180 C220 20, 780 20, 620 180"
+        fill="none"
+        stroke="#7c3aed"
+        stroke-width="4"
+    />
+
+    <path
+        d="M390 280 C300 385, 700 385, 610 280"
+        fill="none"
+        stroke="#7c3aed"
+        stroke-width="5"
+    />
+
+    <path
+        d="M380 290 C220 450, 780 450, 620 290"
+        fill="none"
+        stroke="#7c3aed"
+        stroke-width="4"
+    />
+
+    <!-- MOVING FIELD DOTS -->
+
+    <circle r="9" fill="#16a34a">
+        <animateMotion
+            dur="3s"
+            repeatCount="indefinite"
+            path="M390 190 C300 85, 700 85, 610 190"
+        />
+    </circle>
+
+    <circle r="9" fill="#16a34a">
+        <animateMotion
+            dur="3s"
+            repeatCount="indefinite"
+            path="M390 280 C300 385, 700 385, 610 280"
+        />
+    </circle>
+
+    <text
+        x="250"
+        y="420"
+        font-family="Arial"
+        font-size="22"
+        font-weight="700"
+        fill="#4338ca"
+    >
+        Outside the magnet: field direction is N → S
+    </text>
+
+</svg>

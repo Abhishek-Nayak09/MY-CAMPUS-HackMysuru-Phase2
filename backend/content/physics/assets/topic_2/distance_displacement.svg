@@ -1,0 +1,112 @@
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 430">
+
+    <rect
+        width="1000"
+        height="430"
+        rx="28"
+        fill="#eef2ff"
+    />
+
+    <text
+        x="45"
+        y="60"
+        font-family="Arial"
+        font-size="32"
+        font-weight="700"
+        fill="#172033"
+    >
+        Distance vs Displacement
+    </text>
+
+    <!-- START -->
+
+    <circle
+        cx="130"
+        cy="310"
+        r="18"
+        fill="#22c55e"
+    />
+
+    <text
+        x="100"
+        y="350"
+        font-family="Arial"
+        font-size="20"
+        fill="#172033"
+    >
+        Start
+    </text>
+
+    <!-- END -->
+
+    <circle
+        cx="820"
+        cy="160"
+        r="18"
+        fill="#ef4444"
+    />
+
+    <text
+        x="800"
+        y="130"
+        font-family="Arial"
+        font-size="20"
+        fill="#172033"
+    >
+        End
+    </text>
+
+    <!-- CURVED DISTANCE -->
+
+    <path
+        d="M130 310
+           C260 100,
+            400 390,
+            560 180
+           C660 70,
+            730 260,
+            820 160"
+        fill="none"
+        stroke="#6366f1"
+        stroke-width="8"
+        stroke-dasharray="15 10"
+    />
+
+    <!-- DISPLACEMENT -->
+
+    <line
+        x1="130"
+        y1="310"
+        x2="820"
+        y2="160"
+        stroke="#f97316"
+        stroke-width="7"
+    />
+
+    <polygon
+        points="820,160 790,150 800,180"
+        fill="#f97316"
+    />
+
+    <text
+        x="380"
+        y="120"
+        font-family="Arial"
+        font-size="21"
+        fill="#4f46e5"
+    >
+        Actual path travelled = Distance
+    </text>
+
+    <text
+        x="430"
+        y="300"
+        font-family="Arial"
+        font-size="21"
+        fill="#ea580c"
+    >
+        Shortest straight path = Displacement
+    </text>
+
+</svg>

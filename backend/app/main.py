@@ -1,4 +1,6 @@
 from pathlib import Path
+from contextlib import asynccontextmanager
+from app.db.initialize import initialize_database
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -56,9 +58,10 @@ from app.api import adaptive_intelligence
 # CREATE DATABASE TABLES
 # ============================================================
 
-Base.metadata.create_all(
-    bind=engine
-)
+@asynccontextmanager
+async def lifespan(app):
+    initialize_database()
+    yield
 
 
 # ============================================================
@@ -67,6 +70,7 @@ Base.metadata.create_all(
 
 app = FastAPI(
 
+    lifespan=lifespan,
     title="My Campus API",
 
     description=(

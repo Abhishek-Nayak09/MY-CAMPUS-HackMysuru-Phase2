@@ -1,0 +1,128 @@
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 470">
+
+    <rect
+        width="1000"
+        height="470"
+        rx="28"
+        fill="#ecfdf5"
+    />
+
+    <text
+        x="45"
+        y="60"
+        font-family="Arial"
+        font-size="32"
+        font-weight="700"
+        fill="#172033"
+    >
+        Refraction — Light Changes Direction
+    </text>
+
+    <!-- INTERFACE -->
+
+    <line
+        x1="80"
+        y1="250"
+        x2="920"
+        y2="250"
+        stroke="#0f766e"
+        stroke-width="7"
+    />
+
+    <text
+        x="100"
+        y="225"
+        font-family="Arial"
+        font-size="21"
+        fill="#0f766e"
+    >
+        Air
+    </text>
+
+    <text
+        x="100"
+        y="290"
+        font-family="Arial"
+        font-size="21"
+        fill="#0369a1"
+    >
+        Glass / Water
+    </text>
+
+    <!-- NORMAL -->
+
+    <line
+        x1="500"
+        y1="90"
+        x2="500"
+        y2="410"
+        stroke="#94a3b8"
+        stroke-width="4"
+        stroke-dasharray="12 10"
+    />
+
+    <!-- INCIDENT -->
+
+    <line
+        x1="220"
+        y1="110"
+        x2="490"
+        y2="245"
+        stroke="#ef4444"
+        stroke-width="8"
+    />
+
+    <polygon
+        points="500,250 474,225 472,257"
+        fill="#ef4444"
+    />
+
+    <!-- REFRACTED -->
+
+    <line
+        x1="505"
+        y1="255"
+        x2="620"
+        y2="405"
+        stroke="#2563eb"
+        stroke-width="8"
+    />
+
+    <polygon
+        points="630,420 603,397 627,390"
+        fill="#2563eb"
+    />
+
+    <text
+        x="220"
+        y="145"
+        font-family="Arial"
+        font-size="20"
+        fill="#b91c1c"
+    >
+        Incident Light
+    </text>
+
+    <text
+        x="630"
+        y="360"
+        font-family="Arial"
+        font-size="20"
+        fill="#1d4ed8"
+    >
+        Refracted Light
+    </text>
+
+    <text
+        x="235"
+        y="445"
+        font-family="Arial"
+        font-size="22"
+        font-weight="700"
+        fill="#15803d"
+    >
+        Light changes speed and direction when entering another medium
+    </text>
+
+</svg>

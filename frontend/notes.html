@@ -1480,7 +1480,7 @@
 
             const response =
                 await fetch(
-                    `${API_BASE}/notes/topic/${topicId}`
+                    `${API_BASE}/notes/topic/${topicId}${params.get("level_id") ? "?level_id=" + encodeURIComponent(params.get("level_id")) : ""}`
                 );
 
 
@@ -1548,7 +1548,7 @@
         document.getElementById(
             "noteSubtitle"
         ).textContent =
-            notesData.note.subtitle || "";
+            [notesData.level?.name, notesData.note.subtitle].filter(Boolean).join(" • ");
 
 
         document.getElementById(

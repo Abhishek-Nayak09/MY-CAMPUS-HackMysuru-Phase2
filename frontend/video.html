@@ -1124,7 +1124,7 @@
 
                     <br>
 
-                    Educational video powered by YouTube Embed
+                    Shared topic lesson via YouTube. If playback is blocked or unavailable, continue with Notes. External availability is not guaranteed.
 
                 </div>
 
@@ -1460,7 +1460,7 @@
             if (!resourceURL) {
 
                 throw new Error(
-                    "Video URL is missing."
+                    "No playable video is configured. Open the Notes for this topic to continue learning."
                 );
 
             }
@@ -2147,7 +2147,7 @@
 
 
         window.location.href =
-            `notes.html?topic_id=${topicId}`;
+            `notes.html?topic_id=${topicId}${new URLSearchParams(location.search).get("level_id") ? "&level_id=" + encodeURIComponent(new URLSearchParams(location.search).get("level_id")) : ""}`;
 
     }
 
@@ -2189,8 +2189,11 @@
             "block";
 
 
-        box.textContent =
-            message;
+        box.textContent = message;
+        const link = document.createElement("a");
+        link.href = `notes.html?topic_id=${topicId}&${new URLSearchParams(location.search).toString()}`;
+        link.textContent = " Open topic notes";
+        box.appendChild(link);
 
     }
 

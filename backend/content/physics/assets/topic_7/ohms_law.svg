@@ -1,0 +1,154 @@
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 450">
+
+    <rect
+        width="1000"
+        height="450"
+        rx="28"
+        fill="#ecfdf5"
+    />
+
+    <text
+        x="45"
+        y="60"
+        font-family="Arial"
+        font-size="32"
+        font-weight="700"
+        fill="#172033"
+    >
+        Ohm's Law — Voltage, Current &amp; Resistance
+    </text>
+
+    <!-- VOLTAGE -->
+
+    <rect
+        x="80"
+        y="130"
+        width="230"
+        height="150"
+        rx="22"
+        fill="#dbeafe"
+        stroke="#2563eb"
+        stroke-width="4"
+    />
+
+    <text
+        x="195"
+        y="185"
+        text-anchor="middle"
+        font-family="Arial"
+        font-size="28"
+        font-weight="700"
+        fill="#1d4ed8"
+    >
+        VOLTAGE
+    </text>
+
+    <text
+        x="195"
+        y="230"
+        text-anchor="middle"
+        font-family="Arial"
+        font-size="44"
+        font-weight="700"
+        fill="#1d4ed8"
+    >
+        V
+    </text>
+
+    <!-- CURRENT -->
+
+    <rect
+        x="385"
+        y="130"
+        width="230"
+        height="150"
+        rx="22"
+        fill="#dcfce7"
+        stroke="#16a34a"
+        stroke-width="4"
+    />
+
+    <text
+        x="500"
+        y="185"
+        text-anchor="middle"
+        font-family="Arial"
+        font-size="28"
+        font-weight="700"
+        fill="#15803d"
+    >
+        CURRENT
+    </text>
+
+    <text
+        x="500"
+        y="230"
+        text-anchor="middle"
+        font-family="Arial"
+        font-size="44"
+        font-weight="700"
+        fill="#15803d"
+    >
+        I
+    </text>
+
+    <!-- RESISTANCE -->
+
+    <rect
+        x="690"
+        y="130"
+        width="230"
+        height="150"
+        rx="22"
+        fill="#fee2e2"
+        stroke="#dc2626"
+        stroke-width="4"
+    />
+
+    <text
+        x="805"
+        y="185"
+        text-anchor="middle"
+        font-family="Arial"
+        font-size="25"
+        font-weight="700"
+        fill="#b91c1c"
+    >
+        RESISTANCE
+    </text>
+
+    <text
+        x="805"
+        y="230"
+        text-anchor="middle"
+        font-family="Arial"
+        font-size="44"
+        font-weight="700"
+        fill="#b91c1c"
+    >
+        R
+    </text>
+
+    <text
+        x="355"
+        y="365"
+        font-family="Arial"
+        font-size="40"
+        font-weight="700"
+        fill="#172033"
+    >
+        V = I × R
+    </text>
+
+    <text
+        x="280"
+        y="410"
+        font-family="Arial"
+        font-size="21"
+        fill="#172033"
+    >
+        More voltage pushes more current; resistance opposes current
+    </text>
+
+</svg>

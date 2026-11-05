@@ -3112,7 +3112,7 @@
                     <div>
 
                         <span class="topic-index">
-                            TOPIC ${topic.id}
+                            TOPIC ${topic.curriculum_key || topicIndex + 1}
                         </span>
 
                         <div class="topic-title">
@@ -3163,7 +3163,7 @@
                     () => {
 
                         window.location.href =
-                            `notes.html?topic_id=${topic.id}`;
+                            `notes.html?topic_id=${topic.id}&level_id=${topic.level_id}`;
 
                     }
                 )
@@ -3178,7 +3178,7 @@
                     () => {
 
                         window.location.href =
-                            `video.html?topic_id=${topic.id}`;
+                            `video.html?topic_id=${topic.id}&level_id=${topic.level_id}`;
 
                     }
                 )
@@ -3192,7 +3192,7 @@
                     levelUnlocked,
                     () => {
 
-                        const interactiveId = Number(topic.id); if (interactiveId >= 1 && interactiveId <= 10) { const page = interactiveId === 1 ? "interactive.html" : `interactive_topic_${interactiveId}.html`; window.location.href = `${page}?topic_id=${interactiveId}`; } else { alert("Interactive lab is not available for this topic yet."); }
+                        const interactiveId = Number(topic.curriculum_key); if (interactiveId >= 1 && interactiveId <= 10) { const page = interactiveId === 1 ? "interactive.html" : `interactive_topic_${interactiveId}.html`; window.location.href = `${page}?topic_id=${topic.id}`; } else { alert("Interactive lab is not available for this topic yet."); }
 
                     }
                 )
@@ -3228,7 +3228,7 @@
 
                         const gameTopicId =
                             Number(
-                                topic.id
+                                topic.curriculum_key
                             );
 
 
@@ -3317,7 +3317,7 @@
 
                         window.location.href =
                             `${gamePage}?topic_id=${encodeURIComponent(
-                                gameTopicId
+                                topic.id
                             )}&resource=game`;
 
                     }

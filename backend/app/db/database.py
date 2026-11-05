@@ -58,7 +58,7 @@ if ENV_DATABASE_URL:
         ENV_DATABASE_URL
     )
 
-    USING_SQLITE = False
+    USING_SQLITE = DATABASE_URL.startswith("sqlite:")
 
 else:
 
@@ -82,7 +82,8 @@ if USING_SQLITE:
 
         connect_args={
             "check_same_thread":
-                False
+                False,
+            "timeout": 120
         },
 
         pool_pre_ping=True,
