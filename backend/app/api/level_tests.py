@@ -1,4 +1,5 @@
 import json
+from random import SystemRandom
 
 from datetime import datetime
 from typing import List
@@ -192,6 +193,13 @@ def load_options(
     except Exception:
 
         return []
+
+
+def shuffled_options(options_json: str):
+    """Shuffle a response-only copy; grading still uses the saved answer text."""
+    options = load_options(options_json)
+    SystemRandom().shuffle(options)
+    return options
 
 
 def get_test_questions(
@@ -527,7 +535,7 @@ def get_unlock_test(
                 question.question_text,
 
             "options":
-                load_options(
+                shuffled_options(
                     question.options_json
                 )
         })

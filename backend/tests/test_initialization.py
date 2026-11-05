@@ -243,6 +243,71 @@ class InitializationTests(unittest.TestCase):
                     self.assertEqual(client.get('/health').status_code,200)
             self.assertEqual(initialize.call_count,3)
 
+    def test_quiz_options_are_shuffled_on_each_request_without_db_changes(self):
+        user = self.register('student')
+        with Session(self.engine) as db:
+            levels = db.query(Level).order_by(Level.level_order).all()
+            for level in levels:
+                db.add(StudentLevelProgress(user_id=user['id'], subject_id=level.subject_id,
+                    level_id=level.id, is_unlocked=True, best_score=0))
+            db.commit()
+            source_ids = [level.id for level in levels[:-1]]
+            bank = {q.id: (json.loads(q.options_json), q.correct_answer)
+                    for q in db.query(LevelTestQuestion)}
+        before = self.snapshot()
+        calls = 0
+        def rotate(options):
+            # Deterministic permutations keep this regression test non-flaky.
+            nonlocal calls
+            calls += 1
+            shift = calls % len(options)
+            options[:] = options[shift:] + options[:shift]
+        positions = set()
+        with patch('app.api.level_tests.SystemRandom.shuffle', side_effect=rotate) as shuffle:
+            for source_id in source_ids:
+                batches = []
+                for _ in range(2):
+                    response = self.client.get(f"/level-tests/test/{user['id']}/{source_id}")
+                    self.assertEqual(response.status_code, 200, response.text)
+                    questions = response.json()['questions']
+                    self.assertEqual(len(questions), 10)
+                    batches.append(questions)
+                    for question in questions:
+                        original, correct = bank[question['id']]
+                        self.assertCountEqual(question['options'], original)
+                        self.assertNotIn('correct_answer', question)
+                        self.assertNotIn('explanation', question)
+                        positions.add(question['options'].index(correct))
+                self.assertEqual([q['id'] for q in batches[0]], [q['id'] for q in batches[1]])
+                self.assertTrue(all(a['options'] != b['options'] for a,b in zip(*batches)))
+            self.assertEqual(shuffle.call_count, 60)
+        self.assertEqual(positions, {0, 1, 2, 3})
+        self.assertEqual(before, self.snapshot())
+
+    def test_shuffled_quiz_submission_still_scores_by_answer_text(self):
+        user = self.register('student')
+        with Session(self.engine) as db:
+            source_id = db.query(Level).filter_by(name='Entry').one().id
+            correct = {q.id:q.correct_answer for q in db.query(LevelTestQuestion)
+                       .filter_by(source_level_id=source_id)}
+        with patch('app.api.level_tests.SystemRandom.shuffle', side_effect=lambda options: options.reverse()):
+            response = self.client.get(f"/level-tests/test/{user['id']}/{source_id}")
+        self.assertEqual(response.status_code, 200, response.text)
+        displayed = response.json()['questions']
+        answers = []
+        for i, question in enumerate(displayed):
+            answer = correct[question['id']]
+            self.assertEqual(question['options'][-1], answer)
+            selected = answer if i < 8 else next(option for option in question['options'] if option != answer)
+            answers.append({'question_id':question['id'], 'selected_answer':selected})
+        result = self.client.post(f'/level-tests/submit/{source_id}',
+                                 json={'user_id':user['id'], 'answers':answers})
+        self.assertEqual(result.status_code, 200, result.text)
+        self.assertEqual(result.json()['score'], 8)
+        self.assertTrue(result.json()['passed'])
+        self.assertEqual(len(result.json()['wrong_answers']), 2)
+        self.assertTrue(all(item['explanation'] for item in result.json()['wrong_answers']))
+
     def test_unlock_rule_and_wrong_answer_explanations(self):
         user=self.register('student')
         with Session(self.engine) as db:

@@ -458,7 +458,10 @@ existing API URLs remain valid.
 - Entry is unlocked by default; higher levels retain the original unlock rules.
   The original three ten-question tests and eight-correct pass threshold remain.
   Their original question scope is unchanged (topics 1–2, 3–5, and 6–8). Incorrect
-  answers include explanations. Initialization does not touch attempts or scores.
+  answers include explanations. Options are shuffled independently for every
+  question when a quiz is opened; correct answers can appear in any position.
+  Grading compares answer text, so shuffling does not affect scores or existing
+  attempts. Initialization does not touch attempts or scores.
 - Games and experiments keep their existing implementations. Dashboard and shared
   resource routing use curriculum keys for bundled filenames and actual database
   IDs for API calls. Notes and video navigation carry the selected level.
