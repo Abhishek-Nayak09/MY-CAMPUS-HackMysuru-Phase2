@@ -77,3 +77,12 @@ concurrency tests here cover SQLite.
 
 Use `start_my_campus.bat` for one-click Windows startup. Direct Uvicorn commands
 remain supported. See README for commands and troubleshooting.
+
+## Learning-path grouping correction
+
+The learning path now shows ten topics total, each in its stored level exactly
+once: Entry 1–2, Basics 3–5, Intermediate 6–8, Pro 9–10. The API previously
+repeated all ten topics in each level; its query now filters by both subject and
+level. A regression check asserts the exact groups and ten unique topic IDs.
+Existing alternate note packages, authored content and student progress are
+retained; this correction changes the learning-path response only.

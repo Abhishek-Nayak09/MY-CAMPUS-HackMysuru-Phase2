@@ -443,8 +443,10 @@ existing API URLs remain valid.
 
 ### Content coverage and limits
 
-- Ten Physics topics remain ten database topics. The dashboard lists them under
-  each of Entry, Basics, Intermediate and Pro, using separate topic/level notes.
+- The dashboard divides ten Physics topics across four levels without repeats:
+  Entry: topics 1–2; Basics: 3–5; Intermediate: 6–8; Pro: 9–10. Each topic uses
+  its stored `level_id`, matching the original curriculum and unlock tests.
+  Alternate note packages are retained without duplicating dashboard topics.
 - Forty note packages combine the original 118 rich sections with distinct level
   explanations, assumptions, formulas and worked examples. Thirty bundled SVGs
   restore missing generated assets without overwriting existing files.

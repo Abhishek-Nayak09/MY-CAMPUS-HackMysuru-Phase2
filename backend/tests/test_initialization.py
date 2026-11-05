@@ -83,10 +83,19 @@ class InitializationTests(unittest.TestCase):
         subjects = self.client.get(f"/student/courses/{courses[0]['id']}/years/{years[0]['id']}/subjects").json()['subjects']
         path = self.client.get(f"/student/subjects/{subjects[0]['id']}/learning-path").json()['student_learning_path']
         self.assertEqual([l['is_unlocked'] for l in path['levels']], [True, False, False, False])
+        expected_groups = {
+            'Entry': [1, 2], 'Basics': [3, 4, 5],
+            'Intermediate': [6, 7, 8], 'Pro': [9, 10],
+        }
+        all_topics = [topic for level in path['levels'] for topic in level['topics']]
+        self.assertEqual(len(all_topics), 10)
+        self.assertEqual(len({topic['id'] for topic in all_topics}), 10)
         for level in path['levels']:
-            self.assertEqual(len(level['topics']), 10)
-            self.assertEqual([t['curriculum_key'] for t in level['topics']], list(range(1,11)))
-            for topic in level['topics']:
+            self.assertEqual([t['curriculum_key'] for t in level['topics']], expected_groups[level['name']])
+            self.assertTrue(all(t['level_id'] == level['id'] for t in level['topics']))
+            # Retained alternate notes remain available through the optional API
+            # level parameter, but topics appear only once in the learning path.
+            for topic in all_topics:
                 response = self.client.get(f"/notes/topic/{topic['id']}?level_id={level['id']}")
                 self.assertEqual(response.status_code, 200, response.text)
                 sections = response.json()['sections']

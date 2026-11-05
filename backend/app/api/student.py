@@ -202,16 +202,14 @@ def get_subject_learning_path(
         topics = (
             db.query(Topic)
             .filter(
-                Topic.subject_id == subject.id
+                Topic.subject_id == subject.id,
+                Topic.level_id == level.id
             )
             .order_by(
                 Topic.topic_order
             )
             .all()
         )
-        topics = [topic for topic in topics if topic.level_id == level.id or (
-            (subject.code == "PHY101" or subject.name == "Physics") and topic.title in TOPIC_KEYS
-        )]
         topics.sort(key=lambda topic: (TOPIC_KEYS.get(topic.title, 1000), topic.topic_order))
 
         level_list.append(
