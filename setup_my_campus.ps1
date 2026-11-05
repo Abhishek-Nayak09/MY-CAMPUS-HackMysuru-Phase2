@@ -15,7 +15,9 @@ try {
             if ($install -and $install.ExecutablePath) { $registeredPython += $install.ExecutablePath }
         }
     }
-    $candidates = @($localPython, 'py.exe') + $registeredPython + @('python.exe', 'python3.exe')
+    # Respect the interpreter selected on PATH (including actions/setup-python),
+    # rather than py -3 choosing an unrelated newer installation that needs builds.
+    $candidates = @($localPython, 'python.exe', 'python3.exe') + $registeredPython + @('py.exe')
     foreach ($candidate in $candidates) {
         if ([IO.Path]::IsPathRooted($candidate)) {
             if (-not (Test-Path -LiteralPath $candidate)) { continue }
@@ -24,6 +26,7 @@ try {
             $command = Get-Command $candidate -ErrorAction SilentlyContinue
             if (-not $command) { continue }
             $commandPath = $command.Source
+            if ($commandPath -match '\\WindowsApps\\python') { continue }
         }
         $prefix = @()
         if ($candidate -eq 'py.exe') { $prefix = @('-3') }
