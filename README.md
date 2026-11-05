@@ -3,6 +3,24 @@
 > **Hack Mysuru 1.0 · Phase 2 Submission**  
 > An adaptive learning platform that understands what a student knows, how they learn best, and when human support is needed.
 
+### Fresh clone or update: content is included in Git
+
+With Python 3.10+ installed, clone/pull this repository and double-click
+**`start_my_campus.bat`** on Windows. If no usable project environment exists,
+startup creates `.venv` and installs `requirements.txt` automatically. First-time
+installation needs internet access. It then initializes the local database and
+bundled diagrams before opening the application. No database download or manual
+seed scripts are needed.
+
+You can also run **`setup_my_campus.bat`** explicitly after cloning or pulling to
+prepare/update dependencies and initialize content, then start the application.
+On other platforms use `python3 setup_my_campus.py`, then the manual server
+commands below. Existing accounts and learning progress are retained.
+
+See [fresh-install verification](FRESH_INSTALL.md) for the exact clean-checkout
+test, coverage and troubleshooting. GitHub Actions runs the fresh-start content
+check on Windows and Linux for pushes and pull requests.
+
 ---
 
 ## 1. Problem Understanding
@@ -397,12 +415,15 @@ Double-click `start_my_campus.bat`, or run from the repository root:
 .\start_my_campus.ps1 -ValidateOnly
 ```
 
-The launcher finds an activated environment, a repository `.venv`, or the existing
-parent `.venv` (including `C:\hackthon my campus\.venv`). It validates imports,
+The launcher prefers the repository `.venv`, then a usable existing parent `.venv`
+(including `C:\hackthon my campus\.venv`). If neither is usable it prepares a
+repository-owned environment automatically. It validates imports,
 initializes safely, starts hidden local backend/frontend processes, waits for
 readiness, and opens the frontend. It reuses responding MY CAMPUS services on
 8000/5500 and rejects unrelated port occupants. Logs are in `.run/`.
-No operating-system settings are changed. The batch file uses execution-policy
+Managed environments record the requirements hash and reinstall dependencies
+after it changes. `pip check` and application imports must pass before setup is
+marked complete. No operating-system settings are changed. The batch file uses execution-policy
 bypass only for that PowerShell process. If policy disallows it, use the direct
 Python commands below.
 
@@ -486,7 +507,12 @@ in-memory copy of the local DB; it does not save test accounts to that database.
 These checks do not prove external video playback, external AI availability, or
 every interaction in every Three.js game.
 
-If content is missing, restart the backend after updating source, refresh the
+`/health` checks actual content availability: ten topics, four levels, ten usable
+native notes/videos and thirty quiz questions. It returns HTTP 503 when required
+content is incomplete. The launcher also checks the backend's checkout/database
+identity, so another project's server on port 8000 cannot silently pass startup.
+
+If content is missing, run `setup_my_campus.bat`, restart the backend after updating source, refresh the
 dashboard, and confirm that `DATABASE_URL` points to the intended DB. Do not run
 old copies of destructive seed scripts. Initialization errors stop startup and
 appear in `.run/backend.err.log` or the Uvicorn terminal. For an occupied port,

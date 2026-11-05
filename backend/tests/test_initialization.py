@@ -243,6 +243,36 @@ class InitializationTests(unittest.TestCase):
                     self.assertEqual(client.get('/health').status_code,200)
             self.assertEqual(initialize.call_count,3)
 
+    def test_health_detects_missing_learning_resources(self):
+        healthy = self.client.get('/health').json()
+        self.assertEqual(healthy['status'], 'healthy')
+        self.assertTrue(healthy['content']['ready'])
+        self.assertEqual(healthy['content']['topics'], 10)
+        self.assertTrue(healthy['instance_id'])
+        with Session(self.engine) as db:
+            db.query(LearningContent).filter_by(resource_type='video').update({'is_active': False})
+            db.commit()
+        response = self.client.get('/health')
+        self.assertEqual(response.status_code, 503)
+        degraded = response.json()
+        self.assertEqual(degraded['status'], 'degraded')
+        self.assertFalse(degraded['content']['ready'])
+        self.assertEqual(degraded['content']['videos'], 0)
+        self.assertEqual(degraded['instance_id'], healthy['instance_id'])
+
+    def test_empty_database_is_not_reported_content_ready(self):
+        from app.services.curriculum import content_status
+        bind = create_engine('sqlite:///' + (Path(self.temp.name) / 'empty.db').as_posix())
+        try:
+            Base.metadata.create_all(bind)
+            with Session(bind) as db:
+                status = content_status(db)
+            self.assertFalse(status['ready'])
+            self.assertEqual(status['topics'], 0)
+            self.assertEqual(status['notes'], 0)
+        finally:
+            bind.dispose()
+
     def test_quiz_options_are_shuffled_on_each_request_without_db_changes(self):
         user = self.register('student')
         with Session(self.engine) as db:

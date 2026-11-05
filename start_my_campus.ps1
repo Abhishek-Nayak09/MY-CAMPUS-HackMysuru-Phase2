@@ -6,13 +6,15 @@ $backendRoot = Join-Path $projectRoot 'backend'
 $frontendRoot = Join-Path $projectRoot 'frontend'
 $runRoot = Join-Path $projectRoot '.run'
 $startedProcesses = @()
+$expectedInstance = $null
 
 function Get-CampusService([int]$Port, [string]$Kind) {
     # Probe HTTP first: Windows CIM port inventory can omit existing listeners.
     try {
         if ($Kind -eq 'backend') {
-            $response = Invoke-RestMethod -Uri "http://127.0.0.1:$Port/" -TimeoutSec 3
-            if ($response.application -ne 'My Campus') { throw 'Unexpected API' }
+            $response = Invoke-RestMethod -Uri "http://127.0.0.1:$Port/health" -TimeoutSec 3
+            if ($response.instance_id -ne $expectedInstance) { throw 'A different checkout/database or outdated MY CAMPUS backend is using this port. Stop that backend and restart from this repository.' }
+            if ($response.status -ne 'healthy' -or -not $response.content.ready) { throw 'Learning content is incomplete. Run setup_my_campus.bat and check DATABASE_URL.' }
         } else {
             $response = Invoke-WebRequest -Uri "http://127.0.0.1:$Port/index.html" -UseBasicParsing -TimeoutSec 3
             if ($response.Content -notmatch '(?i)my\s*campus') { throw 'Unexpected frontend' }
@@ -24,7 +26,7 @@ function Get-CampusService([int]$Port, [string]$Kind) {
             if (-not $pending.AsyncWaitHandle.WaitOne(500)) { return $false }
             $probe.EndConnect($pending)
         } catch { return $false } finally { $probe.Dispose() }
-        throw "Port $Port is occupied by another service. Stop it or use the existing project's server."
+        throw "Port $Port cannot be reused: $($_.Exception.Message)"
     }
     return $true
 }
@@ -41,20 +43,39 @@ function Wait-CampusService([int]$Port, [string]$Kind, $Process) {
 }
 
 try {
-    $candidates = @()
-    if ($env:VIRTUAL_ENV) { $candidates += (Join-Path $env:VIRTUAL_ENV 'Scripts\python.exe') }
-    $candidates += (Join-Path $projectRoot '.venv\Scripts\python.exe')
-    $candidates += (Join-Path (Split-Path $projectRoot -Parent) '.venv\Scripts\python.exe')
-    $pythonExe = $candidates | Where-Object { Test-Path -LiteralPath $_ } | Select-Object -First 1
-    if (-not $pythonExe) { throw 'No virtual environment found. Create .venv and install requirements.txt first.' }
-    & $pythonExe -c "import fastapi,uvicorn,sqlalchemy,httpx,passlib,bcrypt,email_validator,multipart; assert int(bcrypt.__version__.split('.')[0]) < 5, 'Install bcrypt==4.0.1 for passlib compatibility'"
-    if ($LASTEXITCODE -ne 0) { throw "Dependency validation failed. Run: & '$pythonExe' -m pip install -r '$projectRoot\requirements.txt'" }
+    $localPython = Join-Path $projectRoot '.venv\Scripts\python.exe'
+    $candidates = @($localPython, (Join-Path (Split-Path $projectRoot -Parent) '.venv\Scripts\python.exe'))
+    $pythonExe = $null
+    foreach ($candidate in $candidates) {
+        if (-not (Test-Path -LiteralPath $candidate)) { continue }
+        & $candidate -c "import importlib.util; raise SystemExit(0 if all(importlib.util.find_spec(m) for m in ['fastapi','uvicorn','sqlalchemy','httpx','passlib','bcrypt','email_validator','multipart']) else 1)"
+        if ($LASTEXITCODE -eq 0) { $pythonExe = $candidate; break }
+    }
+    if (-not $pythonExe) {
+        if ($ValidateOnly) { throw 'Run setup_my_campus.bat to prepare the project environment first.' }
+        & (Join-Path $projectRoot 'setup_my_campus.ps1') -PrepareOnly
+        if ($LASTEXITCODE -ne 0) { throw 'Automatic first-time environment setup failed.' }
+        $pythonExe = $localPython
+    } elseif ($pythonExe -eq $localPython -and -not $ValidateOnly) {
+        & $pythonExe (Join-Path $projectRoot 'setup_my_campus.py') --prepare-only
+        if ($LASTEXITCODE -ne 0) { throw 'Project dependency preparation failed.' }
+    }
+    & $pythonExe -c "import fastapi,uvicorn,sqlalchemy,httpx,passlib,bcrypt,email_validator,multipart; assert bcrypt.__version__ == '4.0.1', 'Run setup_my_campus.bat to install compatible dependencies'"
+    if ($LASTEXITCODE -ne 0) { throw 'Dependency validation failed. Run setup_my_campus.bat.' }
     Write-Host "Python: $pythonExe"
+    Push-Location $backendRoot
+    try {
+        $expectedInstance = & $pythonExe -c 'from app.services.runtime_info import INSTANCE_ID; print(INSTANCE_ID)'
+        if ($LASTEXITCODE -ne 0) { throw 'Could not determine project/database identity.' }
+        $expectedInstance = $expectedInstance.Trim()
+    } finally { Pop-Location }
+    if (-not $ValidateOnly) {
+        & $pythonExe -X utf8 (Join-Path $projectRoot 'setup_demo.py')
+        if ($LASTEXITCODE -ne 0) { throw 'Safe initialization failed. Servers have not been started.' }
+    }
     $backendRunning = Get-CampusService 8000 'backend'
     $frontendRunning = Get-CampusService 5500 'frontend'
-    if ($ValidateOnly) { Write-Host 'Launcher prerequisites validated.'; exit 0 }
-    & $pythonExe (Join-Path $projectRoot 'setup_demo.py')
-    if ($LASTEXITCODE -ne 0) { throw 'Safe initialization failed. Servers have not been started.' }
+    if ($ValidateOnly) { Write-Host 'Launcher prerequisites and existing service content validated.'; exit 0 }
     New-Item -ItemType Directory -Path $runRoot -Force | Out-Null
     if (-not $backendRunning) {
         $backendArgs = @('-m','uvicorn','app.main:app','--host','127.0.0.1','--port','8000')

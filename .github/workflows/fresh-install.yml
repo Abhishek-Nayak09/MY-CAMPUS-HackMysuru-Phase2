@@ -1,0 +1,51 @@
+name: Fresh installation and content
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  fresh-install:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    env:
+      PYTHONPATH: backend
+      PYTHONIOENCODING: utf-8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - name: Install committed requirements into a clean runner
+        run: python -m pip install -r requirements.txt
+      - name: Verify startup creates content without seed commands
+        run: python scripts/verify_fresh_install.py
+      - name: Initialization, content, auth and randomized-quiz tests
+        run: python -m unittest discover -s backend/tests -p test_initialization.py -v
+      - name: Prepare default database for the existing faculty integration test
+        run: python setup_demo.py
+      - name: Faculty resource and ticket regression checks
+        run: python -X utf8 backend/tests/test_faculty_hub.py
+      - name: Windows one-click setup and repeat-start verification
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: |
+          .\setup_my_campus.ps1
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          .\start_my_campus.ps1 -NoBrowser
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $before = Invoke-RestMethod http://127.0.0.1:8000/health
+          .\start_my_campus.ps1 -NoBrowser
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $after = Invoke-RestMethod http://127.0.0.1:8000/health
+          if (-not $after.content.ready -or $before.process_id -ne $after.process_id) {
+            throw 'Repeat launch must reuse the same initialized backend.'
+          }

@@ -1,8 +1,13 @@
 from pathlib import Path
+import os
 from contextlib import asynccontextmanager
 from app.db.initialize import initialize_database
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends, Response
+from sqlalchemy.orm import Session
+from app.db.database import get_db
+from app.services.curriculum import content_status
+from app.services.runtime_info import INSTANCE_ID
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
@@ -216,12 +221,20 @@ def root():
 # ============================================================
 
 @app.get("/health")
-def health():
+def health(response: Response, db: Session = Depends(get_db)):
+
+    content_readiness = content_status(db)
+    if not content_readiness['ready']:
+        response.status_code = 503
 
     return {
 
         "status":
-            "healthy",
+            "healthy" if content_readiness['ready'] else "degraded",
+
+        "instance_id": INSTANCE_ID,
+        "process_id": os.getpid(),
+        "content": content_readiness,
 
         "database":
             "connected",

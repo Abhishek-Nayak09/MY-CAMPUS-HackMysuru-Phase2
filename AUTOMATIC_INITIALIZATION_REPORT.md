@@ -86,3 +86,20 @@ repeated all ten topics in each level; its query now filters by both subject and
 level. A regression check asserts the exact groups and ten unique topic IDs.
 Existing alternate note packages, authored content and student progress are
 retained; this correction changes the learning-path response only.
+
+## Reproducible fresh-install upgrade
+
+A separate GitHub clone was created with no database, uploads or virtual
+environment copied from the working project. Its committed dependencies were
+installed into a newly created environment. Backend startup with a new disposable
+database then passed the real-server fresh-install verifier: content, diagrams,
+registration/login, every unlock transition and two genuine worker restarts.
+The normal project DB is never used by that verifier.
+
+The repo now also includes Windows/Python first-time setup, automatic environment
+preparation from the launcher, dependency-hash tracking and compatibility checks,
+content-aware HTTP 503 readiness, checkout/database identity checking, fourteen
+regression tests, and a Windows/Linux GitHub Actions workflow. Wrong-checkout
+service reuse was rejected in a negative test; isolated Windows startup and
+repeat-launch worker reuse passed. See FRESH_INSTALL.md for the repeatable flow
+and the distinction between local checks and remote Actions results.
